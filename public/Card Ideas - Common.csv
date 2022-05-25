@@ -1,0 +1,24 @@
+Name,Type,Subtype,Element,Strength,Armor,Agility,Will,Traits,Text,Materials
+Commerce,Ability,,,,,,,,Destroy a friendly Item. Reveal the top 5 cards of your deck. Add an item of the same type to your Inventory.,
+Diplomatic Solution,Ability,,None,,,min2,,,React: Prevent all damage to this character.,
+Hone,Ability,,None,,,,,,This character's next Sharp or Piercing attack this turn does +2 damage On Hit.,
+Teleport,Ability,,None,,,,min3,,Move this character up to 4. Action +1. ,
+Greatship,Location,,Water,,,,,,,"Metal, Rope, Hide, Wood"
+Health Potion,Item,Potion,,,,,,,Use: Heal 5. Draw a card.,Soul
+Leather Armor,Item,Armor,None,0,+2,0,0,"Armor, Light, Chest",,Hide
+Lighthammer,Item,Weapon,None,+1,0,0,0,"Hammer, 1-Handed, Blunt",,Metal
+Long Axe,Item,Weapon,None,+3,+1,-1,0,"Axe, 2-Handed, Sharp",,Metal
+Longbow,Item,Weapon,None,+4,-3,0,0,"Bow, 2-Handed, Piercing",,"Wood, Rope"
+Longsword,Item,Weapon,None,+3,+1,-1,0,"Sword, 2-Handed, Sharp",,Metal
+Plate Armor,Item,Armor,None,0,+4,-2,0,"Armor, Heavy, Chest",,"Metal, Metal"
+Short Axe,Item,Weapon,None,+1,0,0,0,"Axe, 1-Handed, Sharp",,Metal
+Shortbow,Item,Weapon,None,+2,-2,0,0,"Bow, 2-Handed, Piercing",,"Wood, Rope"
+Shortsword,Item,Weapon,None,+1,0,0,0,"Sword, 1-Handed, Sharp",,Metal
+Sledgehammer,Item,Weapon,None,+3,+1,-1,0,"Hammer, 2-Handed, Blunt",,Metal
+Farmhouse,Location,,Earth,,,,,,,"Hide, Metal, Rope"
+Tree-on-Cliff,Location,,Earth,,,,,,,"Metal, Wood"
+Dwarven Fortress,Location,Castle,Earth,,,,,,,
+Woodland,Location,Wild,Earth,,,,,,,Wood
+Item Shop,Location,Vendor,,,,,,,Sells goods,
+First City,Location,Settlement,,,,,,,,
+Little Village,Location,Settlement,,,,,,,Place some sheeps around,

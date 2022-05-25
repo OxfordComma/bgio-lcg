@@ -1,0 +1,40 @@
+#container{
+	width: 100vw;
+	height: 100vh;
+	
+}
+
+.myhand {
+	display: flex;
+	flex-direction: row;
+	grid-area: hand;
+}
+
+.board {
+	display: grid;
+	grid-template-rows: 75% 25%;
+	grid-template-columns: 60% 40%;
+	width: 100%;
+	height: 100%;
+	grid-template-areas: 
+		'battlefield controls'
+		'hand controls'
+}
+
+.battlefield {
+	display: grid;
+	height: 100%;
+	width: 100%;
+	grid-template-rows: repeat(6, 1fr);
+	grid-template-columns: repeat(5, 1fr);
+	grid-area: battlefield;
+}
+
+.gamestate {
+	display: flex;
+	flex-direction: column;
+}
+
+.card:hover {
+	/*opacity:  0.5;*/
+}

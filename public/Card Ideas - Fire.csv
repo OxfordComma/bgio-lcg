@@ -1,0 +1,24 @@
+Name,Type,Subtype,Element,Might,Armor,Agility,Will,Traits,Text,Materials,Recipe
+Fireball,Ability,,Fire,,,,min2,Destruction,+3 Ranged attack.,,
+Desecrate,Ability,Tactic,Fire,,,,,Destruction,Characters cannot move through target space.,,
+Fury,Ability,,Fire,,,,,,+3 Might this turn. -3 Armor this turn.,,
+Channel,Ability,,Fire,,,,,,-X Soul: Perform a +X ranged attack.,,
+Fire Dagger,Ability,Thief,Fire,,,,m1,Conjuration,Equip a +1 Might offhand Sword weapon.,Soul,
+,,,,,,,,,,,
+Berserker,Character,Fighter,Fire,3,2,2,,,"O: +2 Melee attack.
+D: React - After being hit by a basic attack, if the attacking character is in range, perform a -4 basic attack against them.",,
+Pyromancer,Character,Mage,Fire,3,0,2,,,"O: +0 Ranged attack.
+O: Burn target character. Range 2.",,
+Fire Rogue,Character,Rogue,Fire,1,1,3,,,"O: 1 damage Melee attack. Draw a card.
+D: The next attack that targets this character misses.",,
+Hero,Character,Fighter,Fire,5,4,2,,Leader,"O: +2 Melee attack.
+O: You may move up to 3 spaces in one direction and then make a -2 melee attack.
+D: The next time an adjacent character would take damage from an opponent's attack, this character takes that damage instead.",,
+Rebirth Potion,Item,,Fire,,,,,,Use: Recruit a character from the Crypt.,,
+Fire Core,Location,Core,Fire,-,20,-,,,"Draw +1. At the end of your turn, discard a card from your hand.",,
+Volcano,Location,,Fire,,,,,Quest,"Complete: Have 5 or more of your characters on the field.
+Reward: Draw a card for each of your characters on the field.",Metal,
+Campfire,Location,,Fire,,,,,,Characters in this row have +1 Might. Fire characters in this row have +3 Might.,Soul,
+Obsidian Mine,Location,,Fire,,,,,,Enter: +3 Soul or +3 Metal.,Metal,
+Heatwell,Location,,Fire,,,,,,"Build: +1 Soul. 
+-3 Soul: Draw a card.",Soul,
