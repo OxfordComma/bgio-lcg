@@ -12,7 +12,7 @@ function selectDeck(G, ctx, deckName, playerID) {
 	deck = Decks().filter(d => d.name==deckName)[0]
 	deck['cards'] = []
 	Object.keys(deck['decklist']).map(cardName => {
-		let card = Cards().filter(c => c.Name == cardName)[0]
+		let card = Cards().filter(c => c.name == cardName)[0]
 		let numCardNameInDeck = deck['decklist'][cardName]
 		// For each card, add the appropriate number to the deck 
 		// And assign it an ID based on the order it was assigned
@@ -23,7 +23,6 @@ function selectDeck(G, ctx, deckName, playerID) {
 		}
 	})
 
-	
 	G['decklists'][0] = deck.decklist
 	G['decklists'][1] = deck.decklist
 }
@@ -68,21 +67,31 @@ function selectHandCard(G, ctx, id) {
 }
 
 
-function selectFieldCard(G, ctx, id) {
-	console.log('select field card at id:', id)
+function selectLandscapeCard(G, ctx, id) {
+	console.log('select landscape card with id:', id)
 
 	let currentPlayer = G.players[ctx.currentPlayer]
 
-	if (id === currentPlayer.selectedFieldID)
-		G.players[ctx.currentPlayer].selectedFieldID = null
+	if (id === currentPlayer.selectedLandscapeID)
+		G.players[ctx.currentPlayer].selectedLandscapeID = null
 	else
-		G.players[ctx.currentPlayer].selectedFieldID = id
+		G.players[ctx.currentPlayer].selectedLandscapeID = id
 
-	// if (currentPlayer.selectedHandCardID && currentPlayer.selectedFieldID) {
+	// if (currentPlayer.selectedHandCardID && currentPlayer.selectedLandscapeID) {
 	// 	console.log('play card')
 	// 	ctx.moves.playCard(G, ctx, currentPlayer.selectedHandCardID)
 	// }
 
+}
+
+function selectBeingCard(G, ctx, id) {
+	console.log('select being card with id:', id)
+	let currentPlayer = G.players[ctx.currentPlayer]
+
+	if (id === currentPlayer.selectedBeingID)
+		G.players[ctx.currentPlayer].selectedBeingID = null
+	else
+		G.players[ctx.currentPlayer].selectedBeingID = id
 }
 
 
@@ -110,48 +119,52 @@ function addLocationResources(G, ctx, id) {
 export const CardGame = {
 	name: 'battle-dudes',
 	setup: (ctx) => {
-		let field0 = []
-		let field1 = []
-		console.log(field0)
+		let landscape0 = []
+		let landscape1 = []
+		console.log(landscape0)
 
 		for (let i=0; i < 15; i++) {
-			let field = {
-				fieldID: i.toString(), 
-				fieldCardID: null
+			let landscape = {
+				landscapeID: i.toString(), 
+				landscapeCardID: null
 			}
 
-			field0 = field0.concat(field)
-			field1 = field1.concat(field)
+			landscape0 = landscape0.concat(landscape)
+			landscape1 = landscape1.concat(landscape)
 		}
 
 		return { 
 			players: {
 				'0': {
 					handIDs: [],
+					beingIDs: [],
 					selectedHandCardID: null,
-					selectedFieldID: null,
+					selectedLandscapeID: null,
+					selectedBeingID: null,
 				},
 				'1': {
 					handIDs: [],
+					beingIDs: [],
 					selectedHandCardID: null,
-					selectedFieldID: null,					
+					selectedLandscapeID: null,	
+					selectedBeingID: null,				
 				}
 			},
 			resources: {
 				'0': {
 					metal: 0,
 					wood: 0,
-					mana: 0,
+					soul: 0,
 				},
 				'1': {
 					metal: 0,
 					wood: 0,
-					mana: 0,
+					soul: 0,
 				}
 			},
-			field: {
-				'0': field0,
-				'1': field1
+			landscape: {
+				'0': landscape0,
+				'1': landscape1
 			},
 			decklists: {
 				'0': null,
@@ -167,8 +180,12 @@ export const CardGame = {
 			move: selectHandCard,
 			noLimit: true,
 		},
-		selectFieldCard: {
-			move: selectFieldCard,
+		selectLandscapeCard: {
+			move: selectLandscapeCard,
+			noLimit: true,
+		},
+		selectBeingCard: {
+			move: selectBeingCard,
 			noLimit: true,
 		},
 		playCard: playCard,
@@ -181,9 +198,9 @@ export const CardGame = {
 		order: TurnOrder.RESET,
 		onBegin: (G, ctx) => {
 			console.log('turn begin')
-			G.field[ctx.currentPlayer].map(f => {
-				if(f.fieldCardID != null)
-					addLocationResources(G, ctx, f.fieldCardID)
+			G.landscape[ctx.currentPlayer].map(f => {
+				if(f.landscapeCardID != null)
+					addLocationResources(G, ctx, f.landscapeCardID)
 			})
 		},
 		minMoves: 0,

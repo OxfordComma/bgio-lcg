@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Cards } from './Cards'
 import './styles/Board.css'
 
-function Card({card, selectedHandCardID, onClick, customStyle, fields}) {
+function Card({card, selectedHandCardID, onClick, customStyle}) {
   let style = {
     border: '1px solid #555',
     backgroundColor: selectedHandCardID == card.id ? 'yellow' : 'white',
@@ -11,13 +11,11 @@ function Card({card, selectedHandCardID, onClick, customStyle, fields}) {
   }
   return (
     <div className='card' style={style}>
-      <div>{card ? 'id' + card.id : ''}</div>
-      <div>{card ? '#' + card.Number : ''}</div>
-      <div>{card ? card.Name : ''}</div>
-      <div>{card ? card.Type : ''}</div>
-      <div>{card ? card.Subtype : ''}</div>
-      <div>{card ? card.Materials : ''}</div>
-      <div>{card ? card.Text : ''}</div>
+      {/*<div>{card ? 'id' + card.id : ''}</div>*/}
+      {/*<div>{card ? '#' + card.number : ''}</div>*/}
+      <div>{card ? `${card.name} (${card.id})` : ''}</div>
+      <div>{card ? `${card.type} ${card.subtype}`: ''}</div>
+      <div>{card ? card.text : ''}</div>
   </div>)
 }
 
@@ -50,40 +48,44 @@ function HandCard({card, selectedHandCardID, onClick}) {
 }
 
 
-function LocationCard({ onClick, selectedFieldID, field, card}) {
-  let cardID = field.fieldCardID
-  let fieldID = field.fieldID
+function LocationCard({ onClick, selectedLandscapeID, landscape, card}) {
+  let cardID = landscape.landscapeCardID
+  let landscapeID = landscape.landscapeID
   
   let style = {
     border: '1px solid #555',
     width: '100%',
     height: '100%',
-    backgroundColor: (selectedFieldID == fieldID) ? 'yellow' : 'white',
+    backgroundColor: (selectedLandscapeID == landscapeID) ? 'yellow' : 'white',
   }
   return (
     card == undefined ? 
       <div onClick={onClick} style={style}/> : 
       <div onClick={onClick} className='card' style={style}>
         <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? card.Name : ''}</div>
+        <div>{card ? card.name : ''}</div>
     </div>
   )
 }
+
+// function BeingCard({ onClick, selectedLandscapeID, landscape, card}) {
+
+// }
 
 function Menu({G, ctx, moves, events, playerID}) {
   let [deck, setDeck] = useState('')
   function onSubmit(event, events) {
     event.preventDefault()
     console.log('menu submit:', event.target)
-    let deckType = event.target.value
-    console.log(deckType)
-    if (deckType == 'fire')
+    let decktype = event.target.value
+    console.log(decktype)
+    if (decktype == 'fire')
       moves.selectDeck('Fire Deck', playerID)
-   if (deckType == 'water')
+   if (decktype == 'water')
       moves.selectDeck('Fire Deck', playerID)
-    if (deckType == 'earth')
+    if (decktype == 'earth')
       moves.selectDeck('Fire Deck', playerID)
-    if (deckType == 'air')
+    if (decktype == 'air')
       moves.selectDeck('Fire Deck', playerID)
      // console.log(events)
     else
@@ -114,9 +116,9 @@ function Menu({G, ctx, moves, events, playerID}) {
   </div>
 }
 
-function Battlefield({ ctx, G, moves, playerID }) {
+function Battle({ ctx, G, moves, playerID }) {
   let [selectedHandCardID, setSelectedHandCardID] = useState(null)
-  let [selectedFieldID, setSelectedFieldID] = useState(null)
+  let [selectedLandscapeID, setSelectedLandscapeID] = useState(null)
 
   let [showTooltip, setShowTooltip] = useState(null)
   let [x, setX] = useState()
@@ -137,10 +139,10 @@ function Battlefield({ ctx, G, moves, playerID }) {
   let cards = []
   let decklist = G.decklists[playerID]
   // console.log(G.decklists)
-  Object.keys(decklist).map(cardName => {
-    let numCards = decklist[cardName]
+  Object.keys(decklist).map(cardname => {
+    let numCards = decklist[cardname]
     // console.log('numCards:', numCarfds)
-    let card = Cards().filter(c => c.Name == cardName)[0]
+    let card = Cards().filter(c => c.name == cardname)[0]
     // console.log('card:', card)
     for (let i = 0; i<numCards; i++)  {
       let obj = {...card}
@@ -154,21 +156,21 @@ function Battlefield({ ctx, G, moves, playerID }) {
   // console.log(player)
   return (
     <div className='board'>
-      <div className='battlefield'>
-        {G.field[opponentID].slice(0).reverse().map(field => 
+      <div className='landscape'>
+        {G.landscape[opponentID].slice(0).reverse().map(landscape => 
           <LocationCard
-            onClick={e => { e.preventDefault(); console.log('click field'); moves.selectFieldCard(field.fieldID) }} 
-            selectedFieldID={null} 
-            field={field} 
-            card={cards.filter(c => c.id == field.fieldCardID)[0]}
+            onClick={e => { e.preventDefault(); console.log('click landscape'); moves.selectLandscapeCard(landscape.landscapeID) }} 
+            selectedLandscapeID={null} 
+            landscape={landscape} 
+            card={cards.filter(c => c.id == landscape.landscapeCardID)[0]}
           />
         )}
-        {G.field[playerID].map(field => 
+        {G.landscape[playerID].map(landscape => 
           <LocationCard
-            onClick={e => { e.preventDefault(); console.log('click field'); moves.selectFieldCard(field.fieldID) }} 
-            selectedFieldID={G.players[ctx.currentPlayer]?.selectedFieldID} 
-            field={field} 
-            card={cards.filter(c => c.id == field.fieldCardID)[0]}
+            onClick={e => { e.preventDefault(); console.log('click landscape'); moves.selectLandscapeCard(landscape.landscapeID) }} 
+            selectedLandscapeID={G.players[ctx.currentPlayer]?.selectedLandscapeID} 
+            landscape={landscape} 
+            card={cards.filter(c => c.id == landscape.landscapeCardID)[0]}
           />
         )}
       </div>
@@ -191,6 +193,20 @@ function Battlefield({ ctx, G, moves, playerID }) {
         <div>Wood:{G.resources[ctx.currentPlayer].wood}</div>
         <div>Mana:{G.resources[ctx.currentPlayer].mana}</div>
       </div>
+      <div className='battlefield'>
+        {player.beingIDs.map(beingID => {
+          let card = cards.filter(c => c.id == beingID)[0]
+          return (
+            <div id={card.id} onMouseMove={onHover} onMouseOut={e => setShowTooltip(null)}  onClick={e => {e.preventDefault(); moves.selectBeingCard(e.target.id)} }>
+              <Tooltip show={showTooltip == card.id} card={card} x={x+5} y={y-240} />
+              <HandCard 
+                onClick={e => { e.preventDefault(); moves.selectBeingCard(beingID) }} 
+                selectedHandCardID={G.players[ctx.currentPlayer]?.selectedHandCardID} 
+                card={card}
+              />
+            </div>)
+        })}
+      </div>
       <div className='controls'>
         <button onClick={e =>  {
           if (G.players[ctx.currentPlayer].selectedHandCardID != null)
@@ -212,7 +228,7 @@ export function GameBoard({ G, ctx, moves, events, playerID }) {
           events={events}
           playerID={playerID}
         /> : 
-        <Battlefield  
+        <Battle  
           G={G}
           ctx={ctx}
           moves={moves}
