@@ -1,4 +1,4 @@
-#container{
+.container{
 	width: 100vw;
 	height: 100vh;
 	
@@ -8,44 +8,31 @@
 	display: flex;
 	flex-direction: row;
 	grid-area: hand;
-	overflow-x: scroll;
 }
 
 .board {
 	display: grid;
-	grid-template-rows: 50% 25% 25%;
-	grid-template-columns: 50% 50%;
+	grid-template-rows: 75% 25%;
+	grid-template-columns: 60% 40%;
 	width: 100%;
 	height: 100%;
 	grid-template-areas: 
-		'landscape charinfo'
-		'landscape battlefield'
-		'hand controls';
+		'battlefield controls'
+		'hand controls'
 }
 
-.landscape {
+.battlefield {
 	display: grid;
 	height: 100%;
 	width: 100%;
 	grid-template-rows: repeat(6, 1fr);
 	grid-template-columns: repeat(5, 1fr);
-	grid-area: landscape;
-}
-
-.battlefield {
-	display: flex;
-	flex-direction: row;
 	grid-area: battlefield;
 }
 
 .gamestate {
 	display: flex;
 	flex-direction: column;
-	grid-area: charinfo;
-}
-
-.card {
-	font-size: 0.8em;
 }
 
 .card:hover {
