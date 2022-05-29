@@ -1,14 +1,14 @@
 import { Client } from 'boardgame.io/react';
 import { Local, SocketIO } from 'boardgame.io/multiplayer';
 import { CardGame } from './Game';
-import { GameBoard } from './Board';
+import { Board } from './Board';
 import { PlayerSelectMenu } from './PlayerSelectMenu';
 
 import React, { useState, useEffect } from 'react'
 
 const CardGameClient = Client({
   game: CardGame,
-  board: GameBoard,
+  board: Board,
   multiplayer: Local(),
   // playerID: 0
   // multiplayer: SocketIO({ server: '192.168.0.6:8000' }),

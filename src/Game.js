@@ -55,17 +55,17 @@ function selectHandCard(G, ctx, id) {
 }
 
 
-function selectFieldCard(G, ctx, id) {
-	console.log('select field card at id:', id)
+function selectLandscapeCard(G, ctx, id) {
+	console.log('select landscape card at id:', id)
 
 	let currentPlayer = G.players[ctx.currentPlayer]
 
-	if (id === currentPlayer.selectedFieldID)
-		G.players[ctx.currentPlayer].selectedFieldID = null
+	if (id === currentPlayer.selectedLandscapeID)
+		G.players[ctx.currentPlayer].selectedLandscapeID = null
 	else
-		G.players[ctx.currentPlayer].selectedFieldID = id
+		G.players[ctx.currentPlayer].selectedLandscapeID = id
 
-	// if (currentPlayer.selectedHandCardID && currentPlayer.selectedFieldID) {
+	// if (currentPlayer.selectedHandCardID && currentPlayer.selectedLandscapeID) {
 	// 	console.log('play card')
 	// 	ctx.moves.playCard(G, ctx, currentPlayer.selectedHandCardID)
 	// }
@@ -75,19 +75,44 @@ function selectFieldCard(G, ctx, id) {
 
 function playCard(G, ctx, id) {
 	if (!!id) {
+		console.log('play card:', id)
 		const card = G.cards[ctx.currentPlayer].find(c => c.id === id);
     const player = G.players[ctx.currentPlayer];
-    if (card.Type === 'Location') {
-      if (player.selectedHandCardID && player.selectedFieldID) {
-        console.log('you can play this card!');
-        player.handIDs = player?.handIDs?.filter(cid => cid !== player?.selectedHandCardID);
-        G.field[player.selectedFieldID].fieldCardID = player?.selectedHandCardID;
+
+    const landscapes = G.landscapes[ctx.currentPlayer];
+    let beings = G.beings[ctx.currentPlayer];
+    if (card.type === "Location") {
+    	// console.log({card, player, landscape, beings})
+    	// console.log(player.selectedLandscapeID)
+    	// console.log(parseInt(player.selectedLandscapeID))
+    	// console.log(landscape[parseInt(player.selectedLandscapeID)])
+      if (player.selectedHandCardID && player.selectedLandscapeID) {
+        console.log('you can play this location card!');
+        player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
+        landscapes[parseInt(player.selectedLandscapeID)]['landscapeCardID'] = player.selectedHandCardID;
       }
 
       G.players[ctx.currentPlayer] = player;
+      G.landscapes[ctx.currentPlayer] = landscapes;
+    }
+
+    if (card.type === "Being") {
+      if (player.selectedHandCardID) {
+        console.log('you can play this being card!');
+        player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
+        beings = beings.concat({
+        	beingCardID: player.selectedHandCardID,
+        	id: beings.length,
+        })
+
+      }
+
+      G.players[ctx.currentPlayer] = player;
+      G.beings[ctx.currentPlayer] = beings;
     }
     return G;
 	}
+	// else {console.log('!!id')}
 	
 }
 
@@ -113,21 +138,29 @@ function addLocationResources(G, ctx, id) {
 export const CardGame = {
 	name: 'battle-dudes',
 	setup: (ctx) => {
-		const field = Array.from({length: 30}).map((_, i) => ({
-			id: i.toString(), 
-			fieldCardID: null
+		// Changed this id back so the indices would make sense from the perspective of both players,
+		// otherwise one player has high indices
+		const landscapes = Array.from({length: 30}).map((_, i) => ({
+			id: (i%15).toString(), 
+			landscapeCardID: null
 		}));
+
+		const landscape0 = landscapes.slice(0, 15);
+		const landscape1 = landscapes.slice(15, 30);
 		return { 
 			players: {
 				'0': {
 					handIDs: [],
 					selectedHandCardID: null,
-					selectedFieldID: null,
+					selectedLandscapeID: null,
+					selectedBeingID: null
 				},
 				'1': {
 					handIDs: [],
 					selectedHandCardID: null,
-					selectedFieldID: null,					
+					selectedLandscapeID: null,
+					selectedBeingID: null,
+
 				}
 			},
 			decks: [
@@ -162,7 +195,14 @@ export const CardGame = {
 					mana: 0,
 				}
 			},
-			field,
+			landscapes: {
+				'0': landscape0,
+				'1': landscape1,
+			},
+			beings: {
+				'0': [],
+				'1': [],
+			},
 			cards: {
 				'0': null,
 				'1': null
@@ -181,8 +221,8 @@ export const CardGame = {
 			move: selectHandCard,
 			noLimit: true,
 		},
-		selectFieldCard: {
-			move: selectFieldCard,
+		selectLandscapeCard: {
+			move: selectLandscapeCard,
 			noLimit: true,
 		},
 		playCard: playCard,
@@ -195,9 +235,9 @@ export const CardGame = {
 		order: TurnOrder.RESET,
 		onBegin: (G, ctx) => {
 			console.log('turn begin')
-			G.field.forEach(f => {
-				if (f.fieldCardID != null)
-					addLocationResources(G, ctx, f.fieldCardID)
+			G.landscapes[ctx.currentPlayer].forEach(f => {
+				if (f.landscapeCardID != null)
+					addLocationResources(G, ctx, f.landscapeCardID)
 			})
 		},
 		minMoves: 0,

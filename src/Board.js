@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { SelectDeckMenu } from './SelectDeckMenu';
 import { PlayerHand } from './PlayerHand';
-import { PlayingField } from './PlayingField';
+import { Landscape } from './Landscape';
+import { Battlefield } from './Battlefield';
 import './styles/Board.css';
 
 
@@ -19,14 +20,15 @@ function Controls({ onPlayCard }) {
   </div>
 }
 
-function Battlefield({ ctx, G, cards, fields, playerResources, playerHand, selectedFieldID, selectedHandCardID, onSelectField, onSelectCard, onPlayCard}) {
+function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResources, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
   return (
     <div className="board">
-      <PlayingField
-        fields={fields}
+      <Landscape
+        playerID={playerID}
+        landscapes={landscapes}
         cards={cards}
-        onSelect={onSelectField}
-        selectedFieldID={selectedFieldID}
+        onSelect={onSelectLandscape}
+        selectedLandscapeID={selectedLandscapeID}
       />
       <PlayerHand 
         hand={playerHand}
@@ -34,20 +36,28 @@ function Battlefield({ ctx, G, cards, fields, playerResources, playerHand, selec
         onSelectCard={onSelectCard}
       />
       <PlayerResources resources={playerResources} />
+      <Battlefield
+        playerID={playerID}
+        beings={beings}
+        cards={cards}
+        onSelectCard={null}
+        selectedBeingID={selectedBeingID}
+      />
       <Controls onPlayCard={onPlayCard} />
     </div>
   )
 }
 
 
-function AboveBattlefield({ ctx, G, moves, playerID }) {
+function PlayGameMenu({ ctx, G, moves, playerID }) {
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find(p => p !== playerID);
   let cards = [ ...G.cards["0"], ...G.cards["1"] ]; // for now
 
   const [selectedHandCardID, setSelectedHandCardID] = useState(null);
-  const [selectedFieldID, setSelectedFieldID] = useState(null);
+  const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
+  const [selectedBeingID, setSelectedBeingID] = useState(null);
 
   function onSelectCard(cardID) {
     setSelectedHandCardID(cardID);
@@ -55,43 +65,48 @@ function AboveBattlefield({ ctx, G, moves, playerID }) {
   }
 
   function onPlayCard() {
-    setSelectedFieldID(null);
-    setSelectedHandCardID(null);
+    console.log('play card')
     !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
+    setSelectedLandscapeID(null);
+    setSelectedHandCardID(null);
+
   }
 
-  const fields = G.field;
+  const landscapes = G.landscapes;
 
+  const beings = G.beings;
   const resources = G.resources[ctx.currentPlayer];
 
   const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
 
-  function onSelectField(fieldID) {
-    setSelectedFieldID(fieldID);
-    moves.selectFieldCard(fieldID);
+  function onSelectLandscape(landscapeID) {
+    setSelectedLandscapeID(landscapeID);
+    moves.selectLandscapeCard(landscapeID);
   }
 
-  return <Battlefield
+  return <GameBoard
     cards={cards}
-    fields={fields}
+    landscapes={landscapes}
+    beings={beings}
     playerResources={resources}
     playerHand={playerHand}
     playerID={playerID}
     moves={moves}
     selectedHandCardID={selectedHandCardID}
-    selectedFieldID={selectedFieldID}
+    selectedBeingID={selectedBeingID}
+    selectedLandscapeID={selectedLandscapeID}
     onSelectCard={onSelectCard}
     onPlayCard={onPlayCard}
-    onSelectField={onSelectField}
+    onSelectLandscape={onSelectLandscape}
   />;
 }
 
-export function GameBoard({ G, ctx, moves, events, playerID }) {
+
+export function Board({ G, ctx, moves, events, playerID }) {
   function onDeckSelect(deckType) {
     moves.selectDeck('Fire Deck', playerID);
     // moves.selectDeck(deckType, playerID)
   }
-
   return (
     <div className="container">
       {ctx.phase === 'menu' ? 
@@ -99,7 +114,7 @@ export function GameBoard({ G, ctx, moves, events, playerID }) {
           decks={G.decks}
           onDeckSelect={onDeckSelect}
         /> : 
-        <AboveBattlefield 
+        <PlayGameMenu 
           G={G}
           ctx={ctx}
           moves={moves}

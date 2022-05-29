@@ -8,23 +8,14 @@ function DetailedCardInfo({card, isSelected, customStyle}) {
       pointerEvents: 'none',
       ...customStyle
     }
-    const nameStyle = {
-      'fontWeight': 'bold',
-      'textAlign': 'center'
-    }
-
-    const materials = !!card.materials ? Object.keys(card.materials).map(k => card.materials[k]+' '+k).join(', ') : ''
-    const production = !!card.production ? Object.keys(card.production).map(k => card.production[k]+' '+k).join(', ') : ''
-
     return (
       <div className='card' style={style}>
         <div>{card ? 'id' + card.id : ''}</div>
         <div>{card ? '#' + card.number : ''}</div>
-        <div style={nameStyle}>{card ? card.name : ''}</div>
+        <div>{card ? card.name : ''}</div>
         <div>{card ? card.type : ''}</div>
         <div>{card ? card.subtype : ''}</div>
-        <div>{card ? materials : ''}</div>
-        <div>{card ? production : ''}</div>
+        <div>{card ? card.materials : ''}</div>
         <div>{card ? card.text : ''}</div>
     </div>)
   }
@@ -73,18 +64,26 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
     );
   }
 
-export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
-  console.log(hand)
+export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelectCard }) {
   return (
-  <div className="myhand" >
-    {hand.map(card => 
-      <PlayerHandCard 
-        key={'card' + card.id} 
-        card={card} 
-        isSelected={(card.id === selectedCardID)} 
+  <div className="battlefield" >
+    { beings[['0', '1'].filter(p => p !== playerID)].map(being => 
+      <PlayerHandCard
+        key={"being" + being.id.toString()}
+        being={being}
+        card={cards.find(c => c.id === being.beingCardID)}
+        isSelected={ false }
         onSelect={onSelectCard}
       />
-    )
-    }
+    )}
+    { beings[playerID].map(being => 
+      <PlayerHandCard
+        key={"being" + being.id.toString()}
+        being={being}
+        card={cards.find(c => c.id === being.beingCardID)}
+        isSelected={ selectedBeingID === being.id }
+        onSelect={onSelectCard}
+      />
+    )}
   </div>)
 }
