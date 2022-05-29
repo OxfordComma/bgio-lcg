@@ -87,15 +87,17 @@ function AboveBattlefield({ ctx, G, moves, playerID }) {
 }
 
 export function GameBoard({ G, ctx, moves, events, playerID }) {
+  function onDeckSelect(deckType) {
+    moves.selectDeck('Fire Deck', playerID);
+    // moves.selectDeck(deckType, playerID)
+  }
+
   return (
     <div className="container">
       {ctx.phase === 'menu' ? 
         <SelectDeckMenu
-          G={G}
-          ctx={ctx}
-          moves={moves}
-          events={events}
-          playerID={playerID}
+          decks={G.decks}
+          onDeckSelect={onDeckSelect}
         /> : 
         <AboveBattlefield 
           G={G}

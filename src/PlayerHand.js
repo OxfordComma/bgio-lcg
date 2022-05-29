@@ -8,11 +8,13 @@ function DetailedCardInfo({card, isSelected, customStyle}) {
       pointerEvents: 'none',
       ...customStyle
     }
+    const nameStyle = {
+      'font-weight': 'bold',
+      'text-align': 'center'
+    }
     return (
       <div className='card' style={style}>
-        <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? '#' + card.Number : ''}</div>
-        <div>{card ? card.Name : ''}</div>
+        <div style={nameStyle}>{card ? card.Name : ''}</div>
         <div>{card ? card.Type : ''}</div>
         <div>{card ? card.Subtype : ''}</div>
         <div>{card ? card.Materials : ''}</div>

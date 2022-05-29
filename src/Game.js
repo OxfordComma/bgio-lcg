@@ -4,6 +4,7 @@ import { Decks } from './Decks'
 // import { CardFunctions } from './CardFunctions'
 
 
+
 function selectDeck(G, ctx, deckName, playerID) {
 	const deck = Decks().find(d => d.name === deckName);
 	const decklist = deck.decklist;
@@ -129,6 +130,24 @@ export const CardGame = {
 					selectedFieldID: null,					
 				}
 			},
+			decks: [
+				{
+					"name": "Fire",
+					"id": "fire"
+				},
+				{
+					"name": "Water",
+					"id": "water"
+				},
+				{
+					"name": "Earth",
+					"id": "earth"
+				},
+				{
+					"name": "Air",
+					"id": "air"
+				},
+			],
 			resources: {
 				'0': {
 					metal: 0,
