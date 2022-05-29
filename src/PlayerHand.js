@@ -69,7 +69,7 @@ export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
   <div className="myhand" >
     {hand.map(card => 
       <PlayerHandCard 
-        key={"card" + card.id} 
+        key={'card' + card.id} 
         card={card} 
         isSelected={(card.id === selectedCardID)} 
         onSelect={onSelectCard}

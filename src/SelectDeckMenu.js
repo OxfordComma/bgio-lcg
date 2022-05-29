@@ -21,24 +21,24 @@ export function SelectDeckMenu({G, ctx, moves, events, playerID}) {
   
     return <div>
       <form onSubmit={e => onSubmit(e, events)}>
-        <div id='deckselect'>
-          <label for='fire'>Fire</label>
-          <input id='fire' type='radio' value='fire'/>
-          <label for='water'>Water</label>
-          <input id='water' type='radio' value='water'/>
-          <label for='earth'>Earth</label>
-          <input id='earth' type='radio' value='earth'/>
-          <label for='air'>Air</label>
-          <input id='air' type='radio' value='air'/>
+        <div id="deckselect">
+          <label for="fire">Fire</label>
+          <input id="fire" type="radio" value="fire"/>
+          <label for="water">Water</label>
+          <input id="water" type="radio" value="water"/>
+          <label for="earth">Earth</label>
+          <input id="earth" type="radio" value="earth"/>
+          <label for="air">Air</label>
+          <input id="air" type="radio" value="air"/>
         </div>
-        {/*<div id='playerselect'>
-          <label for='player'>Player ID:</label>
-          <select id='player' type='dropdown'>
+        {/*<div id="playerselect">
+          <label for="player">Player ID:</label>
+          <select id="player" type="dropdown">
             <option>0</option>
             <option>1</option>
           </select>
         </div>*/}
-        <button type='submit'>submit</button>
+        <button type="submit">submit</button>
       </form>
     </div>
   }
