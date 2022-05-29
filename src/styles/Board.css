@@ -8,9 +8,9 @@
 	display: flex;
 	flex-direction: row;
 	grid-area: hand;
-	font-size: small;
 	overflow-x: scroll;
 	overflow-y: hidden;
+  font-size: 0.6em;
 }
 
 .board {
@@ -34,12 +34,14 @@
 	grid-template-rows: repeat(6, 1fr);
 	grid-template-columns: repeat(5, 1fr);
 	grid-area: landscape;
+  font-size: 0.6em;
 }
 
 .battlefield {
 	display: grid;
 	grid-template-rows: 50% 50%;
 	grid-area: battlefield;
+  font-size: 0.6em;
 }
 
 .myside, .theirside {
