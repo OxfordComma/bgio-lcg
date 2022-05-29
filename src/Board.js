@@ -1,120 +1,234 @@
-import React, { useState } from 'react';
-import { SelectDeckMenu } from './SelectDeckMenu';
-import { PlayerHand } from './PlayerHand';
-import { Landscape } from './Landscape';
-import { Battlefield } from './Battlefield';
-import './styles/Board.css';
+import React, { useState, useEffect } from 'react'
+import { Cards } from './Cards'
+import './styles/Board.css'
 
-
-function PlayerResources({ resources }) {
-  return <div className="gamestate">
-    <div>Metal:{resources.metal}</div>
-    <div>Wood:{resources.wood}</div>
-    <div>Mana:{resources.mana}</div>
-  </div>
-}
-
-function Controls({ onPlayCard }) {
-  return <div className="controls">
-    <button onClick={e => {e.preventDefault(); onPlayCard() }}>play</button>
-  </div>
-}
-
-function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResources, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
+function Card({card, selectedHandCardID, onClick, customStyle}) {
+  let style = {
+    border: '1px solid #555',
+    backgroundColor: selectedHandCardID == card.id ? 'yellow' : 'white',
+    pointerEvents: 'none',
+    ...customStyle
+  }
   return (
-    <div className="board">
-      <Landscape
-        playerID={playerID}
-        landscapes={landscapes}
-        cards={cards}
-        onSelect={onSelectLandscape}
-        selectedLandscapeID={selectedLandscapeID}
-      />
-      <PlayerHand 
-        hand={playerHand}
-        selectedCardID={selectedHandCardID}
-        onSelectCard={onSelectCard}
-      />
-      <PlayerResources resources={playerResources} />
-      <Battlefield
-        playerID={playerID}
-        beings={beings}
-        cards={cards}
-        onSelectCard={null}
-        selectedBeingID={selectedBeingID}
-      />
-      <Controls onPlayCard={onPlayCard} />
+    <div className='card' style={style}>
+      {/*<div>{card ? 'id' + card.id : ''}</div>*/}
+      {/*<div>{card ? '#' + card.number : ''}</div>*/}
+      <div>{card ? `${card.name} (${card.id})` : ''}</div>
+      <div>{card ? `${card.type} ${card.subtype}`: ''}</div>
+      <div>{card ? card.text : ''}</div>
+  </div>)
+}
+
+function Tooltip({show, card, x, y}) {
+  let style = {
+    display: 'float',
+    border: '1px solid #555',
+    width: '160px',
+    height: 'auto',
+    position: 'absolute', 
+    left: x,
+    top: y,
+    backgroundColor: 'darkgray',
+    transition: 300,
+  }
+
+  return show ? <Card customStyle={style} card={card}/> : <div/>
+}
+
+
+function HandCard({card, selectedHandCardID, onClick}) {
+  let style = {
+    border: '1px solid #555',
+    width: '100px',
+    backgroundColor: selectedHandCardID == card.id ? 'yellow' : 'white',
+    pointerEvents: 'none',
+    aspectRatio: (1/1.6),
+  }
+  return <Card card={card} customStyle={style}/>
+}
+
+
+function LocationCard({ onClick, selectedFieldID, field, card}) {
+  let cardID = field.fieldCardID
+  let fieldID = field.id
+  
+  let style = {
+    border: '1px solid #555',
+    width: '100%',
+    height: '100%',
+    backgroundColor: (selectedFieldID && selectedFieldID == fieldID) ? 'yellow' : 'white',
+  }
+  return (
+    card == undefined ? 
+      <div onClick={onClick} style={style}/> : 
+      <div onClick={onClick} className='card' style={style}>
+        <div>{card ? 'id' + card.id : ''}</div>
+        <div>{card ? card.name : ''}</div>
     </div>
   )
 }
 
+// function BeingCard({ onClick, selectedFieldID, field, card}) {
 
-function PlayGameMenu({ ctx, G, moves, playerID }) {
-  // This state management needs refactoring later
-  let player = G.players[playerID];
-  let opponentID = ctx.playOrder.find(p => p !== playerID);
-  let cards = [ ...G.cards["0"], ...G.cards["1"] ]; // for now
+// }
 
-  const [selectedHandCardID, setSelectedHandCardID] = useState(null);
-  const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
-  const [selectedBeingID, setSelectedBeingID] = useState(null);
-
-  function onSelectCard(cardID) {
-    setSelectedHandCardID(cardID);
-    moves.selectHandCard(cardID);
+function Menu({G, ctx, moves, events, playerID}) {
+  let [deck, setDeck] = useState('')
+  function onSubmit(event, events) {
+    event.preventDefault()
+    // console.log('menu submit:', event.target)
+    // let decktype = event.target.value
+    // console.log(decktype)
+   //  if (decktype == 'fire')
+   //    moves.selectDeck('Fire Deck', playerID)
+   // if (decktype == 'water')
+   //    moves.selectDeck('Fire Deck', playerID)
+   //  if (decktype == 'earth')
+   //    moves.selectDeck('Fire Deck', playerID)
+   //  if (decktype == 'air')
+   //    moves.selectDeck('Fire Deck', playerID)
+   //   // console.log(events)
+   //  else
+    moves.selectDeck('Fire Deck', playerID)
   }
 
-  function onPlayCard() {
-    console.log('play card')
-    !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
-    setSelectedLandscapeID(null);
-    setSelectedHandCardID(null);
-
-  }
-
-  const landscapes = G.landscapes;
-
-  const beings = G.beings;
-  const resources = G.resources[ctx.currentPlayer];
-
-  const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
-
-  function onSelectLandscape(landscapeID) {
-    setSelectedLandscapeID(landscapeID);
-    moves.selectLandscapeCard(landscapeID);
-  }
-
-  return <GameBoard
-    cards={cards}
-    landscapes={landscapes}
-    beings={beings}
-    playerResources={resources}
-    playerHand={playerHand}
-    playerID={playerID}
-    moves={moves}
-    selectedHandCardID={selectedHandCardID}
-    selectedBeingID={selectedBeingID}
-    selectedLandscapeID={selectedLandscapeID}
-    onSelectCard={onSelectCard}
-    onPlayCard={onPlayCard}
-    onSelectLandscape={onSelectLandscape}
-  />;
+  return <div>
+    <form onSubmit={e => onSubmit(e, events)}>
+      <div id='deckselect'>
+        <label for='fire'>Fire</label>
+        <input id='fire' type='radio' value='fire'/>
+        <label for='water'>Water</label>
+        <input id='water' type='radio' value='water'/>
+        <label for='earth'>Earth</label>
+        <input id='earth' type='radio' value='earth'/>
+        <label for='air'>Air</label>
+        <input id='air' type='radio' value='air'/>
+      </div>
+      {/*<div id='playerselect'>
+        <label for='player'>Player ID:</label>
+        <select id='player' type='dropdown'>
+          <option>0</option>
+          <option>1</option>
+        </select>
+      </div>*/}
+      <button type='submit'>submit</button>
+    </form>
+  </div>
 }
 
+function Battle({ ctx, G, moves, playerID }) {
+  let [selectedHandCardID, setSelectedHandCardID] = useState(null)
+  let [selectedFieldID, setSelectedFieldID] = useState(null)
 
-export function Board({ G, ctx, moves, events, playerID }) {
-  function onDeckSelect(deckType) {
-    moves.selectDeck('Fire Deck', playerID);
-    // moves.selectDeck(deckType, playerID)
+  let [showTooltip, setShowTooltip] = useState(null)
+  let [x, setX] = useState()
+  let [y, setY] = useState()
+  
+
+  function onHover(e) {
+    // console.log(e.target)
+    setShowTooltip(e.target.id)
+    setX(e.screenX < 0 ? 0 : e.screenX)
+    setY(e.screenY < 0 ? 0 : e.screenY)
+    // console.log(e.screenX, e.screenY)
   }
+
+  let player = G.players[playerID]
+  let opponentID = ctx.playOrder.filter(p => p != playerID)[0]
+  console.log(opponentID)
+  let cards = []
+  let decklist = G.decklists[playerID]
+  // console.log(G.decklists)
+  Object.keys(decklist).map(cardname => {
+    let numCards = decklist[cardname]
+    // console.log('numCards:', numCarfds)
+    let card = Cards().filter(c => c.name == cardname)[0]
+    // console.log('card:', card)
+    for (let i = 0; i<numCards; i++)  {
+      let obj = {...card}
+      obj['id'] = cards.length.toString()
+      // console.log('card:', obj)
+      cards = cards.concat( obj )
+    }
+    // fireDeck['cards'] = fireDeck['cards'].map( (card, i) => {card['id'] = i; return card})
+  })
+
+  // console.log(player)
   return (
-    <div className="container">
-      {ctx.phase === 'menu' ? 
-        <SelectDeckMenu
-          decks={G.decks}
-          onDeckSelect={onDeckSelect}
+    <div className='board'>
+      <div className='landscape'>
+        {G.field[opponentID].slice(0).reverse().map(field => 
+          <LocationCard
+            onClick={e => { e.preventDefault(); console.log('click field'); moves.selectFieldCard(field.id) }} 
+            selectedFieldID={null} 
+            field={field} 
+            card={cards.filter(c => c.id == field.fieldCardID)[0]}
+          />
+        )}
+        {G.field[playerID].map(field => 
+          <LocationCard
+            onClick={e => { e.preventDefault(); console.log('click field'); moves.selectFieldCard(field.id) }} 
+            selectedFieldID={G.players[ctx.currentPlayer]?.selectedFieldID} 
+            field={field} 
+            card={cards.filter(c => c.id == field.fieldCardID)[0]}
+          />
+        )}
+      </div>
+      <div className='myhand' >{player.handIDs.map(cardID => {
+        {/*console.log(cardID)*/}
+        let card = cards.filter(c => c.id == cardID)[0]
+        return (
+          <div id={card.id} onMouseMove={onHover} onMouseOut={e => setShowTooltip(null)}  onClick={e => {e.preventDefault(); moves.selectHandCard(e.target.id)} }>
+            <Tooltip show={showTooltip == card.id} card={card} x={x+5} y={y-240} />
+            <HandCard 
+              onClick={e => { e.preventDefault(); moves.selectHandCard(cardID) }} 
+              selectedHandCardID={G.players[ctx.currentPlayer]?.selectedHandCardID} 
+              card={card}
+            />
+          </div>)
+      })}
+      </div>
+      <div className='gamestate'>
+        <div>Metal:{G.resources[ctx.currentPlayer].metal}</div>
+        <div>Wood:{G.resources[ctx.currentPlayer].wood}</div>
+        <div>Mana:{G.resources[ctx.currentPlayer].mana}</div>
+      </div>
+      <div className='battlefield'>
+        {player.beingIDs.map(beingID => {
+          let card = cards.filter(c => c.id == beingID)[0]
+          return (
+            <div id={card.id} onMouseMove={onHover} onMouseOut={e => setShowTooltip(null)}  onClick={e => {e.preventDefault(); moves.selectBeingCard(e.target.id)} }>
+              <Tooltip show={showTooltip == card.id} card={card} x={x+5} y={y-240} />
+              <HandCard 
+                onClick={e => { e.preventDefault(); moves.selectBeingCard(beingID) }} 
+                selectedHandCardID={G.players[ctx.currentPlayer]?.selectedHandCardID} 
+                card={card}
+              />
+            </div>)
+        })}
+      </div>
+      <div className='controls'>
+        <button onClick={e =>  {
+          if (G.players[ctx.currentPlayer].selectedHandCardID != null)
+            moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
+        }}>play</button>
+      </div>
+    </div>
+  )
+}
+
+export function GameBoard({ G, ctx, moves, events, playerID }) {
+  return (
+    <div className='container'>
+      {ctx.phase == 'menu' ? 
+        <Menu
+          G={G}
+          ctx={ctx}
+          moves={moves}
+          events={events}
+          playerID={playerID}
         /> : 
-        <PlayGameMenu 
+        <Battle  
           G={G}
           ctx={ctx}
           moves={moves}
