@@ -67,6 +67,7 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
 export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelectCard }) {
   return (
   <div className="battlefield" >
+    <div className="myside">
     { beings[['0', '1'].filter(p => p !== playerID)].map(being => 
       <PlayerHandCard
         key={"being" + being.id.toString()}
@@ -76,6 +77,8 @@ export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect
         onSelect={onSelectCard}
       />
     )}
+  </div>
+  <div className="theirside" >
     { beings[playerID].map(being => 
       <PlayerHandCard
         key={"being" + being.id.toString()}
@@ -85,5 +88,6 @@ export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect
         onSelect={onSelectCard}
       />
     )}
+  </div>
   </div>)
 }

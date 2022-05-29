@@ -9,6 +9,8 @@
 	flex-direction: row;
 	grid-area: hand;
 	font-size: small;
+	overflow-x: scroll;
+	overflow-y: hidden;
 }
 
 .board {
@@ -37,8 +39,12 @@
 .battlefield {
 	display: grid;
 	grid-template-rows: 50% 50%;
-	/*flex-direction: row;*/
 	grid-area: battlefield;
+}
+
+.myside, .theirside {
+	display: flex;
+	flex-direction: row;
 
 }
 

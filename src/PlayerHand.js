@@ -60,7 +60,8 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
   
     const style = {
       border: '1px solid #555',
-      width: '100px',
+      // width: '100px',
+      height: '100%',
       backgroundColor: isSelected ? 'yellow' : 'white',
       pointerEvents: 'none',
       aspectRatio: (1/1.6),
