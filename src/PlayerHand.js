@@ -9,8 +9,8 @@ function DetailedCardInfo({card, isSelected, customStyle}) {
       ...customStyle
     }
     const nameStyle = {
-      'font-weight': 'bold',
-      'text-align': 'center'
+      'fontWeight': 'bold',
+      'textAlign': 'center'
     }
     return (
       <div className='card' style={style}>
