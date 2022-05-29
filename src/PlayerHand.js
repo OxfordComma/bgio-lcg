@@ -8,11 +8,13 @@ function DetailedCardInfo({card, isSelected, customStyle}) {
       pointerEvents: 'none',
       ...customStyle
     }
+    const nameStyle = {
+      'fontWeight': 'bold',
+      'textAlign': 'center'
+    }
     return (
       <div className='card' style={style}>
-        <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? '#' + card.Number : ''}</div>
-        <div>{card ? card.Name : ''}</div>
+        <div style={nameStyle}>{card ? card.Name : ''}</div>
         <div>{card ? card.Type : ''}</div>
         <div>{card ? card.Subtype : ''}</div>
         <div>{card ? card.Materials : ''}</div>
@@ -69,7 +71,7 @@ export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
   <div className="myhand" >
     {hand.map(card => 
       <PlayerHandCard 
-        key={"card" + card.id} 
+        key={'card' + card.id} 
         card={card} 
         isSelected={(card.id === selectedCardID)} 
         onSelect={onSelectCard}

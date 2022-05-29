@@ -60,14 +60,11 @@ function AboveBattlefield({ ctx, G, moves, playerID }) {
     !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
   }
 
-  const fields = [
-    ...G.field[opponentID].slice().reverse(), 
-    ...G.field[playerID]
-  ];
+  const fields = G.field;
 
   const resources = G.resources[ctx.currentPlayer];
 
-  const playerHand = player.handIDs.map(handId => cards.find(({ id }) => id === handId));
+  const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
 
   function onSelectField(fieldID) {
     setSelectedFieldID(fieldID);
@@ -90,15 +87,17 @@ function AboveBattlefield({ ctx, G, moves, playerID }) {
 }
 
 export function GameBoard({ G, ctx, moves, events, playerID }) {
+  function onDeckSelect(deckType) {
+    moves.selectDeck('Fire Deck', playerID);
+    // moves.selectDeck(deckType, playerID)
+  }
+
   return (
     <div className="container">
       {ctx.phase === 'menu' ? 
         <SelectDeckMenu
-          G={G}
-          ctx={ctx}
-          moves={moves}
-          events={events}
-          playerID={playerID}
+          decks={G.decks}
+          onDeckSelect={onDeckSelect}
         /> : 
         <AboveBattlefield 
           G={G}

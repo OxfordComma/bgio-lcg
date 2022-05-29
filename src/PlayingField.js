@@ -10,7 +10,7 @@ function GridLocation({ isSelected, onSelect, field, card }) {
   return (
     <div 
       onClick={(e) => {e.preventDefault(); onSelect(field.id)}} 
-      className={ card ? "card" : ""} 
+      className={ card ? 'card' : ''} 
       style={style}
     >
       {card && <>
@@ -25,7 +25,7 @@ export function PlayingField({ fields, cards, selectedFieldID, onSelect}) {
   return <div className="battlefield">
     { fields.map(field => 
       <GridLocation
-        key={"field" + field.id.toString()}
+        key={'field' + field.id.toString()}
         field={field}
         card={cards.find(c => c.id === field.fieldCardID)}
         isSelected={ selectedFieldID === field.id }
