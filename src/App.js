@@ -14,10 +14,8 @@ const CardGameClient = Client({
 
 });
 
-
-// const playerID = (Math.floor(Math.random() * 1000000)).toString()
 const App = () => {
-  let [playerID, setPlayerID] = useState(null);
+  // let [playerID, setPlayerID] = useState(null);
   // return (
   //   playerID == null ? 
   //   <div>
@@ -36,8 +34,8 @@ const App = () => {
   // )
   return (
     <div>
-      <CardGameClient playerID='0'/>
-      <CardGameClient playerID='1'/>
+      <CardGameClient playerID="0"/>
+      <CardGameClient playerID="1"/>
     </div>
   )
 }

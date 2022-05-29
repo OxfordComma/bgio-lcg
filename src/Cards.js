@@ -1,765 +1,627 @@
 // function Card(value, suit, rank) {
-			// number: '',
+			// "Number": "",
 //   // this.value = value;
 //   // this.suit = suit;
 //   // this.rank = rank;
 // }
 
-function PlayLocation (G, ctx, id) {
-    console.log('play location:', id)
-    let player = G.players[ctx.currentPlayer]
-    let landscape = G.landscape[ctx.currentPlayer]
-    if (player.selectedHandCardID && player.selectedLandscapeID) {
-      console.log('you can play this card!')
-      player['handIDs'] = player['handIDs'].filter(cid => cid != player.selectedHandCardID)
-      landscape[parseInt(player.selectedLandscapeID)]['landscapeCardID'] = player.selectedHandCardID
-    }
-    G.players[ctx.currentPlayer] = player
-    G.landscape[ctx.currentPlayer] = landscape
-    return G
-}
 
-function PlayBeing (G, ctx, id) {
-    console.log('play being:', id)
-    let player = G.players[ctx.currentPlayer]
-    let landscape = G.landscape[ctx.currentPlayer]
-    if (player.selectedHandCardID) {
-      console.log('you can play this card!')
-      player['handIDs'] = player['handIDs'].filter(cid => cid != player.selectedHandCardID)
-      player['beingIDs'] = player['beingIDs'].concat(player.selectedHandCardID)
-    }
-    G.players[ctx.currentPlayer] = player
-    G.landscape[ctx.currentPlayer] = landscape
-    return G
+const cardlist = [
+{
+  "Number": "1",
+  "Name": "Commerce",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Destroy a friendly Item. Reveal the top 5 cards of your deck. Add an item of the same type to your Inventory.",
+  "Materials": "",
+},
+{
+  "Number": "2",
+  "Name": "Diplomatic Solution",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "None",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "min2",
+  "Will": "",
+  "Traits": "",
+  "Text": "React: Prevent all damage to this character.",
+  "Materials": "",
+},
+{
+  "Number": "3",
+  "Name": "Hone",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "None",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "This character's next Sharp or Piercing attack this turn does +2 damage On Hit.",
+  "Materials": "",
+},
+{
+  "Number": "4",
+  "Name": "Teleport",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "None",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "min3",
+  "Traits": "",
+  "Text": "Move this character up to 4. Action +1.",
+  "Materials": "",
+},
+{
+  "Number": "5",
+  "Name": "Greatship",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Water",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "",
+  "Materials": "Metal, Rope, Hide, Wood",
+},
+{
+  "Number": "6",
+  "Name": "Health Potion",
+  "Type": "Item",
+  "Subtype": "Potion",
+  "Element": "",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Use: Heal 5. Draw a card.",
+  "Materials": "Soul",
+},
+{
+  "Number": "7",
+  "Name": "Leather Armor",
+  "Type": "Item",
+  "Subtype": "Armor",
+  "Element": "None",
+  "Strength": 0,
+  "Armor": "+2",
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Armor, Light, Chest",
+  "Text": "",
+  "Materials": "Hide",
+},
+{
+  "Number": "8",
+  "Name": "Lighthammer",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+1",
+  "Armor": 0,
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Hammer, 1-Handed, Blunt",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "9",
+  "Name": "Long Axe",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+3",
+  "Armor": "+1",
+  "Agility": -1,
+  "Will": 0,
+  "Traits": "Axe, 2-Handed, Sharp",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "10",
+  "Name": "Longbow",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+4",
+  "Armor": -3,
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Bow, 2-Handed, Piercing",
+  "Text": "",
+  "Materials": "Wood, Rope",
+},
+{
+  "Number": "11",
+  "Name": "Longsword",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+3",
+  "Armor": "+1",
+  "Agility": -1,
+  "Will": 0,
+  "Traits": "Sword, 2-Handed, Sharp",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "12",
+  "Name": "Plate Armor",
+  "Type": "Item",
+  "Subtype": "Armor",
+  "Element": "None",
+  "Strength": 0,
+  "Armor": "+4",
+  "Agility": -2,
+  "Will": 0,
+  "Traits": "Armor, Heavy, Chest",
+  "Text": "",
+  "Materials": "Metal, Metal",
+},
+{
+  "Number": "13",
+  "Name": "Short Axe",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+1",
+  "Armor": 0,
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Axe, 1-Handed, Sharp",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "14",
+  "Name": "Shortbow",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+2",
+  "Armor": -2,
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Bow, 2-Handed, Piercing",
+  "Text": "",
+  "Materials": "Wood, Rope",
+},
+{
+  "Number": "15",
+  "Name": "Shortsword",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+1",
+  "Armor": 0,
+  "Agility": 0,
+  "Will": 0,
+  "Traits": "Sword, 1-Handed, Sharp",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "16",
+  "Name": "Sledgehammer",
+  "Type": "Item",
+  "Subtype": "Weapon",
+  "Element": "None",
+  "Strength": "+3",
+  "Armor": "+1",
+  "Agility": -1,
+  "Will": 0,
+  "Traits": "Hammer, 2-Handed, Blunt",
+  "Text": "",
+  "Materials": "Metal",
+},
+{
+  "Number": "17",
+  "Name": "Farmhouse",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Earth",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "",
+  "Materials": "Hide, Metal, Rope",
+  'text': '+1 wood',
+  "production": {
+    "wood": 1,
+  },
+},
+{
+  "Number": "18",
+  "Name": "Tree-on-Cliff",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Earth",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "+1 wood",
+  "Materials": "Metal, Wood",
+  "production": {
+    "wood": 1
+  },
+},
+{
+  "Number": "19",
+  "Name": "Dwarven Fortress",
+  "Type": "Location",
+  "Subtype": "Castle",
+  "Element": "Earth",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "+1 wood, +1 metal",
+  "Materials": "",
+  "production": {
+    "wood": 1,
+    "metal": 1
+  },
+},
+{
+  "Number": "20",
+  "Name": "Woodland",
+  "Type": "Location",
+  "Subtype": "Wild",
+  "Element": "Earth",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "",
+  "Materials": "Wood",
+  "production": {
+    "wood": 1,
+    "metal": 1
+  },
+  'text': '+1 wood, +1 metal',
+},
+{
+  "Number": "21",
+  "Name": "Item Shop",
+  "Type": "Location",
+  "Subtype": "Vendor",
+  "Element": "",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Sells goods",
+  "Materials": "",
+ text: 'Vendor',
+},
+{
+  "Number": "22",
+  "Name": "First City",
+  "Type": "Location",
+  "Subtype": "Settlement",
+  "Element": "",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Materials": "",
+  "production": {
+    "wood": 1,
+    "metal": 1
+  },
+  'Text': '+1 metal',
+},
+{
+  "Number": "23",
+  "Name": "Little Village",
+  "Type": "Location",
+  "Subtype": "Settlement",
+  "Element": "",
+  "Strength": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Place some sheeps around. +1 wood",
+  "Materials": "",
+  "production": {
+    "wood": 1,
+  },
+},
+{
+  "Number": "24",
+  "Name": "Fireball",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "min2",
+  "Traits": "Destruction",
+  "Text": "+3 Ranged attack.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "25",
+  "Name": "Desecrate",
+  "Type": "Ability",
+  "Subtype": "Tactic",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "Destruction",
+  "Text": "Characters cannot move through target space.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "26",
+  "Name": "Fury",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "+3 Might this turn. -3 Armor this turn.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "27",
+  "Name": "Channel",
+  "Type": "Ability",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "-X Soul: Perform a +X ranged attack.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "28",
+  "Name": "Fire Dagger",
+  "Type": "Ability",
+  "Subtype": "Thief",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "m1",
+  "Traits": "Conjuration",
+  "Text": "Equip a +1 Might offhand Sword weapon.",
+  "Materials": "Soul",
+  "Recipe": "",
+},
+{
+  "Number": "29",
+  "Name": "Armory",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Put your arms in here to buy them!",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "30",
+  "Name": "Berserker",
+  "Type": "Character",
+  "Subtype": "Fighter",
+  "Element": "Fire",
+  "Might": 3,
+  "Armor": 2,
+  "Agility": 2,
+  "Will": "",
+  "Traits": "",
+  "Text": "O: +2 Melee attack.\nD: React - After being hit by a basic attack, if the attacking character is in range, perform a -4 basic attack against them.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "31",
+  "Name": "Pyromancer",
+  "Type": "Character",
+  "Subtype": "Mage",
+  "Element": "Fire",
+  "Might": 3,
+  "Armor": 0,
+  "Agility": 2,
+  "Will": "",
+  "Traits": "",
+  "Text": "O: +0 Ranged attack.\nO: Burn target character. Range 2.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "32",
+  "Name": "Fire Rogue",
+  "Type": "Character",
+  "Subtype": "Rogue",
+  "Element": "Fire",
+  "Might": 1,
+  "Armor": 1,
+  "Agility": 3,
+  "Will": "",
+  "Traits": "",
+  "Text": "O: 1 damage Melee attack. Draw a card.\nD: The next attack that targets this character misses.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "33",
+  "Name": "Hero",
+  "Type": "Character",
+  "Subtype": "Fighter",
+  "Element": "Fire",
+  "Might": 5,
+  "Armor": 4,
+  "Agility": 2,
+  "Will": "",
+  "Traits": "Leader",
+  "Text": "O: +2 Melee attack.\nO: You may move up to 3 spaces in one direction and then make a -2 melee attack.\nD: The next time an adjacent character would take damage from an opponent's attack, this character takes that damage instead.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "34",
+  "Name": "Rebirth Potion",
+  "Type": "Item",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Use: Recruit a character from the Crypt.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "35",
+  "Name": "Fire Core",
+  "Type": "Location",
+  "Subtype": "Core",
+  "Element": "Fire",
+  "Might": "-",
+  "Armor": 20,
+  "Agility": "-",
+  "Will": "",
+  "Traits": "",
+  "Text": "Draw +1. At the end of your turn, discard a card from your hand.",
+  "Materials": "",
+  "Recipe": "",
+},
+{
+  "Number": "36",
+  "Name": "Volcano",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "Quest",
+  "Text": "Complete: Have 5 or more of your characters on the field.\nReward: Draw a card for each of your characters on the field.",
+  "Materials": "+1 wood, +1 metal",
+  "Recipe": "",
+  "production": {
+    "wood": 1,
+    "metal": 1
+  },
+},
+{
+  "Number": "37",
+  "Name": "Campfire",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Characters in this row have +1 Might. Fire characters in this row have +3 Might.",
+  "Materials": "+1 Soul",
+  "Recipe": "",
+  "production": {
+    "soul": 1,
+  },
+  'text': '',
+},
+{
+  "Number": "38",
+  "Name": "Obsidian Mine",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Enter: +3 Soul or +3 Metal.",
+  "Materials": "2 metal",
+  "Recipe": "",
+  "production": {
+    "wood": 1,
+    "metal": 1
+  },
+},
+{
+  "Number": "39",
+  "Name": "Heatwell",
+  "Type": "Location",
+  "Subtype": "",
+  "Element": "Fire",
+  "Might": "",
+  "Armor": "",
+  "Agility": "",
+  "Will": "",
+  "Traits": "",
+  "Text": "Build: +1 Soul. \n-3 Soul: Draw a card.",
+  "Materials": "+1 Soul",
+  "Recipe": "",
+  "production": {
+    "soul": 1
+  },
 }
+];
 
+export function generateDeckFromDecklist(decklist) {
+	return cardlist.reduce(
+		(populatedDeck, card) => (decklist.hasOwnProperty(card.Name) && decklist[card.Name] > 0) 
+			? [
+				...populatedDeck, 
+				...Array.from({length: decklist[card.Name]}).fill({...card, })
+			]
+			: populatedDeck,
+		[]
+	).map((card, i) => ({...card, id: i.toString()}));
+}
 
 export function Cards() {
-
-   // let card = function(props){
-   //    return {   
-   //       name: props.name,
-   //       number: props.number,
-   //       type: props.type,
-   //       subtype: sprops.ubtype,
-   //       text: props.text,
-   //    }
-   // }
-
-   // let location = function(props) {
-   //    let c = card(props)
-   //    return {
-   //       ...c,
-
-   //    }
-   // }
-
-
-   return [
-      {
-			number: 1,
-         name: 'Commerce',
-         type: 'ability',
-         text: 'Destroy a friendly Item. Reveal the top 5 cards of your deck. Add an item of the same type to your Inventory.',
-         play: (G, ctx) => {
-            console.log('play')
-            return G
-         }
-
-    },
-    {
-			number: 2,
-         name: 'Diplomatic Solution',
-         type: 'ability',
-         text: 'React: Prevent all damage to this character.',
-         play: (G, ctx) => {
-           console.log('play')
-           return G
-         },
-    },
-    {
-			number: 3,
-         name: 'Hone',
-         type: 'ability',
-         text: 'This character\'s next Sharp or Piercing attack this turn does +2 damage On Hit.',
-         play: (G, ctx) => {
-           console.log('play')
-           return G
-         },
-       },
-   {
-      number: 4,
-      name: 'Teleport',
-      type: 'ability',
-      subtype: '',
-      element: 'None',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': 'min3',
-      'Traits': '',
-      text: 'Move this character up to 4. Action +1.',
-      'Materials': '',
-      play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-   },
-   {
-		number: 5,
-      name: 'Greatship',
-      type: 'location',
-      subtype: '',
-      element: 'Water',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '',
-      'Materials': 'Metal, Rope, Hide, Wood',
-      play: PlayLocation
-    },
-    {
-			number: 6,
-      name: 'Health Potion',
-      type: 'Item',
-      subtype: 'Potion',
-      element: '',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Use: Heal 5. Draw a card.',
-      'Materials': 'Soul',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 7,
-      name: 'Leather Armor',
-      type: 'Item',
-      subtype: 'Armor',
-      element: 'None',
-      'Strength': 0,
-      'Armor': 2,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': 'Armor, Light, Chest',
-      text: '',
-      'Materials': 'Hide',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 8,
-      name: 'Lighthammer',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 1,
-      'Armor': 0,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': 'Hammer, 1-Handed, Blunt',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 9,
-      name: 'Long Axe',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 3,
-      'Armor': 1,
-      'Agility': -1,
-      'Will': 0,
-      'Traits': 'Axe, 2-Handed, Sharp',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 10,
-      name: 'Longbow',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 4,
-      'Armor': -3,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': ['bow', 'two-handed'],
-      text: '',
-      'Materials': ['wood', 'rope'],
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 11,
-      name: 'Longsword',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 3,
-      'Armor': 1,
-      'Agility': -1,
-      'Will': 0,
-      'Traits': 'Sword, 2-Handed, Sharp',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 12,
-      name: 'Plate Armor',
-      type: 'Item',
-      subtype: 'Armor',
-      element: 'None',
-      'Strength': 0,
-      'Armor': 4,
-      'Agility': -2,
-      'Will': 0,
-      'Traits': 'Armor, Heavy, Chest',
-      text: '',
-      'Materials': 'Metal, Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 13,
-      name: 'Short Axe',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 1,
-      'Armor': 0,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': 'Axe, 1-Handed, Sharp',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 14,
-      name: 'Shortbow',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 2,
-      'Armor': -2,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': 'Bow, 2-Handed, Piercing',
-      text: '',
-      'Materials': 'Wood, Rope',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 15,
-      name: 'Shortsword',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 1,
-      'Armor': 0,
-      'Agility': 0,
-      'Will': 0,
-      'Traits': 'Sword, 1-Handed, Sharp',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 16,
-      name: 'Sledgehammer',
-      type: 'Item',
-      subtype: 'weapon',
-      element: 'None',
-      'Strength': 3,
-      'Armor': 1,
-      'Agility': -1,
-      'Will': 0,
-      'Traits': 'Hammer, 2-Handed, Blunt',
-      text: '',
-      'Materials': 'Metal',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 17,
-      name: 'Farmhouse',
-      type: 'location',
-      subtype: '',
-      element: 'Earth',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '',
-      'Materials': 'Hide, Metal, Rope',
-      'text': '+1 wood',
-      play: PlayLocation,
-      onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 18,
-      name: 'Tree-on-Cliff',
-      type: 'location',
-      subtype: '',
-      element: 'Earth',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '+1 wood',
-      'Materials': 'Metal, Wood',
-     play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 19,
-      name: 'Dwarven Fortress',
-      type: 'location',
-      subtype: 'Castle',
-      element: 'Earth',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '+1 wood, +1 metal',
-      'Materials': '',
-     play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         resources['metal'] = resources['metal'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 20,
-      name: 'Woodland',
-      type: 'location',
-      subtype: 'Wild',
-      element: 'Earth',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '',
-      'Materials': 'Wood',
-     play: PlayLocation,
-      'text': '+1 wood, +1 metal',
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         resources['metal'] = resources['metal'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 21,
-      name: 'Item Shop',
-      type: 'location',
-      subtype: 'Vendor',
-      element: '',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Sells goods',
-      'Materials': '',
-     play: PlayLocation,
-     text: 'Vendor',
-    },
-    {
-			number: 22,
-      name: 'First City',
-      type: 'location',
-      subtype: 'Settlement',
-      element: '',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-
-      'Materials': '',
-     play: PlayLocation,
-      'Text': '+1 metal',
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         resources['metal'] = resources['metal'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 23,
-      name: 'Little Village',
-      type: 'location',
-      subtype: 'Settlement',
-      element: '',
-      'Strength': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Place some sheeps around. +1 wood',
-      'Materials': '',
-     play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 24,
-      name: 'Fireball',
-      type: 'ability',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': 'min2',
-      'Traits': 'Destruction',
-      text: '+3 Ranged attack.',
-      'Materials': '',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 25,
-      name: 'Desecrate',
-      type: 'ability',
-      subtype: 'Tactic',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': 'Destruction',
-      text: 'Characters cannot move through target space.',
-      'Materials': '',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 26,
-      name: 'Fury',
-      type: 'ability',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '+3 Might this turn. -3 Armor this turn.',
-      'Materials': '',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 27,
-      name: 'Channel',
-      type: 'ability',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: '-X Soul: Perform a +X ranged attack.',
-      'Materials': '',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 28,
-      name: 'Fire Dagger',
-      type: 'ability',
-      subtype: 'Thief',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': 'm1',
-      'Traits': 'Conjuration',
-      text: 'Equip a +1 Might offhand Sword weapon.',
-      'Materials': 'Soul',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 29,
-      name: 'Armory',
-      type: 'location',
-      subtype: '',
-      element: '',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Put your arms in here to buy them!',
-      'Materials': '',
-      'Recipe': '',
-     play: PlayLocation
-    },
-    {
-			number: 30,
-      name: 'Berserker',
-      type: 'being',
-      subtype: 'Fighter',
-      element: 'Fire',
-      'Might': 3,
-      'Armor': 2,
-      'Agility': 2,
-      'Will': '',
-      'Traits': '',
-      text: 'O: +2 Melee attack.\nD: React - After being hit by a basic attack, if the attacking character is in range, perform a -4 basic attack against them.',
-      'Materials': '',
-      'Recipe': '',
-     play: PlayBeing,
-    },
-    {
-			number: 31,
-      name: 'Pyromancer',
-      type: 'being',
-      subtype: 'Mage',
-      element: 'Fire',
-      'Might': 3,
-      'Armor': 0,
-      'Agility': 2,
-      'Will': '',
-      'Traits': '',
-      text: 'O: +0 Ranged attack.\nO: Burn target character. Range 2.',
-      'Materials': '',
-      'Recipe': '',
-       play: PlayBeing,
-
-    },
-    {
-			number: 32,
-      name: 'Fire Rogue',
-      type: 'being',
-      subtype: 'Rogue',
-      element: 'Fire',
-      'Might': 1,
-      'Armor': 1,
-      'Agility': 3,
-      'Will': '',
-      'Traits': '',
-      text: 'O: 1 damage Melee attack. Draw a card.\nD: The next attack that targets this character misses.',
-      'Materials': '',
-      'Recipe': '',
-      play: PlayBeing,
-
-    },
-    {
-			number: 33,
-      name: 'Hero',
-      type: 'being',
-      subtype: 'Fighter',
-      element: 'Fire',
-      'Might': 5,
-      'Armor': 4,
-      'Agility': 2,
-      'Will': '',
-      'Traits': 'Leader',
-      text: 'O: +2 Melee attack.\nO: You may move up to 3 spaces in one direction and then make a -2 melee attack.\nD: The next time an adjacent character would take damage from an opponent\'s attack, this character takes that damage instead.',
-      'Materials': '',
-      'Recipe': '',
-      play: PlayBeing,
-
-    },
-    {
-			number: 34,
-      name: 'Rebirth Potion',
-      type: 'Item',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Use: Recruit a character from the Crypt.',
-      'Materials': '',
-      'Recipe': '',
-     play: (G, ctx) => {
-        console.log('play')
-        return G
-      },
-    },
-    {
-			number: 35,
-      name: 'Fire Core',
-      type: 'location',
-      subtype: 'Core',
-      element: 'Fire',
-      'Might': '-',
-      'Armor': 20,
-      'Agility': '-',
-      'Will': '',
-      'Traits': '',
-      text: 'Draw +1. At the end of your turn, discard a card from your hand.',
-      'Materials': '',
-      'Recipe': '',
-     play: PlayLocation
-    },
-    {
-			number: 36,
-      name: 'Volcano',
-      type: 'location',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': 'Quest',
-      text: 'Complete: Have 5 or more of your characters on the landscape.\nReward: Draw a card for each of your characters on the landscape.',
-      'Materials': '+1 wood, +1 metal',
-      'Recipe': '',
-     play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         resources['metal'] = resources['metal'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 37,
-      name: 'Campfire',
-      type: 'location',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Characters in this row have +1 Might. Fire characters in this row have +3 Might.',
-      'Materials': '+1 Soul',
-      'Recipe': '',
-     play: PlayLocation,
-      'text': '',
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['soul'] = resources['soul'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 38,
-      name: 'Obsidian Mine',
-      type: 'location',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Enter: +3 Soul or +3 Metal.',
-      'Materials': '2 metal',
-      'Recipe': '',
-     play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['wood'] = resources['wood'] + 1
-         resources['metal'] = resources['metal'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-    {
-			number: 39,
-      name: 'Heatwell',
-      type: 'location',
-      subtype: '',
-      element: 'Fire',
-      'Might': '',
-      'Armor': '',
-      'Agility': '',
-      'Will': '',
-      'Traits': '',
-      text: 'Build: +1 Soul. \n-3 Soul: Draw a card.',
-      'Materials': '+1 Soul',
-      'Recipe': '',
-      play: PlayLocation,
-     onTurnStart: (G, ctx) => {
-         let resources = G.resources[ctx.currentPlayer]
-         resources['soul'] = resources['soul'] + 1
-         G.resources[ctx.currentPlayer] = resources
-      },
-    },
-
-  ]
+  return cardlist;
 }
