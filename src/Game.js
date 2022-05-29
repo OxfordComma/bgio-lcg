@@ -76,16 +76,14 @@ function playCard(G, ctx, id) {
 	if (!!id) {
 		const card = G.cards[ctx.currentPlayer].find(c => c.id === id);
     const player = G.players[ctx.currentPlayer];
-    const field = G.field[ctx.currentPlayer];
     if (card.Type === 'Location') {
       if (player.selectedHandCardID && player.selectedFieldID) {
         console.log('you can play this card!');
         player.handIDs = player?.handIDs?.filter(cid => cid !== player?.selectedHandCardID);
-        field[parseInt(player.selectedFieldID)].fieldCardID = player?.selectedHandCardID;
+        G.field[player.selectedFieldID].fieldCardID = player?.selectedHandCardID;
       }
 
       G.players[ctx.currentPlayer] = player;
-      G.field[ctx.currentPlayer] = field;
     }
     return G;
 	}
@@ -118,8 +116,6 @@ export const CardGame = {
 			id: i.toString(), 
 			fieldCardID: null
 		}));
-		const field0 = field.slice(0, 15);
-		const field1 = field.slice(15, 30);
 		return { 
 			players: {
 				'0': {
@@ -147,10 +143,7 @@ export const CardGame = {
 					mana: 0,
 				}
 			},
-			field: {
-				'0': field0,
-				'1': field1
-			},
+			field,
 			cards: {
 				'0': null,
 				'1': null
@@ -183,7 +176,7 @@ export const CardGame = {
 		order: TurnOrder.RESET,
 		onBegin: (G, ctx) => {
 			console.log('turn begin')
-			G.field[ctx.currentPlayer].forEach(f => {
+			G.field.forEach(f => {
 				if (f.fieldCardID != null)
 					addLocationResources(G, ctx, f.fieldCardID)
 			})

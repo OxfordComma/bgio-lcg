@@ -60,14 +60,11 @@ function AboveBattlefield({ ctx, G, moves, playerID }) {
     !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
   }
 
-  const fields = [
-    ...G.field[opponentID].slice().reverse(), 
-    ...G.field[playerID]
-  ];
+  const fields = G.field;
 
   const resources = G.resources[ctx.currentPlayer];
 
-  const playerHand = player.handIDs.map(handId => cards.find(({ id }) => id === handId));
+  const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
 
   function onSelectField(fieldID) {
     setSelectedFieldID(fieldID);
