@@ -6,21 +6,24 @@ import { Battlefield } from './Battlefield';
 import './styles/Board.css';
 
 
-function PlayerResources({ resources }) {
+function PlayerResources({ life, resources }) {
   return <div className="gamestate">
-    <div>Metal:{resources.metal}</div>
-    <div>Wood:{resources.wood}</div>
-    <div>Mana:{resources.mana}</div>
+    <div>Metal: {resources.metal}</div>
+    <div>Wood: {resources.wood}</div>
+    <div>Mana: {resources.mana}</div>
+    <div>Life: {life}</div>
   </div>
 }
 
-function Controls({ onPlayCard }) {
+function Controls({ onPlayCard, attack, endTurn }) {
   return <div className="controls">
     <button onClick={e => {e.preventDefault(); onPlayCard() }}>play</button>
+    <button onClick={e => {e.preventDefault(); attack() }}>attack</button>
+    <button onClick={e => {e.preventDefault(); endTurn() }}>end</button>
   </div>
 }
 
-function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResources, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
+function GameBoard({ ctx, G, moves, events, cards, landscapes, beings, playerID, playerResources, life, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
   return (
     <div className="board">
       <Landscape
@@ -35,7 +38,10 @@ function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResource
         selectedCardID={selectedHandCardID}
         onSelectCard={onSelectCard}
       />
-      <PlayerResources resources={playerResources} />
+      <PlayerResources 
+        life={life}
+        resources={playerResources} 
+      />
       <Battlefield
         playerID={playerID}
         beings={beings}
@@ -43,13 +49,17 @@ function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResource
         onSelectCard={null}
         selectedBeingID={selectedBeingID}
       />
-      <Controls onPlayCard={onPlayCard} />
+      <Controls 
+        attack={moves.attack}
+        onPlayCard={onPlayCard} 
+        endTurn={events.endTurn}
+      />
     </div>
   )
 }
 
 
-function PlayGameMenu({ ctx, G, moves, playerID }) {
+function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find(p => p !== playerID);
@@ -76,7 +86,7 @@ function PlayGameMenu({ ctx, G, moves, playerID }) {
 
   const beings = G.beings;
   const resources = G.resources[ctx.currentPlayer];
-
+  const life = player.deckIDs.length
   const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
 
   function onSelectLandscape(landscapeID) {
@@ -88,10 +98,12 @@ function PlayGameMenu({ ctx, G, moves, playerID }) {
     cards={cards}
     landscapes={landscapes}
     beings={beings}
+    life={life}
     playerResources={resources}
     playerHand={playerHand}
     playerID={playerID}
     moves={moves}
+    events={events}
     selectedHandCardID={selectedHandCardID}
     selectedBeingID={selectedBeingID}
     selectedLandscapeID={selectedLandscapeID}
@@ -118,6 +130,7 @@ export function Board({ G, ctx, moves, events, playerID }) {
           G={G}
           ctx={ctx}
           moves={moves}
+          events={events}
           playerID={playerID}
         />
       }
