@@ -68,7 +68,7 @@ export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect
         key={playerID + "_being" + being.id.toString()}
         being={being}
         card={cards.find(c => c.id === being.beingCardID)}
-        isSelected={ parseInt(selectedBeingID) === being.id }
+        isSelected={ selectedBeingID === being.beingCardID }
         onSelect={onSelect}
       />
     )}

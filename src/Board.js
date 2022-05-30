@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SelectDeckMenu } from './SelectDeckMenu';
 import { PlayerHand } from './PlayerHand';
 import { Landscape } from './Landscape';
@@ -15,16 +15,30 @@ function PlayerResources({ life, resources }) {
   </div>
 }
 
-function Controls({ onPlayCard, attack, endTurn }) {
+function Controls({ onPlayCard, attack, endTurn, consoleMessage }) {
+  let [consoleMessages, setConsoleMessages] = useState([consoleMessage]);
+  useEffect(() => {
+    setConsoleMessages(consoleMessages.concat(consoleMessage))
+  }, [consoleMessage])
+
+  const  consoleStyle = {
+    'overflowY': 'scroll',
+  };
+
   return <div className="controls">
-    <button onClick={e => {e.preventDefault(); onPlayCard() }}>play</button>
-    <button onClick={e => {e.preventDefault(); attack() }}>attack</button>
-    <button onClick={e => {e.preventDefault(); endTurn() }}>end</button>
+    <div>
+      <button onClick={e => {e.preventDefault(); onPlayCard() }}>play</button>
+      <button onClick={e => {e.preventDefault(); attack() }}>attack</button>
+      <button onClick={e => {e.preventDefault(); endTurn() }}>end</button>
+      </div>
+    <div style={consoleStyle}>{
+      consoleMessages.map((msg, i) => <div key={i}>{msg}</div>)
+    }</div>
   </div>
 }
 
 function GameBoard({ 
-  ctx, G, 
+  ctx, G, consoleMessage,
   cards, landscapes, beings, 
   playerID, playerResources, life, playerHand, 
   attack, endTurn,
@@ -60,6 +74,7 @@ function GameBoard({
         attack={attack}
         onPlayCard={onPlayCard} 
         endTurn={endTurn}
+        consoleMessage={consoleMessage}
       />
     </div>
   )
@@ -75,6 +90,8 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   const [selectedHandCardID, setSelectedHandCardID] = useState(null);
   const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
   const [selectedBeingID, setSelectedBeingID] = useState(null);
+  
+  const [consoleMessage, setConsoleMessage] = useState(null);
 
   function onSelectHand(cardID) {
     console.log('set selected card in hand:', cardID)
@@ -98,6 +115,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   function onPlayCard() {
     console.log('play card')
     !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
+    // setConsoleMessage(`player ${playerID} play card`)
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
     setSelectedBeingID(null);
@@ -108,8 +126,16 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   const resources = G.resources[playerID];
   const life = player.deckIDs.length
   const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
-  const attack = moves.attack;
-  const endTurn = events.endTurn;
+  
+  const attack = function() {
+    setConsoleMessage(`player ${playerID} attack!`)
+    moves.attack();
+  }
+  const endTurn = function() {
+    setConsoleMessage(`player ${playerID} end turn`);
+
+    events.endTurn();
+  }
   
 
   return <GameBoard
@@ -129,6 +155,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     onSelectBeing={onSelectBeing}
     onSelectLandscape={onSelectLandscape}
     onPlayCard={onPlayCard}
+    consoleMessage={consoleMessage}
   />;
 }
 
