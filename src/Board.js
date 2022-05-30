@@ -23,7 +23,14 @@ function Controls({ onPlayCard, attack, endTurn }) {
   </div>
 }
 
-function GameBoard({ ctx, G, moves, events, cards, landscapes, beings, playerID, playerResources, life, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
+function GameBoard({ 
+  ctx, G, 
+  cards, landscapes, beings, 
+  playerID, playerResources, life, playerHand, 
+  attack, endTurn,
+  selectedLandscapeID, selectedHandCardID, selectedBeingID, 
+  onSelectLandscape, onSelectHand, onSelectBeing, onPlayCard 
+}) {
   return (
     <div className="board">
       <Landscape
@@ -36,7 +43,7 @@ function GameBoard({ ctx, G, moves, events, cards, landscapes, beings, playerID,
       <PlayerHand 
         hand={playerHand}
         selectedCardID={selectedHandCardID}
-        onSelectCard={onSelectCard}
+        onSelect={onSelectHand}
       />
       <PlayerResources 
         life={life}
@@ -46,13 +53,13 @@ function GameBoard({ ctx, G, moves, events, cards, landscapes, beings, playerID,
         playerID={playerID}
         beings={beings}
         cards={cards}
-        onSelectCard={null}
+        onSelect={onSelectBeing}
         selectedBeingID={selectedBeingID}
       />
       <Controls 
-        attack={moves.attack}
+        attack={attack}
         onPlayCard={onPlayCard} 
-        endTurn={events.endTurn}
+        endTurn={endTurn}
       />
     </div>
   )
@@ -69,9 +76,23 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
   const [selectedBeingID, setSelectedBeingID] = useState(null);
 
-  function onSelectCard(cardID) {
-    setSelectedHandCardID(cardID);
+  function onSelectHand(cardID) {
+    console.log('set selected card in hand:', cardID)
     moves.selectHandCard(cardID);
+    // This properly sets the hand ID to whatever was set in the move
+    setSelectedHandCardID(G.players[ctx.currentPlayer].selectedHandCardID == cardID ? null : cardID);
+  }
+
+  function onSelectBeing(beingID) {
+    console.log('set selected card in hand:', beingID)
+    moves.selectBeingCard(beingID);
+    setSelectedBeingID(G.players[ctx.currentPlayer].selectedBeingID == beingID ? null : beingID);
+  }
+
+  function onSelectLandscape(landscapeID) {
+    console.log('set selected landscape:', landscapeID)
+    moves.selectLandscapeCard(landscapeID);
+    setSelectedLandscapeID(G.players[ctx.currentPlayer].selectedLandscapeID == landscapeID ? null : landscapeID);
   }
 
   function onPlayCard() {
@@ -79,20 +100,17 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
-
+    setSelectedBeingID(null);
   }
 
   const landscapes = G.landscapes;
-
   const beings = G.beings;
-  const resources = G.resources[ctx.currentPlayer];
+  const resources = G.resources[playerID];
   const life = player.deckIDs.length
   const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
-
-  function onSelectLandscape(landscapeID) {
-    setSelectedLandscapeID(landscapeID);
-    moves.selectLandscapeCard(landscapeID);
-  }
+  const attack = moves.attack;
+  const endTurn = events.endTurn;
+  
 
   return <GameBoard
     cards={cards}
@@ -102,14 +120,15 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     playerResources={resources}
     playerHand={playerHand}
     playerID={playerID}
-    moves={moves}
-    events={events}
+    attack={attack}
+    endTurn={endTurn}
     selectedHandCardID={selectedHandCardID}
-    selectedBeingID={selectedBeingID}
     selectedLandscapeID={selectedLandscapeID}
-    onSelectCard={onSelectCard}
-    onPlayCard={onPlayCard}
+    selectedBeingID={selectedBeingID}
+    onSelectHand={onSelectHand}
+    onSelectBeing={onSelectBeing}
     onSelectLandscape={onSelectLandscape}
+    onPlayCard={onPlayCard}
   />;
 }
 

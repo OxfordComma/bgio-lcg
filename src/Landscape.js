@@ -32,7 +32,7 @@ export function Landscape({ landscapes, playerID, cards, selectedLandscapeID, on
         landscape={landscape}
         card={cards.find(c => c.id === landscape.landscapeCardID)}
         isSelected={ false }
-        onSelect={onSelect}
+        onSelect={null}
       />
     )}
     {myLandscapes.map(landscape => 

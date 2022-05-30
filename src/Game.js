@@ -46,7 +46,7 @@ function selectHandCard(G, ctx, id) {
 	console.log('select hand card with id:', id)
 	let currentPlayer = G.players[ctx.currentPlayer]
 
-	if (id === currentPlayer.selectedHandCardID)
+	if (id == currentPlayer.selectedHandCardID)
 		G.players[ctx.currentPlayer].selectedHandCardID = null
 	else
 		G.players[ctx.currentPlayer].selectedHandCardID = id
@@ -70,6 +70,17 @@ function selectLandscapeCard(G, ctx, id) {
 	// 	ctx.moves.playCard(G, ctx, currentPlayer.selectedHandCardID)
 	// }
 
+}
+
+function selectBeingCard(G, ctx, id) {
+	console.log('select being card at id:', id)
+
+	let currentPlayer = G.players[ctx.currentPlayer]
+
+	if (id === currentPlayer.selectedBeingID)
+		G.players[ctx.currentPlayer].selectedBeingID = null
+	else
+		G.players[ctx.currentPlayer].selectedBeingID = id
 }
 
 
@@ -99,7 +110,8 @@ function playCard(G, ctx, id) {
         beings = beings.concat({
         	beingCardID: player.selectedHandCardID,
         	id: beings.length,
-        })
+        	equipment: []
+        })	
 
       }
 
@@ -246,6 +258,10 @@ export const CardGame = {
 		},
 		selectLandscapeCard: {
 			move: selectLandscapeCard,
+			noLimit: true,
+		},
+		selectBeingCard: {
+			move: selectBeingCard,
 			noLimit: true,
 		},
 		playCard: playCard,

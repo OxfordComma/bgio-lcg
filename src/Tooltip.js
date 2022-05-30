@@ -19,6 +19,14 @@ export function Tooltip({show, card, x, y}) {
     'fontWeight': 'bold',
     'textAlign': 'left'
   }
+  const statsStyle = {
+      width: '100%',
+      height: 'auto',
+      display: 'grid',
+      gridTemplateAreas: `
+        'str arm'
+        'agi will'`,
+    }
   const materials = !!card.materials ? 'Materials: ' + Object.keys(card.materials).map(k => card.materials[k]+' '+k).join(', ') : ''
   const production = !!card.production ? 'Production: ' + Object.keys(card.production).map(k => card.production[k]+' '+k).join(', ') : ''
   return (
@@ -30,6 +38,14 @@ export function Tooltip({show, card, x, y}) {
       <div style={nameStyle}>{card ? card.name : ''}</div>
       <div>{card ? card.type + (!!card.subtype ? (' - ' + card.subtype) : '') : ''}</div>
       <div>{card ? card.text : ''}</div>
+      <div>{
+        card ? card.stats ? <div style={statsStyle}>
+          <div style={{gridArea: 'str'}}>STR {card.stats.strength}</div>
+          <div style={{gridArea: 'arm'}}>ARM {card.stats.armor}</div>
+          <div style={{gridArea: 'agi'}}>AGI {card.stats.agility}</div>
+          <div style={{gridArea: 'will'}}>WIL {card.stats.will}</div>
+        </div> : <div></div> : ''}
+      </div>
       <div>{card ? materials : ''}</div>
       <div>{card ? production : ''}</div>
   </div>)

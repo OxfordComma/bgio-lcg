@@ -45,7 +45,7 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
     );
   }
 
-export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
+export function PlayerHand({ hand, selectedCardID, onSelect }) {
   console.log(hand)
   return (
   <div className="myhand" >
@@ -54,7 +54,7 @@ export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
         key={'card' + card.id} 
         card={card} 
         isSelected={(card.id === selectedCardID)} 
-        onSelect={onSelectCard}
+        onSelect={onSelect}
       />
     )
     }
