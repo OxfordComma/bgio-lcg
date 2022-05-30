@@ -33,7 +33,7 @@ function shuffle(array) {
 	return array;
 }
 
-function drawCard(G, ctx, id) {
+function drawCard(G, ctx) {
 	let deck = G.players[ctx.currentPlayer].deckIDs
 	let hand = G.players[ctx.currentPlayer].handIDs.concat(deck.pop())
 	G.players[ctx.currentPlayer].handIDs = hand
@@ -46,7 +46,7 @@ function selectHandCard(G, ctx, id) {
 	console.log('select hand card with id:', id)
 	let currentPlayer = G.players[ctx.currentPlayer]
 
-	if (id === currentPlayer.selectedHandCardID)
+	if (id == currentPlayer.selectedHandCardID)
 		G.players[ctx.currentPlayer].selectedHandCardID = null
 	else
 		G.players[ctx.currentPlayer].selectedHandCardID = id
@@ -72,6 +72,17 @@ function selectLandscapeCard(G, ctx, id) {
 
 }
 
+function selectBeingCard(G, ctx, id) {
+	console.log('select being card at id:', id)
+
+	let currentPlayer = G.players[ctx.currentPlayer]
+
+	if (id === currentPlayer.selectedBeingID)
+		G.players[ctx.currentPlayer].selectedBeingID = null
+	else
+		G.players[ctx.currentPlayer].selectedBeingID = id
+}
+
 
 function playCard(G, ctx, id) {
 	if (!!id) {
@@ -82,10 +93,6 @@ function playCard(G, ctx, id) {
     const landscapes = G.landscapes[ctx.currentPlayer];
     let beings = G.beings[ctx.currentPlayer];
     if (card.type === "Location") {
-    	// console.log({card, player, landscape, beings})
-    	// console.log(player.selectedLandscapeID)
-    	// console.log(parseInt(player.selectedLandscapeID))
-    	// console.log(landscape[parseInt(player.selectedLandscapeID)])
       if (player.selectedHandCardID && player.selectedLandscapeID) {
         console.log('you can play this location card!');
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
@@ -103,7 +110,8 @@ function playCard(G, ctx, id) {
         beings = beings.concat({
         	beingCardID: player.selectedHandCardID,
         	id: beings.length,
-        })
+        	equipment: []
+        })	
 
       }
 
@@ -112,8 +120,33 @@ function playCard(G, ctx, id) {
     }
     return G;
 	}
-	// else {console.log('!!id')}
 	
+}
+
+function attack(G, ctx, id) {
+	let myBeings = G.beings[ctx.currentPlayer];
+	let oppBeings = G.beings[['0', '1'].filter(b => b !== ctx.currentPlayer)];
+	const cards = G.cards[ctx.currentPlayer];
+
+	let totalStrength = myBeings.reduce((acc, being) => {
+		let card = cards.find(c => c.id === being.beingCardID)
+		return acc + card.stats.strength ?? 0
+	}, 0)
+	// console.log('total strength:', totalStrength)
+
+	let totalArmor = myBeings.reduce((acc, being) => {
+		let card = cards.find(c => c.id === being.beingCardID)
+		return card.stats.armor ?? 0
+	}, 0)
+	// console.log('total armor:', totalArmor)
+
+	let player = G.players[ctx.currentPlayer];
+	let opponent = G.players[['0', '1'].filter(b => b !== ctx.currentPlayer)]
+	opponent.deckIDs = player.deckIDs.slice(0, player.deckIDs.length - Math.max(totalStrength + totalArmor, 0) )
+}
+
+function takeDamage(G, ctx, id) {
+
 }
 
 function addLocationResources(G, ctx, id) {
@@ -159,12 +192,14 @@ export const CardGame = {
 			players: {
 				'0': {
 					handIDs: [],
+					deckIDs: [],
 					selectedHandCardID: null,
 					selectedLandscapeID: null,
 					selectedBeingID: null
 				},
 				'1': {
 					handIDs: [],
+					deckIDs: [],
 					selectedHandCardID: null,
 					selectedLandscapeID: null,
 					selectedBeingID: null,
@@ -222,7 +257,7 @@ export const CardGame = {
 		}
 	},
 
-	playerView: PlayerView.STRIP_SECRETS,
+	// playerView: PlayerView.STRIP_SECRETS,
 	moves: {
 		drawCard: drawCard,
 		selectHandCard: {
@@ -233,7 +268,12 @@ export const CardGame = {
 			move: selectLandscapeCard,
 			noLimit: true,
 		},
+		selectBeingCard: {
+			move: selectBeingCard,
+			noLimit: true,
+		},
 		playCard: playCard,
+		attack: attack,
 		selectDeck: {
 			move: selectDeck,
 			noLimit: true,
@@ -243,13 +283,14 @@ export const CardGame = {
 		order: TurnOrder.RESET,
 		onBegin: (G, ctx) => {
 			console.log('turn begin')
+			drawCard(G, ctx)
 			G.landscapes[ctx.currentPlayer].forEach(f => {
 				if (f.landscapeCardID != null)
 					addLocationResources(G, ctx, f.landscapeCardID)
 			})
 		},
 		minMoves: 0,
-		maxMoves: 1,
+		maxMoves: 2,
 	},
 	phases: {
 		menu: {

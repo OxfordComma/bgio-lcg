@@ -5,13 +5,12 @@
 
 .board {
 	display: grid;
-	grid-template-rows: 25% 25% 25% 25%;
+	grid-template-rows: 33% 34% 33%;
 	grid-template-columns: 50% 50%;
 	width: 100%;
 	height: 100%;
 	padding: 5px;
 	grid-template-areas: 
-		'landscape gamestate'
 		'landscape battlefield'
 		'landscape battlefield'
 		'hand controls'
@@ -24,21 +23,18 @@
 	grid-template-rows: repeat(6, 1fr);
 	grid-template-columns: repeat(5, 1fr);
 	grid-area: landscape;
+  font-size: 0.6em;
 }
 
 .battlefield {
 	display: grid;
 	grid-template-rows: 50% 50%;
 	grid-area: battlefield;
+  font-size: 0.6em;
 }
 
-.gamestate {
+.myside, .theirside {
 	display: flex;
-	padding: 5px;
-	flex-direction: column;
-	grid-area: gamestate;
-}
+	flex-direction: row;
 
-.card:hover {
-	/*opacity:  0.5;*/
 }

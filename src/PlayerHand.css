@@ -2,19 +2,43 @@
 	display: flex;
 	flex-direction: row;
 	grid-area: hand;
-	font-size: small;
+	overflow-x: scroll;
+	overflow-y: hidden;
+  font-size: 0.6em;
 }
 
 .myhand .card {
   border: 1px solid #555;
   pointer-events: none;
+  height: 100%;
+  aspect-ratio: 1/1.6;
 }
 
-.myhand .card.isSelected {
+.myhand .card-slot {
+  background-color: white;
+}
+
+.myhand .card-slot.is-selected {
   background-color: yellow;
 }
 
-.myhand .card .card-name {
+
+.card .card-name {
   font-weight: bold;
   text-align: center;
+}
+
+.card .card-id {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.card .stats {
+  width: 100%;
+  height: auto;
+  display: grid;
+  grid-template-areas:
+    "str arm"
+    "agi will";
 }

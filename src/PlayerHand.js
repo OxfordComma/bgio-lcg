@@ -1,43 +1,32 @@
 import React, { useState } from 'react';
+import {Tooltip} from './Tooltip';
 import './PlayerHand.css';
 
-
-function DetailedCardInfo({card, isSelected, customStyle}) {
-    return (
-      <div className='card' style={customStyle}>
-        <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? '#' + card.number : ''}</div>
-        <div className="card-name">{card ? card.name : ''}</div>
-        <div>{card ? card.type : ''}</div>
-        <div>{card ? card.subtype : ''}</div>
-        {
-          card?.materials && 
-           <div>{Object.entries(card.materials)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
-        }
-        {
-          card?.production && 
-          <div>{Object.entries(card.production)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
-        }
-        <div>{card ? card.text : ''}</div>
-    </div>)
-  }
-
-
-function Tooltip({show, card, x, y}) {
-    let style = {
-      display: 'float',
-      width: '160px',
-      height: 'auto',
-      position: 'absolute', 
-      left: x,
-      top: y,
-      backgroundColor: 'darkgray',
-      transition: 300,
+function Card({ card }) {
+  return <div className='card'>
+    <div className='card-id'>
+      <div>id{card.id}</div>
+      <div>#{card.number}</div>
+    </div>
+    <div className='card-name'>{card?.name}</div>
+    <div>{card.type + (card?.subtype && (' - ' + card.subtype))}</div>
+    <div>{card.text}</div>
+    { card?.stats && 
+      <div className='stats'>
+        <div style={{gridArea: 'str'}}>STR {card.stats.strength}</div>
+        <div style={{gridArea: 'arm'}}>ARM {card.stats.armor}</div>
+        <div style={{gridArea: 'agi'}}>AGI {card.stats.agility}</div>
+        <div style={{gridArea: 'will'}}>WIL {card.stats.will}</div>
+      </div>
     }
-
-    return <DetailedCardInfo card={card} isSelected={false} customStyle={style}/>;
-  }
-
+    { card?.materials && 
+      <div>{Object.entries(card.materials)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
+    }
+    { card?.production && 
+      <div>{Object.entries(card.production)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
+    }
+  </div>
+}
 
 function PlayerHandCard({ card, isSelected, onSelect }) {
     const [showTooltip, setShowTooltip] = useState(false);
@@ -49,29 +38,27 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
       setX(e.screenX < 0 ? 0 : e.screenX)
       setY(e.screenY < 0 ? 0 : e.screenY)
     }
-  
-    const style = {
-      width: '100px',
-      pointerEvents: 'none',
-      aspectRatio: (1/1.6),
-    };
+
     return (
-      <div onMouseMove={onHover} onMouseOut={e => setShowTooltip(false)} onClick={e => {e.preventDefault(); onSelect(card.id)} }>
-        { showTooltip && <Tooltip show={showTooltip === card.id} card={card} x={x+5} y={y-240} /> }
-        <DetailedCardInfo card={card} isSelected={isSelected} customStyle={style} />
+      <div className={'card-slot' + (isSelected ? ' is-selected': '')} 
+        onMouseMove={onHover} onMouseOut={e => setShowTooltip(false)} 
+        onClick={e => {e.preventDefault(); onSelect(card.id)} }>
+        { showTooltip && <Tooltip x={x+5} y={y-240} ><Card card={card} /></Tooltip> }
+        { <Card card={card} isSelected={isSelected} /> }
       </div>
     );
   }
 
-export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
+export function PlayerHand({ hand, selectedCardID, onSelect }) {
+  console.log(hand)
   return (
   <div className="myhand" >
-    {hand?.map(card => 
+    {hand?.filter(c => c).map(card => 
       <PlayerHandCard 
         key={'card' + card.id} 
         card={card} 
         isSelected={(card.id === selectedCardID)} 
-        onSelect={onSelectCard}
+        onSelect={onSelect}
       />
     )
     }

@@ -1,44 +1,7 @@
 import React, { useState } from 'react';
+import {Tooltip} from './Tooltip'
 
-
-function DetailedCardInfo({card, isSelected, customStyle}) {
-    let style = {
-      border: '1px solid #555',
-      backgroundColor: isSelected ? 'yellow' : 'white',
-      pointerEvents: 'none',
-      ...customStyle
-    }
-    return (
-      <div className='card' style={style}>
-        <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? '#' + card.number : ''}</div>
-        <div>{card ? card.name : ''}</div>
-        <div>{card ? card.type : ''}</div>
-        <div>{card ? card.subtype : ''}</div>
-        <div>{card ? card.materials : ''}</div>
-        <div>{card ? card.text : ''}</div>
-    </div>)
-  }
-
-
-function Tooltip({show, card, x, y}) {
-    let style = {
-      display: 'float',
-      border: '1px solid #555',
-      width: '160px',
-      height: 'auto',
-      position: 'absolute', 
-      left: x,
-      top: y,
-      backgroundColor: 'darkgray',
-      transition: 300,
-    }
-  
-    return <DetailedCardInfo card={card} isSelected={false} customStyle={style}/>;
-  }
-
-
-function PlayerHandCard({ card, isSelected, onSelect }) {
+function PlayerBattlefieldCard({ card, isSelected, onSelect }) {
     const [showTooltip, setShowTooltip] = useState(false);
     const [x, setX] = useState();
     const [y, setY] = useState();
@@ -51,39 +14,64 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
   
     const style = {
       border: '1px solid #555',
-      width: '100px',
+      height: '100%',
       backgroundColor: isSelected ? 'yellow' : 'white',
       pointerEvents: 'none',
       aspectRatio: (1/1.6),
     };
+
+    const statsStyle = {
+      width: '100%',
+      height: '50%',
+      display: 'grid',
+      gridTemplateAreas: `
+        'str arm'
+        'agi will'`,
+    }
     return (
       <div onMouseMove={onHover} onMouseOut={e => setShowTooltip(false)} onClick={e => {e.preventDefault(); onSelect(card.id)} }>
         { showTooltip && <Tooltip show={showTooltip === card.id} card={card} x={x+5} y={y-240} /> }
-        <DetailedCardInfo card={card} isSelected={isSelected} customStyle={style} />
+         <div className='card' style={style}>
+            <div>{card ? `${card.name} [${card.id}]` : ''}</div>
+            <div>{card ? card.type : ''}</div>
+            <div>{card ? card.subtype : ''}</div>
+            <div>{card ? card.materials : ''}</div>
+            <div>{card ? card.text : ''}</div>
+            <div style={statsStyle}>
+              <div style={{gridArea: 'str'}}>STR {card.stats.strength}</div>
+              <div style={{gridArea: 'arm'}}>ARM {card.stats.armor}</div>
+              <div style={{gridArea: 'agi'}}>AGI {card.stats.agility}</div>
+              <div style={{gridArea: 'will'}}>WIL {card.stats.will}</div>
+            </div>
+        </div>
       </div>
     );
   }
 
-export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelectCard }) {
+export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect }) {
   return (
   <div className="battlefield" >
+    <div className="theirside">
     { beings[['0', '1'].filter(p => p !== playerID)].map(being => 
-      <PlayerHandCard
-        key={"being" + being.id.toString()}
+      <PlayerBattlefieldCard
+        key={['0', '1'].find(p => p !== playerID) + "_being" + being.id.toString()}
         being={being}
         card={cards.find(c => c.id === being.beingCardID)}
         isSelected={ false }
-        onSelect={onSelectCard}
+        onSelect={onSelect}
       />
     )}
+  </div>
+  <div className="myside" >
     { beings[playerID].map(being => 
-      <PlayerHandCard
-        key={"being" + being.id.toString()}
+      <PlayerBattlefieldCard
+        key={playerID + "_being" + being.id.toString()}
         being={being}
         card={cards.find(c => c.id === being.beingCardID)}
-        isSelected={ selectedBeingID === being.id }
-        onSelect={onSelectCard}
+        isSelected={ parseInt(selectedBeingID) === being.id }
+        onSelect={onSelect}
       />
     )}
+  </div>
   </div>)
 }

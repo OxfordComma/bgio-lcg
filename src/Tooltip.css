@@ -1,0 +1,9 @@
+.card-tooltip {
+    display: float;
+    border: 1px solid #555;
+    width: 100px;
+    height: 160px;
+    position: absolute;
+    background-color: darkgray;
+    transition: 300;
+}
