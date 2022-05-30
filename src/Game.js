@@ -120,15 +120,23 @@ function addLocationResources(G, ctx, id) {
 	console.log(id)
 	if (!!id) {
 		let card = G.cards[ctx.currentPlayer].find(c => c.id === id);
-		if (card?.production?.wood) {
-      G.resources[ctx.currentPlayer].wood += 1;
-    }
-    if (card?.production?.metal) {
-      G.resources[ctx.currentPlayer].metal += 1;
-    }
-    if (card?.production?.metal) {
-      G.resources[ctx.currentPlayer].soul += 1;
-    }
+		if (card && 'materials' in card) {
+			if ('wood' in card.materials) {
+				G.resources[ctx.currentPlayer].wood += 1;
+			}
+			if ('metal' in card.materials) {
+				G.resources[ctx.currentPlayer].wood += 1;
+			}
+		}
+		// if (card?.production?.wood) {
+    //   G.resources[ctx.currentPlayer].wood += 1;
+    // }
+    // if (card?.production?.metal) {
+    //   G.resources[ctx.currentPlayer].metal += 1;
+    // }
+    // if (card?.production?.metal) {
+    //   G.resources[ctx.currentPlayer].soul += 1;
+    // }
 	}
 }
 
@@ -247,7 +255,7 @@ export const CardGame = {
 		menu: {
 			start: true,
 			next: 'play',
-			endIf: (G) => G?.decklists['0'] != null && G?.decklists['1'] != null
+			endIf: (G) => ('decklists' in G) && G.decklists['0'] != null && G.decklists['1'] != null
 		},
 		play: {
 			onBegin: (G, ctx) => {

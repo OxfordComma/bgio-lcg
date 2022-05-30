@@ -1,9 +1,10 @@
-import { Client } from 'boardgame.io/react';
+import { Client, Lobby } from 'boardgame.io/react';
 import { Local, SocketIO } from 'boardgame.io/multiplayer';
 import { CardGame } from './Game';
 import { Board } from './Board';
 
 import React, { useState, useEffect } from 'react'
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 const CardGameClient = Client({
   game: CardGame,
@@ -11,13 +12,14 @@ const CardGameClient = Client({
   multiplayer: Local(),
   // playerID: 0
   // multiplayer: SocketIO({ server: '192.168.0.6:8000' }),
-
+  // multiplayer: SocketIO({ server: `http://${window.location.hostname}:8000`}),
+  
 });
 
 
 // const playerID = (Math.floor(Math.random() * 1000000)).toString()
 const App = () => {
-  let [playerID, setPlayerID] = useState(null);
+  // let [playerID, setPlayerID] = useState(null);
   // return (
   //   playerID == null ? 
   //   <div>
@@ -36,8 +38,29 @@ const App = () => {
   // )
   return (
     <div>
+      {/* <Lobby
+        gameServer={`http://${window.location.hostname}:8000`}
+        lobbyServer={`http://${window.location.hostname}:8000`}
+        gameComponents={[
+          { game: CardGame, board: Board, }
+        ]}
+      /> */}
       <CardGameClient playerID='0'/>
-      <CardGameClient playerID='1'/>
+    {/* <BrowserRouter>
+      <Routes>
+        <Route path="/" element={
+          <Lobby
+            gameServer={`http://${window.location.hostname}:8000`}
+            lobbyServer={`http://${window.location.hostname}:8000`}
+            gameComponents={[
+              { game: CardGame, board: Board, }
+            ]}
+          />
+        } />
+        <Route path="/0" element={<CardGameClient playerID='0'/>} />
+        <Route path="/1" element={<CardGameClient playerID='1'/>} />
+      </Routes>
+    </BrowserRouter> */}
     </div>
   )
 }
