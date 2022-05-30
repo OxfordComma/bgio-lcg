@@ -1,0 +1,20 @@
+.myhand {
+	display: flex;
+	flex-direction: row;
+	grid-area: hand;
+	font-size: small;
+}
+
+.myhand .card {
+  border: 1px solid #555;
+  pointer-events: none;
+}
+
+.myhand .card.isSelected {
+  background-color: yellow;
+}
+
+.myhand .card .card-name {
+  font-weight: bold;
+  text-align: center;
+}

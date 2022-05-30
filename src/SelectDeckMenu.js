@@ -5,7 +5,7 @@ export function SelectDeckMenu({ decks, onDeckSelect }) {
     <form onSubmit={e => {e.preventDefault(); onDeckSelect(e.target.value);}}>
       <div>
         {decks.map((deck => <span key={deck.id}>
-          <label for={deck.id}>{deck.name}</label>
+          <label htmlFor={deck.id}>{deck.name}</label>
           <input id={deck.id} type="radio" value={deck.id}/>
         </span>))}
       </div>

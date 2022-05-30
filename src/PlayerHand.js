@@ -1,30 +1,23 @@
 import React, { useState } from 'react';
+import './PlayerHand.css';
 
 
 function DetailedCardInfo({card, isSelected, customStyle}) {
-    let style = {
-      border: '1px solid #555',
-      backgroundColor: isSelected ? 'yellow' : 'white',
-      pointerEvents: 'none',
-      ...customStyle
-    }
-    const nameStyle = {
-      'fontWeight': 'bold',
-      'textAlign': 'center'
-    }
-
-    const materials = !!card.materials ? Object.keys(card.materials).map(k => card.materials[k]+' '+k).join(', ') : ''
-    const production = !!card.production ? Object.keys(card.production).map(k => card.production[k]+' '+k).join(', ') : ''
-
     return (
-      <div className='card' style={style}>
+      <div className='card' style={customStyle}>
         <div>{card ? 'id' + card.id : ''}</div>
         <div>{card ? '#' + card.number : ''}</div>
-        <div style={nameStyle}>{card ? card.name : ''}</div>
+        <div className="card-name">{card ? card.name : ''}</div>
         <div>{card ? card.type : ''}</div>
         <div>{card ? card.subtype : ''}</div>
-        <div>{card ? materials : ''}</div>
-        <div>{card ? production : ''}</div>
+        {
+          card?.materials && 
+           <div>{Object.entries(card.materials)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
+        }
+        {
+          card?.production && 
+          <div>{Object.entries(card.production)?.map((k, v) => `${v} ${k}`).join(', ')}</div>
+        }
         <div>{card ? card.text : ''}</div>
     </div>)
   }
@@ -33,7 +26,6 @@ function DetailedCardInfo({card, isSelected, customStyle}) {
 function Tooltip({show, card, x, y}) {
     let style = {
       display: 'float',
-      border: '1px solid #555',
       width: '160px',
       height: 'auto',
       position: 'absolute', 
@@ -42,7 +34,7 @@ function Tooltip({show, card, x, y}) {
       backgroundColor: 'darkgray',
       transition: 300,
     }
-  
+
     return <DetailedCardInfo card={card} isSelected={false} customStyle={style}/>;
   }
 
@@ -59,9 +51,7 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
     }
   
     const style = {
-      border: '1px solid #555',
       width: '100px',
-      backgroundColor: isSelected ? 'yellow' : 'white',
       pointerEvents: 'none',
       aspectRatio: (1/1.6),
     };
@@ -74,10 +64,9 @@ function PlayerHandCard({ card, isSelected, onSelect }) {
   }
 
 export function PlayerHand({ hand, selectedCardID, onSelectCard }) {
-  console.log(hand)
   return (
   <div className="myhand" >
-    {hand.map(card => 
+    {hand?.map(card => 
       <PlayerHandCard 
         key={'card' + card.id} 
         card={card} 

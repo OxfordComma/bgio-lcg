@@ -1,0 +1,25 @@
+.Ngamestate > div {
+  display: inline-block;
+  margin: 5px;
+}
+
+.Ngamestate > div > div.resouceCount {
+  display: inline-block;
+  text-align: center;
+  margin-left: 5px;
+  border: 1px solid rgb(85, 85, 85);
+  min-width: 20px;
+}
+
+.Ngamestate > div.your-turn {
+  text-align: center;
+  margin-left: 5px;
+  background-color: green;
+}
+
+.Ngamestate > div.opponent-turn {
+  text-align: center;
+  margin-left: 5px;
+  background-color: red;
+}
+

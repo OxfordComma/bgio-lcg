@@ -1,14 +1,6 @@
-.container{
+.container {
 	width: 80vw;
 	height: 80vh;
-	
-}
-
-.myhand {
-	display: flex;
-	flex-direction: row;
-	grid-area: hand;
-	font-size: small;
 }
 
 .board {
@@ -37,9 +29,7 @@
 .battlefield {
 	display: grid;
 	grid-template-rows: 50% 50%;
-	/*flex-direction: row;*/
 	grid-area: battlefield;
-
 }
 
 .gamestate {

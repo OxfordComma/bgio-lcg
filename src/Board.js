@@ -3,48 +3,56 @@ import { SelectDeckMenu } from './SelectDeckMenu';
 import { PlayerHand } from './PlayerHand';
 import { Landscape } from './Landscape';
 import { Battlefield } from './Battlefield';
-import './styles/Board.css';
+import { GameStateBar } from './GameStateBar';
+import './Board.css';
 
-
-function PlayerResources({ resources }) {
-  return <div className="gamestate">
-    <div>Metal:{resources.metal}</div>
-    <div>Wood:{resources.wood}</div>
-    <div>Mana:{resources.mana}</div>
-  </div>
-}
-
-function Controls({ onPlayCard }) {
+function Controls({ isPlayerTurn, onPlayCard }) {
   return <div className="controls">
-    <button onClick={e => {e.preventDefault(); onPlayCard() }}>play</button>
+    <button onClick={e => {e.preventDefault(); onPlayCard() }} disabled={!isPlayerTurn}>play</button>
   </div>
 }
 
-function GameBoard({ ctx, G, cards, landscapes, beings, playerID, playerResources, playerHand, selectedLandscapeID, selectedHandCardID, selectedBeingID, onSelectLandscape, onSelectCard, onPlayCard }) {
+function GameBoard({ 
+  cards, 
+  landscapes, 
+  beings, 
+  isPlayerTurn,
+  playerID, 
+  playerResources, 
+  playerHand, 
+  selectedLandscapeID, 
+  selectedHandCardID, 
+  selectedBeingID, 
+  onSelectLandscape, 
+  onSelectCard, 
+  onPlayCard 
+}) {
   return (
-    <div className="board">
-      <Landscape
-        playerID={playerID}
-        landscapes={landscapes}
-        cards={cards}
-        onSelect={onSelectLandscape}
-        selectedLandscapeID={selectedLandscapeID}
-      />
-      <PlayerHand 
-        hand={playerHand}
-        selectedCardID={selectedHandCardID}
-        onSelectCard={onSelectCard}
-      />
-      <PlayerResources resources={playerResources} />
-      <Battlefield
-        playerID={playerID}
-        beings={beings}
-        cards={cards}
-        onSelectCard={null}
-        selectedBeingID={selectedBeingID}
-      />
-      <Controls onPlayCard={onPlayCard} />
-    </div>
+    <>
+      <GameStateBar isPlayerTurn={!!isPlayerTurn} resources={playerResources} />
+      <div className="board">
+        <Landscape
+          playerID={playerID}
+          landscapes={landscapes}
+          cards={cards}
+          onSelect={onSelectLandscape}
+          selectedLandscapeID={selectedLandscapeID}
+        />
+        <PlayerHand 
+          hand={playerHand}
+          selectedCardID={selectedHandCardID}
+          onSelectCard={onSelectCard}
+        />
+        <Battlefield
+          playerID={playerID}
+          beings={beings}
+          cards={cards}
+          onSelectCard={null}
+          selectedBeingID={selectedBeingID}
+        />
+        <Controls onPlayCard={onPlayCard} isPlayerTurn={isPlayerTurn} />
+      </div>
+    </>
   )
 }
 
@@ -65,8 +73,9 @@ function PlayGameMenu({ ctx, G, moves, playerID }) {
   }
 
   function onPlayCard() {
-    console.log('play card')
-    !!G.players[ctx.currentPlayer].selectedHandCardID && moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID)
+    if (G.players[ctx.currentPlayer]?.selectedHandCardID) {
+      moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID);
+    }
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
 
@@ -84,6 +93,8 @@ function PlayGameMenu({ ctx, G, moves, playerID }) {
     moves.selectLandscapeCard(landscapeID);
   }
 
+  const isPlayerTurn = playerID === ctx.currentPlayer;
+
   return <GameBoard
     cards={cards}
     landscapes={landscapes}
@@ -91,6 +102,7 @@ function PlayGameMenu({ ctx, G, moves, playerID }) {
     playerResources={resources}
     playerHand={playerHand}
     playerID={playerID}
+    isPlayerTurn={isPlayerTurn}
     moves={moves}
     selectedHandCardID={selectedHandCardID}
     selectedBeingID={selectedBeingID}
