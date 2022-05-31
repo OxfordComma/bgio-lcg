@@ -1,9 +1,9 @@
-.Ngamestate > div {
+.gamestate > div {
   display: inline-block;
   margin: 5px;
 }
 
-.Ngamestate > div > div.resouceCount {
+.gamestate > div > div.resouceCount {
   display: inline-block;
   text-align: center;
   margin-left: 5px;
@@ -11,13 +11,13 @@
   min-width: 20px;
 }
 
-.Ngamestate > div.your-turn {
+.gamestate > div.your-turn {
   text-align: center;
   margin-left: 5px;
   background-color: green;
 }
 
-.Ngamestate > div.opponent-turn {
+.gamestate > div.opponent-turn {
   text-align: center;
   margin-left: 5px;
   background-color: red;

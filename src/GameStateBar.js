@@ -3,7 +3,7 @@ import './GameStateBar.css';
 
 
 export function GameStateBar({ isPlayerTurn , resources, life }) {
-  return <div className='Ngamestate'>
+  return <div className='gamestate'>
       {
         isPlayerTurn ? 
           <div className='your-turn'>Your turn</div> : 
