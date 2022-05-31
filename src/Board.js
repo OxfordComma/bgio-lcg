@@ -4,7 +4,9 @@ import { PlayerHand } from './PlayerHand';
 import { Landscape } from './Landscape';
 import { Battlefield } from './Battlefield';
 import { GameStateBar } from './GameStateBar';
+import { GameInterface } from './GameInterface';
 import './Board.css';
+
 
 function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, consoleMessages }) {
   return <div className="controls">
@@ -36,37 +38,35 @@ function GameBoard({
   onAttack,
   onEndTurn,
 }) {
-  return (<>
+  return (<GameInterface>
       <GameStateBar isPlayerTurn={!!isPlayerTurn} resources={playerResources} life={life} />
-      <div className="board">
-        <Landscape
-          playerID={playerID}
-          landscapes={landscapes}
-          cards={cards}
-          onSelect={onSelectLandscape}
-          selectedLandscapeID={selectedLandscapeID}
-        />
-        <PlayerHand 
-          hand={playerHand}
-          selectedCardID={selectedHandCardID}
-          onSelect={onSelectHand}
-        />
-        <Battlefield
-          playerID={playerID}
-          beings={beings}
-          cards={cards}
-          onSelectCard={null}
-          selectedBeingID={selectedBeingID}
-        />
-        <Controls 
-          isPlayerTurn={isPlayerTurn}
-          attack={onAttack}
-          onPlayCard={onPlayCard} 
-          endTurn={onEndTurn}
-          consoleMessages={consoleMessages}
-        />
-      </div>
-    </>)
+      <Landscape
+        playerID={playerID}
+        landscapes={landscapes}
+        cards={cards}
+        onSelect={onSelectLandscape}
+        selectedLandscapeID={selectedLandscapeID}
+      />
+      <Battlefield
+        playerID={playerID}
+        beings={beings}
+        cards={cards}
+        onSelectCard={null}
+        selectedBeingID={selectedBeingID}
+      />
+      <PlayerHand 
+        hand={playerHand}
+        selectedCardID={selectedHandCardID}
+        onSelect={onSelectHand}
+      />
+      <Controls 
+        isPlayerTurn={isPlayerTurn}
+        attack={onAttack}
+        onPlayCard={onPlayCard} 
+        endTurn={onEndTurn}
+        consoleMessages={consoleMessages}
+      />
+    </GameInterface>)
 }
 
 

@@ -1,17 +1,11 @@
 import React from 'react';
+import './Landscape.css';
 
 function GridLocation({ isSelected, onSelect, landscape, card }) {  
-  let style = {
-    border: '1px solid #555',
-    width: '100%',
-    height: '100%',
-    backgroundColor: isSelected ? 'yellow' : 'white',
-  };
   return (
     <div 
       onClick={(e) => {e.preventDefault(); onSelect(landscape.id)}} 
-      className={ card ? "card" : ""} 
-      style={style}
+      className={'land-area' + (card ? ' card' : '') + (isSelected ? ' highlighted' : '')}
     >
       {card && <>
         <div>{card ? 'id' + card.id : ''}</div>

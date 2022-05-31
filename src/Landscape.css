@@ -1,0 +1,24 @@
+.landscape {
+	display: grid;
+	height: 100%;
+	grid-template-rows: repeat(6, 1fr);
+	grid-template-columns: repeat(5, 1fr);
+  font-size: 0.6em;
+}
+
+.landscape .myside,
+.landscape .theirside {
+	display: flex;
+	flex-direction: row;
+}
+
+.land-area {
+  border: 1px solid #555;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+.land-area.highlighted {
+  background-color: yellow;
+}

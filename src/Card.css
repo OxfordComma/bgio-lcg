@@ -1,0 +1,24 @@
+.card {
+  border: 1px solid #555;
+  aspect-ratio: 1/1.6;
+}
+
+.card > .card-name {
+  font-weight: bold;
+  text-align: center;
+}
+
+.card > .card-id {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.card > .stats {
+  width: 100%;
+  height: auto;
+  display: grid;
+  grid-template-areas:
+    "str arm"
+    "agi will";
+}

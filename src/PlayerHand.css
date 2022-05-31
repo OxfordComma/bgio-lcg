@@ -1,44 +1,26 @@
-.myhand {
-	display: flex;
-	flex-direction: row;
-	grid-area: hand;
-	overflow-x: scroll;
-	overflow-y: hidden;
-  font-size: 0.6em;
+.myhand  {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 }
 
-.myhand .card {
-  border: 1px solid #555;
-  pointer-events: none;
-  height: 100%;
+.myhand .card-slots {
+	display: flex;
+	flex-direction: row;
+  font-size: 0.6em;
+  aspect-ratio: 5;
+}
+
+.myhand .card-slots > .card-slot {
   aspect-ratio: 1/1.6;
 }
 
-.myhand .card-slot {
+.myhand .card-slots > .card-slot {
   background-color: white;
 }
 
-.myhand .card-slot.is-selected {
+.myhand .card-slots > .card-slot.is-selected {
   background-color: yellow;
 }
 
-
-.card .card-name {
-  font-weight: bold;
-  text-align: center;
-}
-
-.card .card-id {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.card .stats {
-  width: 100%;
-  height: auto;
-  display: grid;
-  grid-template-areas:
-    "str arm"
-    "agi will";
-}

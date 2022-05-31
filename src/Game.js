@@ -50,8 +50,6 @@ function selectHandCard(G, ctx, id) {
 		G.players[ctx.currentPlayer].selectedHandCardID = null
 	else
 		G.players[ctx.currentPlayer].selectedHandCardID = id
-
-
 }
 
 

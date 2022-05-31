@@ -1,0 +1,27 @@
+.battlefield {
+	display: grid;
+	grid-template-rows: 50% 50%;
+  font-size: 0.6em;
+  height: 100%;
+}
+
+.battlefield .myside,
+.battlefield .theirside {
+	display: flex;
+	flex-direction: row;
+  padding: 1em;
+}
+
+.battlefield .card {
+  border: 1px solid #555;
+  height: 100%;
+  aspect-ratio: 1/1.6;
+}
+
+.battlefield .card-slot {
+  background-color: white;
+}
+
+.myhand .card-slot.is-selected {
+  background-color: yellow;
+}
