@@ -6,11 +6,14 @@ import { Battlefield } from './Battlefield';
 import { GameStateBar } from './GameStateBar';
 import './Board.css';
 
-function Controls({ isPlayerTurn, onPlayCard, attack, endTurn }) {
+function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, consoleMessages }) {
   return <div className="controls">
-    <button onClick={e => {e.preventDefault(); onPlayCard() }} disabled={!isPlayerTurn}>play</button>
-    <button onClick={e => {e.preventDefault(); attack() }} disabled={!isPlayerTurn}>attack</button>
-    <button onClick={e => {e.preventDefault(); endTurn() }} disabled={!isPlayerTurn}>end</button>
+    <div>
+      <button onClick={e => {e.preventDefault(); onPlayCard() }} disabled={!isPlayerTurn}>play</button>
+      <button onClick={e => {e.preventDefault(); attack() }} disabled={!isPlayerTurn}>attack</button>
+      <button onClick={e => {e.preventDefault(); endTurn() }} disabled={!isPlayerTurn}>end</button>
+    </div>
+    <div className='output'>{ consoleMessages.map((msg, i) => <div key={i}>{msg}</div>) }</div>
   </div>
 }
 
@@ -26,6 +29,7 @@ function GameBoard({
   selectedLandscapeID, 
   selectedHandCardID, 
   selectedBeingID, 
+  consoleMessages,
   onSelectLandscape, 
   onSelectHand, 
   onPlayCard,
@@ -59,6 +63,7 @@ function GameBoard({
           attack={onAttack}
           onPlayCard={onPlayCard} 
           endTurn={onEndTurn}
+          consoleMessages={consoleMessages}
         />
       </div>
     </>)
@@ -74,6 +79,8 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   const [selectedHandCardID, setSelectedHandCardID] = useState(null);
   const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
   const [selectedBeingID, setSelectedBeingID] = useState(null);
+
+  const [consoleMessages, setConsoleMessages] = useState([]);
 
   function onSelectHand(cardID) {
     console.log('set selected card in hand:', cardID)
@@ -98,6 +105,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     if (G.players[ctx.currentPlayer]?.selectedHandCardID) {
       moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID);
     }
+    // setConsoleMessages([...consoleMessages, `player ${playerID} play card`])
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
     setSelectedBeingID(null);
@@ -108,9 +116,15 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   const resources = G.resources[playerID];
   const life = player.deckIDs.length
   const playerHand = player?.handIDs.map(handId => cards.find(({ id }) => id === handId));
-  const attack = moves.attack;
-  const endTurn = events.endTurn;
   
+  const attack = function() {
+    setConsoleMessages([...consoleMessages, `player ${playerID} attack!`])
+    moves.attack();
+  }
+  const endTurn = function() {
+    setConsoleMessages([...consoleMessages, `player ${playerID} end turn`])
+    events.endTurn();
+  }
 
   const isPlayerTurn = playerID === ctx.currentPlayer;
 
@@ -132,6 +146,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     onSelectBeing={onSelectBeing}
     onSelectLandscape={onSelectLandscape}
     onPlayCard={onPlayCard}
+    consoleMessages={consoleMessages}
   />;
 }
 
