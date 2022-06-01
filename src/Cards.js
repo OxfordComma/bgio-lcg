@@ -82,6 +82,58 @@ const cardlist = [
     "metal": 3,
   },
 },
+{
+  "number": 6,
+  "name": "Mister Wizard",
+  "type": "Being",
+  "subtype": "",
+  "element": "",
+  "stats": {
+    "strength": 0,
+    "armor": 0,
+    "agility": 0,
+    "will": 5,
+  },
+  "traits": ['human', 'wizard'],
+  "text": "BEWARE MY FIREBALL!",
+},
+{
+  "number": 7,
+  "name": "Stinky Goblin",
+  "type": "Being",
+  "subtype": "",
+  "element": "",
+  "stats": {
+    "strength": 1,
+    "armor": 1,
+    "agility": -1,
+    "will": 0,
+  },
+  "traits": ['goblin'],
+  "text": "Shower?",
+},
+{
+  "number": 6,
+  "name": "Goblinhole",
+  "type": "Location",
+  "subtype": "",
+  "element": "",
+  "text": "Goblins only!",
+  "production": {
+    "soul": 1
+  }
+},
+{
+  "number": 7,
+  "name": "Wizard Tower",
+  "type": "Location",
+  "subtype": "",
+  "element": "",
+  "text": "Wizards only!",
+  "production": {
+    "soul": 1
+  }
+},
 // {
 //   "number": "5",
 //   "name": "Short Sword",

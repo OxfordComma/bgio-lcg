@@ -154,9 +154,8 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
 
 
 export function Board({ G, ctx, moves, events, playerID }) {
-  function onDeckSelect(deckType) {
-    moves.selectDeck('Fire Deck', playerID);
-    // moves.selectDeck(deckType, playerID)
+  function onDeckSelect(deckID) {
+    moves.selectDeck(deckID, playerID);
   }
   return (
     <div className="container">

@@ -49,6 +49,7 @@ function PlayerBattlefieldCard({ card, isSelected, onSelect }) {
   }
 
 export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect }) {
+  console.log(beings)
   return (
   <div className="battlefield" >
     <div className="theirside">

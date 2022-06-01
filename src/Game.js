@@ -1,18 +1,25 @@
 import { PlayerView, TurnOrder } from 'boardgame.io/core';
 import { generateDeckFromDecklist } from './Cards'
 import { Decks } from './Decks'
+import { Cards } from './Cards'
 // import { CardFunctions } from './CardFunctions'
 
 
 
-function selectDeck(G, ctx, deckName, playerID) {
-	const deck = Decks().find(d => d.name === deckName);
-	const decklist = deck.decklist;
+function selectDeck(G, ctx, deckID, playerID) {
+	console.log(deckID)
+
+	const deck = Decks().find(d => d.id === deckID);
+	let decklist = deck.decklist;
+
+	decklist[deck.startingLocation] = 1
+	decklist[deck.startingBeing] = 1
 
 	G.cards['0'] = generateDeckFromDecklist(decklist);
 	G.cards['1'] = generateDeckFromDecklist(decklist);
-	G.decklists['0'] = decklist;
-	G.decklists['1'] = decklist;
+
+	G.decklists['0'] = deck;
+	G.decklists['1'] = deck;
 }
 
 function shuffle(array) {
@@ -155,20 +162,21 @@ function attack(G, ctx, id) {
 	}, 0)
 	// console.log('total strength:', totalStrength)
 
-	let totalArmor = myBeings.reduce((acc, being) => {
+	// Total armor of their front row?
+	let totalArmor = myBeings.slice(0, 2).reduce((acc, being) => {
 		let card = cards.find(c => c.id === being.beingCardID)
 		return card.stats.armor ?? 0
 	}, 0)
 	// console.log('total armor:', totalArmor)
 
+	// Opponent takes the damage!
 	let player = G.players[ctx.currentPlayer];
 	let opponent = G.players[['0', '1'].filter(b => b !== ctx.currentPlayer)]
+	
 	opponent.deckIDs = player.deckIDs.slice(0, player.deckIDs.length - Math.max(totalStrength + totalArmor, 0) )
+	opponent.discardIDs = player.deckIDs.slice(player.deckIDs.length - Math.max(totalStrength + totalArmor, 0) )
 }
 
-function takeDamage(G, ctx, id) {
-
-}
 
 function addLocationResources(G, ctx, id) {
 	console.log(id)
@@ -214,6 +222,7 @@ export const CardGame = {
 				'0': {
 					handIDs: [],
 					deckIDs: [],
+					discardIDs: [],
 					selectedHandCardID: null,
 					selectedLandscapeID: null,
 					selectedBeingID: null
@@ -221,30 +230,14 @@ export const CardGame = {
 				'1': {
 					handIDs: [],
 					deckIDs: [],
+					discardIDs: [],
 					selectedHandCardID: null,
 					selectedLandscapeID: null,
 					selectedBeingID: null,
 
 				}
 			},
-			decks: [
-				{
-					"name": "Fire",
-					"id": "fire"
-				},
-				{
-					"name": "Water",
-					"id": "water"
-				},
-				{
-					"name": "Earth",
-					"id": "earth"
-				},
-				{
-					"name": "Air",
-					"id": "air"
-				},
-			],
+			decks: Decks().map(d => {return {id: d.id , name: d.name}}),
 			resources: {
 				'0': {
 					metal: 0,
@@ -325,7 +318,8 @@ export const CardGame = {
 
 				// Initialize each player
 				ctx.playOrder.forEach(player => {
-					let deckIDs = shuffle(G.cards[ctx.currentPlayer].map(c => c.id));
+					const decklist = G.decklists[player];
+					let deckIDs = shuffle(G.cards[player].map(c => c.id)).filter(c => ![decklist.startingBeing, decklist.startingLocation].includes(c.name));
 					let handIDs = [];
 
 
@@ -333,8 +327,21 @@ export const CardGame = {
 						handIDs = handIDs.concat(deckIDs.pop());
 					}
 
+					// Starting location
+					let landscapes = G.landscapes[player]
+					landscapes[0].landscapeCardID = G.cards[player].find(c => c.name === decklist.startingLocation).id
+					// console.log(G.cards[player].find(c => c.name === decklist.startingLocation).id)
+
 					G.players[player].handIDs = handIDs;
 					G.players[player].deckIDs = deckIDs;
+
+					G.landscapes[player] = landscapes;
+
+					G.beings[player] = [{
+	        	beingCardID: G.cards[player].find(c => c.name === decklist.startingBeing).id,
+	        	id: 0,
+	        	equipment: []
+	        }]
 				});
 			},
 		}
