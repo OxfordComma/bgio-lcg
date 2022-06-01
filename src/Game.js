@@ -89,9 +89,11 @@ function playCard(G, ctx, id) {
 		console.log('play card:', id)
 		const card = G.cards[ctx.currentPlayer].find(c => c.id === id);
     const player = G.players[ctx.currentPlayer];
+  	const resources = player.resources
 
     const landscapes = G.landscapes[ctx.currentPlayer];
     let beings = G.beings[ctx.currentPlayer];
+
     if (card.type === "Location") {
       if (player.selectedHandCardID && player.selectedLandscapeID) {
         console.log('you can play this location card!');
@@ -113,6 +115,25 @@ function playCard(G, ctx, id) {
         	equipment: []
         })	
 
+      }
+
+      G.players[ctx.currentPlayer] = player;
+      G.beings[ctx.currentPlayer] = beings;
+    }
+
+    if (card.type === "Item" && card.subtype === "Equipment") {
+
+      if (player.selectedHandCardID && player.selectedBeingID) {
+        console.log('you can play this equipment card!');
+        
+        player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
+        
+        let being = beings.find(b => b.beingCardID === player.selectedBeingID)
+        console.log(being)
+        being.equipment = being.equipment.concat(player.selectedHandCardID)
+
+        // Replace in array and preserve order
+        beings = beings.map(b => b.id == being.id ? b : being )
       }
 
       G.players[ctx.currentPlayer] = player;

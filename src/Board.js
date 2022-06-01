@@ -31,7 +31,8 @@ function GameBoard({
   selectedBeingID, 
   consoleMessages,
   onSelectLandscape, 
-  onSelectHand, 
+  onSelectHand,
+  onSelectBeing,
   onPlayCard,
   onAttack,
   onEndTurn,
@@ -55,7 +56,7 @@ function GameBoard({
           playerID={playerID}
           beings={beings}
           cards={cards}
-          onSelectCard={null}
+          onSelect={onSelectBeing}
           selectedBeingID={selectedBeingID}
         />
         <Controls 
@@ -102,10 +103,11 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   }
 
   function onPlayCard() {
-    if (G.players[ctx.currentPlayer]?.selectedHandCardID) {
-      moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID);
+    const cardID = G.players[ctx.currentPlayer].selectedHandCardID
+    if (cardID) {
+      moves.playCard(cardID);
     }
-    // setConsoleMessages([...consoleMessages, `player ${playerID} play card`])
+    setConsoleMessages([...consoleMessages, `player ${playerID} played card ${cards.find(c => c.id === cardID).name}`])
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
     setSelectedBeingID(null);
