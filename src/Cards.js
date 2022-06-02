@@ -9,7 +9,7 @@
 const cardlist = [
 {
   "number": 1,
-  "name": "Soldier",
+  "name": "Tank",
   "type": "Being",
   "subtype": "",
   "element": "",
@@ -19,8 +19,11 @@ const cardlist = [
     "agility": 0,
     "will": 0,
   },
-  "traits": [],
+  "traits": ['human'],
   "text": "",
+  "materials": {
+    "soul": 1,
+  },
 },
 {
   "number": 2,
@@ -96,6 +99,9 @@ const cardlist = [
   },
   "traits": ['human', 'wizard'],
   "text": "BEWARE MY FIREBALL!",
+  "materials": {
+    "soul": 1,
+  },
 },
 {
   "number": 7,
@@ -111,6 +117,9 @@ const cardlist = [
   },
   "traits": ['goblin'],
   "text": "Shower?",
+  "materials": {
+    "soul": 1,
+  },
 },
 {
   "number": 6,

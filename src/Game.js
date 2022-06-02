@@ -96,7 +96,7 @@ function playCard(G, ctx, id) {
 		console.log('play card:', id)
 		const card = G.cards[ctx.currentPlayer].find(c => c.id === id);
     const player = G.players[ctx.currentPlayer];
-  	const resources = player.resources
+  	const resources = G.resources[ctx.currentPlayer]
 
     const landscapes = G.landscapes[ctx.currentPlayer];
     let beings = G.beings[ctx.currentPlayer];
@@ -113,7 +113,15 @@ function playCard(G, ctx, id) {
     }
 
     if (card.type === "Being") {
-      if (player.selectedHandCardID) {
+    	let cost = card.materials
+
+    	const canPlay = Object.keys(cost).reduce((acc, c) => {
+    		if (!acc) return false;
+    		
+    		return resources[c] >= cost[c] ? true : false
+    	}, true)
+
+      if (player.selectedHandCardID && canPlay) {
         console.log('you can play this being card!');
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
         beings = beings.concat({
@@ -121,16 +129,24 @@ function playCard(G, ctx, id) {
         	id: beings.length,
         	equipment: []
         })	
-
+        Object.keys(cost).map(c => resources[c] = resources[c] - cost[c])
       }
 
       G.players[ctx.currentPlayer] = player;
       G.beings[ctx.currentPlayer] = beings;
+      G.resources[ctx.currentPlayer] = resources;
     }
 
     if (card.type === "Item" && card.subtype === "Equipment") {
+    	let cost = card.materials
 
-      if (player.selectedHandCardID && player.selectedBeingID) {
+    	const canPlay = Object.keys(cost).reduce((acc, c) => {
+    		if (!acc) return false;
+    		
+    		return resources[c] >= cost[c] ? true : false
+    	}, true)
+
+      if (player.selectedHandCardID && player.selectedBeingID && canPlay) {
         console.log('you can play this equipment card!');
         
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
@@ -141,10 +157,15 @@ function playCard(G, ctx, id) {
 
         // Replace in array and preserve order
         beings = beings.map(b => b.id == being.id ? b : being )
+
+        Object.keys(cost).map(c => resources[c] = resources[c] - cost[c])
+
       }
 
       G.players[ctx.currentPlayer] = player;
       G.beings[ctx.currentPlayer] = beings;
+      G.resources[ctx.currentPlayer] = resources;
+
     }
     return G;
 	}
@@ -182,12 +203,15 @@ function addLocationResources(G, ctx, id) {
 	console.log(id)
 	if (!!id) {
 		let card = G.cards[ctx.currentPlayer].find(c => c.id === id);
-		if (card && 'materials' in card) {
-			if ('wood' in card.materials) {
-				G.resources[ctx.currentPlayer].wood += 1;
+		if (card && 'production' in card) {
+			if ('wood' in card.production) {
+				G.resources[ctx.currentPlayer].wood += card.production.wood;
 			}
-			if ('metal' in card.materials) {
-				G.resources[ctx.currentPlayer].wood += 1;
+			if ('metal' in card.production) {
+				G.resources[ctx.currentPlayer].metal += card.production.metal;
+			}
+			if ('soul' in card.production) {
+				G.resources[ctx.currentPlayer].soul += card.production.soul;
 			}
 		}
 		// if (card?.production?.wood) {
@@ -286,7 +310,10 @@ export const CardGame = {
 			move: selectBeingCard,
 			noLimit: true,
 		},
-		playCard: playCard,
+		playCard: {
+			move: playCard,
+			noLimit: true,
+		},
 		attack: attack,
 		selectDeck: {
 			move: selectDeck,

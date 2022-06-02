@@ -35,7 +35,7 @@ function PlayerBattlefieldCard({ card, isSelected, onSelect }) {
             <div>{card ? `${card.name} [${card.id}]` : ''}</div>
             <div>{card ? card.type : ''}</div>
             <div>{card ? card.subtype : ''}</div>
-            <div>{card ? card.materials : ''}</div>
+            {/*<div>{card ? card.materials : ''}</div>*/}
             <div>{card ? card.text : ''}</div>
             <div style={statsStyle}>
               <div style={{gridArea: 'str'}}>STR {card.stats.strength}</div>

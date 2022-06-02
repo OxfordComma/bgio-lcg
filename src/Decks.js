@@ -6,7 +6,7 @@ export function Decks() {
       startingBeing: 'Mister Wizard',
       startingLocation: 'Wizard Tower',
       decklist: {
-        'Soldier': 4,
+        'Tank': 4,
         'Short Sword': 3,
         'Small Shield': 3,
         'Dense Forest': 4,
@@ -33,7 +33,7 @@ export function Decks() {
       startingBeing: 'Stinky Goblin',
       startingLocation: 'Goblinhole',
       decklist: {
-        'Soldier': 4,
+        'Tank': 4,
         'Short Sword': 3,
         'Small Shield': 3,
         'Dense Forest': 4,
