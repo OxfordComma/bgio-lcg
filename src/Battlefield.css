@@ -3,25 +3,24 @@
 	grid-template-rows: 50% 50%;
   font-size: 0.6em;
   height: 100%;
+  width:100%;
 }
 
-.battlefield .myside,
-.battlefield .theirside {
-	display: flex;
-	flex-direction: row;
-  padding: 1em;
+.battlefield .party {
+	display: grid;
+	grid-template-rows: 25% 25% 25% 25%;
 }
 
-.battlefield .card {
-  border: 1px solid #555;
+.battlefield .party .being {
   height: 100%;
-  aspect-ratio: 1/1.6;
+  display: flex;
+	flex-direction: row;
 }
 
 .battlefield .card-slot {
   background-color: white;
-}
-
-.myhand .card-slot.is-selected {
-  background-color: yellow;
+  display: block;
+  height: 100%;
+  margin: 2px;
+  aspect-ratio: 1 / 1.6;
 }

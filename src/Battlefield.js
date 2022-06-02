@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
-import { Card } from './Card';
-import { Tooltip } from './Tooltip'
-import './Battlefield.css'
+import { SmallCard as Card } from './Card';
+import './Battlefield.css';
 
-export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelect }) {
+
+function Being({ being, items, cards, onSelect }) {
+  return <div className='being'>
+    <Card
+      card={cards.find(c => c.id === being.beingCardID)}
+      onSelect={onSelect}
+    />
+    { items?.map((item) => <Card
+      key={item.id}
+      card={cards.find(c => c.id === item.cardID)}
+      onSelect={onSelect}
+    />) }
+  </div>
+}
+
+function Party({ beings, cards, onSelectCard }) {
+  return <div className='party'>
+    { beings.map(being =>
+        <Being
+          key={being.id}
+          being={being}
+          items={ being.equipment }
+          cards={cards}
+          onSelect={e => onSelectCard(being.id)}
+        />)}
+  </div>
+}
+
+export function Battlefield({ beings, playerID, cards, selectedBeingID, onSelectCard }) {
   return (
   <div className="battlefield" >
-    <div className="theirside">
-      { beings[['0', '1'].filter(p => p !== playerID)].map(being => 
-        <Card
-          key={['0', '1'].find(p => p !== playerID) + "_being" + being.id.toString()}
-          card={cards.find(c => c.id === being.beingCardID)}
-          isSelected={ false }
-          onSelect={onSelect}
-        />
-      )}
-    </div>
-    <div className="myside" >
-      { beings[playerID].map(being => 
-        <Card
-          key={playerID + "_being" + being.id.toString()}
-          card={cards.find(c => c.id === being.beingCardID)}
-          isSelected={ selectedBeingID === being.beingCardID }
-          onSelect={onSelect}
-        />
-      )}
-    </div>
+    {beings && <Party beings={beings['0']} cards={cards} onSelectCard={onSelectCard}/>}
+    {beings && <Party beings={beings['1']} cards={cards} onSelectCard={onSelectCard}/>}
   </div>)
 }

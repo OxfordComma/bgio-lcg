@@ -3,6 +3,12 @@
   aspect-ratio: 1/1.6;
 }
 
+.card > * {
+  /* Stops the card contents from doing anything */
+  pointer-events: none;
+}
+
+
 .card > .card-name {
   font-weight: bold;
   text-align: center;

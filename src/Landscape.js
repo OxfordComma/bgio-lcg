@@ -5,7 +5,7 @@ function GridLocation({ isSelected, onSelect, landscape, card }) {
   return (
     <div 
       onClick={(e) => {e.preventDefault(); onSelect(landscape.id)}} 
-      className={'land-area' + (card ? ' card' : '') + (isSelected ? ' highlighted' : '')}
+      className={'land-area' + (isSelected ? ' highlighted' : '')}
     >
       {card && <>
         <div>{card ? 'id' + card.id : ''}</div>
