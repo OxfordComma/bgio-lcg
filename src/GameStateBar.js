@@ -7,7 +7,7 @@ export function GameStateBar({ isPlayerTurn , resources, life }) {
       {
         isPlayerTurn ? 
           <div className='your-turn'>Your turn</div> : 
-          <div className='opponent-turn'>Opponents Turn</div>
+          <div className='opponent-turn'>Opponent's Turn</div>
       }
       <div>
         <span>Life:</span>
@@ -22,8 +22,8 @@ export function GameStateBar({ isPlayerTurn , resources, life }) {
         <div className='resouceCount'>{resources.wood}</div>
       </div>
       <div>
-        <span>Mana:</span>
-        <div className='resouceCount'>{resources.mana}</div>
+        <span>Soul:</span>
+        <div className='resouceCount'>{resources.soul}</div>
       </div>
   </div>
 }

@@ -33,7 +33,8 @@ function GameBoard({
   selectedBeingID, 
   consoleMessages,
   onSelectLandscape, 
-  onSelectHand, 
+  onSelectHand,
+  onSelectBeing,
   onPlayCard,
   onAttack,
   onEndTurn,
@@ -102,10 +103,11 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
   }
 
   function onPlayCard() {
-    if (G.players[ctx.currentPlayer]?.selectedHandCardID) {
-      moves.playCard(G.players[ctx.currentPlayer].selectedHandCardID);
+    const cardID = G.players[ctx.currentPlayer].selectedHandCardID
+    if (cardID) {
+      moves.playCard(cardID);
     }
-    // setConsoleMessages([...consoleMessages, `player ${playerID} play card`])
+    setConsoleMessages([...consoleMessages, `player ${playerID} played card ${cards.find(c => c.id === cardID).name}`])
     setSelectedLandscapeID(null);
     setSelectedHandCardID(null);
     setSelectedBeingID(null);
@@ -152,9 +154,8 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
 
 
 export function Board({ G, ctx, moves, events, playerID }) {
-  function onDeckSelect(deckType) {
-    moves.selectDeck('Fire Deck', playerID);
-    // moves.selectDeck(deckType, playerID)
+  function onDeckSelect(deckID) {
+    moves.selectDeck(deckID, playerID);
   }
   return (
     <div className="container">

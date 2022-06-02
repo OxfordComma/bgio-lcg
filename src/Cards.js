@@ -9,7 +9,7 @@
 const cardlist = [
 {
   "number": 1,
-  "name": "Soldier",
+  "name": "Tank",
   "type": "Being",
   "subtype": "",
   "element": "",
@@ -19,8 +19,11 @@ const cardlist = [
     "agility": 0,
     "will": 0,
   },
-  "traits": [],
+  "traits": ['human'],
   "text": "",
+  "materials": {
+    "soul": 1,
+  },
 },
 {
   "number": 2,
@@ -81,6 +84,64 @@ const cardlist = [
   "production": {
     "metal": 3,
   },
+},
+{
+  "number": 6,
+  "name": "Mister Wizard",
+  "type": "Being",
+  "subtype": "",
+  "element": "",
+  "stats": {
+    "strength": 0,
+    "armor": 0,
+    "agility": 0,
+    "will": 5,
+  },
+  "traits": ['human', 'wizard'],
+  "text": "BEWARE MY FIREBALL!",
+  "materials": {
+    "soul": 1,
+  },
+},
+{
+  "number": 7,
+  "name": "Stinky Goblin",
+  "type": "Being",
+  "subtype": "",
+  "element": "",
+  "stats": {
+    "strength": 1,
+    "armor": 1,
+    "agility": -1,
+    "will": 0,
+  },
+  "traits": ['goblin'],
+  "text": "Shower?",
+  "materials": {
+    "soul": 1,
+  },
+},
+{
+  "number": 6,
+  "name": "Goblinhole",
+  "type": "Location",
+  "subtype": "",
+  "element": "",
+  "text": "Goblins only!",
+  "production": {
+    "soul": 1
+  }
+},
+{
+  "number": 7,
+  "name": "Wizard Tower",
+  "type": "Location",
+  "subtype": "",
+  "element": "",
+  "text": "Wizards only!",
+  "production": {
+    "soul": 1
+  }
 },
 // {
 //   "number": "5",
