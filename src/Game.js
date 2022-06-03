@@ -214,16 +214,23 @@ function attack(G, ctx, id) {
 
 	let totalStrength = myBeings.reduce((acc, being) => {
 		let card = cards.find(c => c.id === being.beingCardID)
-		return acc + card.stats.strength ?? 0
-	}, 0)
-	// console.log('total strength:', totalStrength)
+		let equipment = being.equipment
 
-	// Total armor of their front row?
-	let totalArmor = myBeings.slice(0, 2).reduce((acc, being) => {
-		let card = cards.find(c => c.id === being.beingCardID)
-		return card.stats.armor ?? 0
+		let equipmentStrength = equipment.reduce((acc, eq) => acc + cards.find(c => c.id === eq.id).stats.strength, 0)
+		return acc + (card.stats.strength + equipmentStrength) ?? 0
 	}, 0)
-	// console.log('total armor:', totalArmor)
+	console.log('total strength:', totalStrength)
+	
+	// Total armor of their front row?
+	let totalArmor = oppBeings.slice(0, 2).reduce((acc, being) => {
+		let card = cards.find(c => c.id === being.beingCardID)
+
+		let equipment = being.equipment
+		let equipmentArmor = equipment.reduce((acc, eq) => acc + cards.find(c => c.id === eq.id).stats.armor, 0)
+
+		return (card.stats.armor + equipmentArmor) ?? 0
+	}, 0)
+	console.log('total armor:', totalArmor)
 
 	// Opponent takes the damage!
 	let player = G.players[ctx.currentPlayer];
@@ -249,15 +256,6 @@ function addLocationResources(G, ctx, id) {
 				G.resources[ctx.currentPlayer].soul += card.production.soul;
 			}
 		}
-		// if (card?.production?.wood) {
-    //   G.resources[ctx.currentPlayer].wood += 1;
-    // }
-    // if (card?.production?.metal) {
-    //   G.resources[ctx.currentPlayer].metal += 1;
-    // }
-    // if (card?.production?.metal) {
-    //   G.resources[ctx.currentPlayer].soul += 1;
-    // }
 	}
 }
 
