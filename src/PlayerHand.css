@@ -12,14 +12,6 @@
   aspect-ratio: 5;
 }
 
-.myhand .card-slots > .card-slot {
-  aspect-ratio: 1/1.6;
-}
-
-.myhand .card-slots > .card-slot {
-  background-color: white;
-}
-
 .myhand .card-slots > .card-slot.is-selected {
   background-color: yellow;
 }
