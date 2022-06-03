@@ -1,0 +1,38 @@
+.card {
+  border: 1px solid #555;
+  aspect-ratio: 1/1.6;
+}
+
+.card > * {
+  /* Stops the card contents from doing anything */
+  pointer-events: none;
+}
+
+
+.card > .card-name {
+  font-weight: bold;
+  text-align: center;
+}
+
+.card > .card-id {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.card > .stats {
+  width: 100%;
+  height: auto;
+  display: grid;
+  grid-template-areas:
+    "str arm"
+    "agi will";
+}
+
+.card-slot {
+  background-color: white;
+  display: block;
+  height: 100% -2px;
+  margin: 2px;
+  aspect-ratio: 1 / 1.6;
+}

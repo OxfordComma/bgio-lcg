@@ -1,0 +1,43 @@
+.grid-item {
+  border: 1px solid #141414;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-item__title {
+  position: absolute;
+  font-size: 14px;
+  background-color: rgb(173, 173, 173);
+  padding: 4px 0;
+  text-align: center;
+}
+
+.grid-item__title:hover {
+  cursor: move;
+}
+
+.grid-item__body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.react-grid-item.editable > .react-resizable-handle::after {
+  border-right-color: rgba(255, 255, 255, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+.react-grid-item.editable > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+
+.edit-mode-control {
+  position: fixed;
+  top: 1em;
+  right: 21em;
+}

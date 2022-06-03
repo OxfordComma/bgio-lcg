@@ -4,7 +4,9 @@ import { PlayerHand } from './PlayerHand';
 import { Landscape } from './Landscape';
 import { Battlefield } from './Battlefield';
 import { GameStateBar } from './GameStateBar';
+import { GameInterface } from './GameInterface';
 import './Board.css';
+
 
 function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, consoleMessages }) {
   return <div className="controls">
@@ -33,45 +35,44 @@ function GameBoard({
   onSelectLandscape, 
   onSelectHand,
   onSelectBeing,
+  onSelectBattleFieldCard,
   onPlayCard,
   onAttack,
   onEndTurn,
 }) {
-  return (<>
+  return (<GameInterface>
       <GameStateBar isPlayerTurn={!!isPlayerTurn} resources={playerResources} life={life} />
-      <div className="board">
-        <Landscape
-          playerID={playerID}
-          landscapes={landscapes}
-          cards={cards}
-          onSelect={onSelectLandscape}
-          selectedLandscapeID={selectedLandscapeID}
-        />
-        <PlayerHand 
-          hand={playerHand}
-          selectedCardID={selectedHandCardID}
-          onSelect={onSelectHand}
-        />
-        <Battlefield
-          playerID={playerID}
-          beings={beings}
-          cards={cards}
-          onSelect={onSelectBeing}
-          selectedBeingID={selectedBeingID}
-        />
-        <Controls 
-          isPlayerTurn={isPlayerTurn}
-          attack={onAttack}
-          onPlayCard={onPlayCard} 
-          endTurn={onEndTurn}
-          consoleMessages={consoleMessages}
-        />
-      </div>
-    </>)
+      <Landscape
+        playerID={playerID}
+        landscapes={landscapes}
+        cards={cards}
+        onSelect={onSelectLandscape}
+        selectedLandscapeID={selectedLandscapeID}
+      />
+      <Battlefield
+        playerID={playerID}
+        beings={beings}
+        cards={cards}
+        onSelectCard={onSelectBattleFieldCard}
+        selectedBeingID={selectedBeingID}
+      />
+      <PlayerHand 
+        hand={playerHand}
+        selectedCardID={selectedHandCardID}
+        onSelect={onSelectHand}
+      />
+      <Controls 
+        isPlayerTurn={isPlayerTurn}
+        attack={onAttack}
+        onPlayCard={onPlayCard} 
+        endTurn={onEndTurn}
+        consoleMessages={consoleMessages}
+      />
+    </GameInterface>)
 }
 
 
-function PlayGameMenu({ ctx, G, moves, events, playerID }) {
+function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find(p => p !== playerID);
@@ -113,6 +114,10 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     setSelectedBeingID(null);
   }
 
+  function onSelectBattleFieldCard(cardId) {
+    console.log("selected battlefield card ID:", cardId);
+  }
+
   const landscapes = G.landscapes;
   const beings = G.beings;
   const resources = G.resources[playerID];
@@ -139,6 +144,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     playerHand={playerHand}
     playerID={playerID}
     isPlayerTurn={isPlayerTurn}
+    consoleMessages={consoleMessages}
     onAttack={attack}
     onEndTurn={endTurn}
     selectedHandCardID={selectedHandCardID}
@@ -148,7 +154,7 @@ function PlayGameMenu({ ctx, G, moves, events, playerID }) {
     onSelectBeing={onSelectBeing}
     onSelectLandscape={onSelectLandscape}
     onPlayCard={onPlayCard}
-    consoleMessages={consoleMessages}
+    onSelectBattleFieldCard={onSelectBattleFieldCard}
   />;
 }
 
@@ -164,7 +170,7 @@ export function Board({ G, ctx, moves, events, playerID }) {
           decks={G.decks}
           onDeckSelect={onDeckSelect}
         /> : 
-        <PlayGameMenu 
+        <GameBoardWrapper
           G={G}
           ctx={ctx}
           moves={moves}
