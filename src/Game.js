@@ -63,7 +63,8 @@ function selectHandCard(G, ctx, id) {
 
 
 function selectLandscapeCard(G, ctx, id) {
-	console.log('select landscape card at id:', id)
+	const landscape = G.landscapes.find(l => l.id == id)
+	console.log(`select landscape card at (${landscape.x}, ${landscape.y})`, id)
 
 	let currentPlayer = G.players[ctx.currentPlayer]
 
@@ -98,14 +99,30 @@ function playCard(G, ctx, id) {
     const player = G.players[ctx.currentPlayer];
   	const resources = G.resources[ctx.currentPlayer]
 
-    const landscapes = G.landscapes[ctx.currentPlayer];
+    const landscapes = G.landscapes
     let beings = G.beings[ctx.currentPlayer];
 
     if (card.type === "Location") {
-      if (player.selectedHandCardID && player.selectedLandscapeID) {
+  		let landscape = landscapes.find(l => l.id === player.selectedLandscapeID)
+    	let allEligibleLocations = []
+    	landscapes.filter(l => l.playerID === ctx.currentPlayer).map(l => {
+    		// Strings because javascript doesn't like comparing lists
+	    	allEligibleLocations = [
+	    		...allEligibleLocations,
+	    		`${l.x}, ${l.y + 1}`, 
+	    		`${l.x}, ${l.y - 1}`,
+	    		`${l.x - 1}, ${l.y}`,
+	    		`${l.x + 1}, ${l.y}`,
+	  		]
+    	})
+    	
+    	console.log('eligible spots:', allEligibleLocations, [landscape.x, landscape.y])
+      if (player.selectedHandCardID && player.selectedLandscapeID && allEligibleLocations.includes(`${landscape.x}, ${landscape.y}`)) {
         console.log('you can play this location card!');
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
+        
         landscapes[parseInt(player.selectedLandscapeID)]['landscapeCardID'] = player.selectedHandCardID;
+        landscapes[parseInt(player.selectedLandscapeID)]['playerID'] = ctx.currentPlayer;
         G.players[ctx.currentPlayer].selectedHandCardID = null
 			  G.players[ctx.currentPlayer].selectedLandscapeID = null
 			  G.players[ctx.currentPlayer].selectedBeingID = null
@@ -115,7 +132,7 @@ function playCard(G, ctx, id) {
       }
 
       G.players[ctx.currentPlayer] = player;
-      G.landscapes[ctx.currentPlayer] = landscapes;
+      G.landscapes = landscapes;
     }
 
     if (card.type === "Being") {
@@ -166,7 +183,9 @@ function playCard(G, ctx, id) {
         
         let being = beings.find(b => b.beingCardID === player.selectedBeingID)
         console.log(being)
-        being.equipment = being.equipment.concat(player.selectedHandCardID)
+        being.equipment = [...being.equipment, {
+        	id: player.selectedHandCardID
+      	}]
 
         // Replace in array and preserve order
         beings = beings.map(b => b.id == being.id ? b : being )
@@ -195,16 +214,23 @@ function attack(G, ctx, id) {
 
 	let totalStrength = myBeings.reduce((acc, being) => {
 		let card = cards.find(c => c.id === being.beingCardID)
-		return acc + card.stats.strength ?? 0
-	}, 0)
-	// console.log('total strength:', totalStrength)
+		let equipment = being.equipment
 
-	// Total armor of their front row?
-	let totalArmor = myBeings.slice(0, 2).reduce((acc, being) => {
-		let card = cards.find(c => c.id === being.beingCardID)
-		return card.stats.armor ?? 0
+		let equipmentStrength = equipment.reduce((acc, eq) => acc + cards.find(c => c.id === eq.id).stats.strength, 0)
+		return acc + (card.stats.strength + equipmentStrength) ?? 0
 	}, 0)
-	// console.log('total armor:', totalArmor)
+	console.log('total strength:', totalStrength)
+	
+	// Total armor of their front row?
+	let totalArmor = oppBeings.slice(0, 2).reduce((acc, being) => {
+		let card = cards.find(c => c.id === being.beingCardID)
+
+		let equipment = being.equipment
+		let equipmentArmor = equipment.reduce((acc, eq) => acc + cards.find(c => c.id === eq.id).stats.armor, 0)
+
+		return (card.stats.armor + equipmentArmor) ?? 0
+	}, 0)
+	console.log('total armor:', totalArmor)
 
 	// Opponent takes the damage!
 	let player = G.players[ctx.currentPlayer];
@@ -230,15 +256,6 @@ function addLocationResources(G, ctx, id) {
 				G.resources[ctx.currentPlayer].soul += card.production.soul;
 			}
 		}
-		// if (card?.production?.wood) {
-    //   G.resources[ctx.currentPlayer].wood += 1;
-    // }
-    // if (card?.production?.metal) {
-    //   G.resources[ctx.currentPlayer].metal += 1;
-    // }
-    // if (card?.production?.metal) {
-    //   G.resources[ctx.currentPlayer].soul += 1;
-    // }
 	}
 }
 
@@ -259,8 +276,11 @@ export const CardGame = {
 		// Changed this id back so the indices would make sense from the perspective of both players,
 		// otherwise one player has high indices
 		const landscapes = Array.from({length: 30}).map((_, i) => ({
-			id: (i%15).toString(), 
-			landscapeCardID: null
+			id: i.toString(), 
+			landscapeCardID: null,
+			playerID: null,
+			x: (i % 5),
+			y: parseInt((i)/5),
 		}));
 
 		const landscape0 = landscapes.slice(0, 15);
@@ -300,10 +320,7 @@ export const CardGame = {
 					mana: 0,
 				}
 			},
-			landscapes: {
-				'0': landscape0,
-				'1': landscape1,
-			},
+			landscapes: landscapes,
 			beings: {
 				'0': [],
 				'1': [],
@@ -353,8 +370,8 @@ export const CardGame = {
 		onBegin: (G, ctx) => {
 			console.log('turn begin')
 			drawCard(G, ctx)
-			G.landscapes[ctx.currentPlayer].forEach(f => {
-				if (f.landscapeCardID != null)
+			G.landscapes.forEach(f => {
+				if (f.landscapeCardID != null && f.playerID == ctx.currentPlayer)
 					addLocationResources(G, ctx, f.landscapeCardID)
 			})
 		},
@@ -383,14 +400,19 @@ export const CardGame = {
 					}
 
 					// Starting location
-					let landscapes = G.landscapes[player]
-					landscapes[0].landscapeCardID = G.cards[player].find(c => c.name === decklist.startingLocation).id
+					let landscapes = G.landscapes
+					let landscapeIndex = player == '0' ? 0 : 29
+					landscapes[landscapeIndex] = {
+						...landscapes[landscapeIndex],
+						landscapeCardID: G.cards[player].find(c => c.name === decklist.startingLocation).id,
+						playerID: player,
+					}
 					// console.log(G.cards[player].find(c => c.name === decklist.startingLocation).id)
 
 					G.players[player].handIDs = handIDs;
 					G.players[player].deckIDs = deckIDs;
 
-					G.landscapes[player] = landscapes;
+					G.landscapes = landscapes;
 
 					G.beings[player] = [{
 	        	beingCardID: G.cards[player].find(c => c.name === decklist.startingBeing).id,

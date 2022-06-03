@@ -14,11 +14,11 @@ function GridLocation({ isSelected, onSelect, landscape, card }) {
 }
 
 export function Landscape({ landscapes, playerID, cards, selectedLandscapeID, onSelect}) {
-  const myLandscapes = landscapes[playerID]
-  let theirLandscapes = [ ...landscapes[['0', '1'].filter(p => p !== playerID)] ].reverse()
+  // const myLandscapes = landscapes
+  // let theirLandscapes = [ ...landscapes[['0', '1'].filter(p => p !== playerID)] ].reverse()
   
   return <div className="landscape">
-    {theirLandscapes.map(landscape => 
+    {/*{theirLandscapes.map(landscape => 
       <GridLocation
         key={playerID+"_landscape" + landscape.id.toString()}
         landscape={landscape}
@@ -26,8 +26,8 @@ export function Landscape({ landscapes, playerID, cards, selectedLandscapeID, on
         isSelected={ false }
         onSelect={onSelect}
       />
-    )}
-    {myLandscapes.map(landscape => 
+    )}*/}
+    {landscapes.map(landscape => 
       <GridLocation
         key={playerID+"_landscape" + landscape.id.toString()}
         landscape={landscape}

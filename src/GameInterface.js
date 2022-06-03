@@ -42,7 +42,7 @@ export function GameInterface({ children }) {
 
   // Edit layout in the browser. After each edit there is a console output you can copy/paste here.
   const layouts = {
-    lg: [{"i":"1","y":0,"x":0,"h":1,"w":12},{"i":"2","y":1,"x":0,"h":13,"w":6},{"i":"3","y":1,"x":6,"h":16,"w":6},{"i":"4","y":17,"x":0,"h":5,"w":12},{"i":"5","y":14,"x":0,"h":3,"w":6}]
+    lg: [{"i":"1","y":0,"x":0,"h":1,"w":12},{"i":"2","y":1,"x":0,"h":9,"w":6},{"i":"3","y":1,"x":6,"h":12,"w":6},{"i":"4","y":13,"x":0,"h":5,"w":12},{"i":"5","y":10,"x":0,"h":3,"w":6}]
     // sm: [
     //   { i: "1", x: 0, y: 0, w: 1, h: 1 },
     //   { i: "2", x: 1, y: 0, w: 2, h: 2 },

@@ -51,7 +51,7 @@ function GameBoard({
         playerID={playerID}
         beings={beings}
         cards={cards}
-        onSelect={onSelectBeing}
+        onSelectCard={onSelectBeing}
         selectedBeingID={selectedBeingID}
       />
       <PlayerHand 
