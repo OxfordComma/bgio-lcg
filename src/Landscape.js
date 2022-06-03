@@ -1,4 +1,5 @@
 import React from 'react';
+import { SmallCard } from './Card';
 import './Landscape.css';
 
 function GridLocation({ isSelected, onSelect, landscape, card }) {  
@@ -7,10 +8,7 @@ function GridLocation({ isSelected, onSelect, landscape, card }) {
       onClick={(e) => {e.preventDefault(); onSelect(landscape.id)}} 
       className={'land-area' + (isSelected ? ' highlighted' : '')}
     >
-      {card && <>
-        <div>{card ? 'id' + card.id : ''}</div>
-        <div>{card ? card.name : ''}</div>
-      </>}
+      {card && <SmallCard card={card} onSelect={(cardID) => {}} />}
     </div>
   )
 }
