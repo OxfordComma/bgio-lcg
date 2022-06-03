@@ -7,6 +7,7 @@
 	grid-area: controls;
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 }
 
 .controls .output {

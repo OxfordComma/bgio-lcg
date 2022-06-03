@@ -57,6 +57,8 @@ function selectHandCard(G, ctx, id) {
 		G.players[ctx.currentPlayer].selectedHandCardID = null
 	else
 		G.players[ctx.currentPlayer].selectedHandCardID = id
+
+
 }
 
 
@@ -104,6 +106,12 @@ function playCard(G, ctx, id) {
         console.log('you can play this location card!');
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
         landscapes[parseInt(player.selectedLandscapeID)]['landscapeCardID'] = player.selectedHandCardID;
+        G.players[ctx.currentPlayer].selectedHandCardID = null
+			  G.players[ctx.currentPlayer].selectedLandscapeID = null
+			  G.players[ctx.currentPlayer].selectedBeingID = null
+      }
+      else {
+      	console.log('You cannnot play this card!')
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -118,6 +126,7 @@ function playCard(G, ctx, id) {
     		
     		return resources[c] >= cost[c] ? true : false
     	}, true)
+    	console.log('can play?', canPlay)
 
       if (player.selectedHandCardID && canPlay) {
         console.log('you can play this being card!');
@@ -126,8 +135,14 @@ function playCard(G, ctx, id) {
         	beingCardID: player.selectedHandCardID,
         	id: beings.length,
         	equipment: []
-        })	
+        })
         Object.keys(cost).map(c => resources[c] = resources[c] - cost[c])
+        G.players[ctx.currentPlayer].selectedHandCardID = null
+			  G.players[ctx.currentPlayer].selectedLandscapeID = null
+			  G.players[ctx.currentPlayer].selectedBeingID = null
+      }
+      else {
+      	console.log('You cannnot play this card!')
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -157,7 +172,10 @@ function playCard(G, ctx, id) {
         beings = beings.map(b => b.id == being.id ? b : being )
 
         Object.keys(cost).map(c => resources[c] = resources[c] - cost[c])
-
+        reset(G, ctx)
+      }
+      else {
+      	console.log('You cannnot play this card!')
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -222,6 +240,14 @@ function addLocationResources(G, ctx, id) {
     //   G.resources[ctx.currentPlayer].soul += 1;
     // }
 	}
+}
+
+function reset(G, ctx) {
+	G.players[ctx.currentPlayer].selectedHandCardID = null
+  G.players[ctx.currentPlayer].selectedLandscapeID = null
+  G.players[ctx.currentPlayer].selectedBeingID = null
+
+  return G
 }
 
 
@@ -315,6 +341,10 @@ export const CardGame = {
 		attack: attack,
 		selectDeck: {
 			move: selectDeck,
+			noLimit: true,
+		},
+		reset: {
+			move: reset,
 			noLimit: true,
 		},
 	},

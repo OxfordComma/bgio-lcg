@@ -7,7 +7,6 @@ import { GameStateBar } from './GameStateBar';
 import { GameInterface } from './GameInterface';
 import './Board.css';
 
-
 function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, consoleMessages }) {
   return <div className="controls">
     <div>
@@ -35,7 +34,6 @@ function GameBoard({
   onSelectLandscape, 
   onSelectHand,
   onSelectBeing,
-  onSelectBattleFieldCard,
   onPlayCard,
   onAttack,
   onEndTurn,
@@ -53,7 +51,7 @@ function GameBoard({
         playerID={playerID}
         beings={beings}
         cards={cards}
-        onSelectCard={onSelectBattleFieldCard}
+        onSelect={onSelectBeing}
         selectedBeingID={selectedBeingID}
       />
       <PlayerHand 
@@ -78,9 +76,12 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   let opponentID = ctx.playOrder.find(p => p !== playerID);
   let cards = [ ...G.cards["0"], ...G.cards["1"] ]; // for now
 
-  const [selectedHandCardID, setSelectedHandCardID] = useState(null);
-  const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
-  const [selectedBeingID, setSelectedBeingID] = useState(null);
+  // const [selectedHandCardID, setSelectedHandCardID] = useState(null);
+  const selectedHandCardID = G.players[ctx.currentPlayer].selectedHandCardID
+  // const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
+  const selectedLandscapeID = G.players[ctx.currentPlayer].selectedLandscapeID
+  // const [selectedBeingID, setSelectedBeingID] = useState(null);
+  const selectedBeingID = G.players[ctx.currentPlayer].selectedBeingID
 
   const [consoleMessages, setConsoleMessages] = useState([]);
 
@@ -88,34 +89,37 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
     console.log('set selected card in hand:', cardID)
     moves.selectHandCard(cardID);
     // This properly sets the hand ID to whatever was set in the move
-    setSelectedHandCardID(G.players[ctx.currentPlayer].selectedHandCardID == cardID ? null : cardID);
+    // setSelectedHandCardID(G.players[ctx.currentPlayer].selectedHandCardID == cardID ? null : cardID);
   }
 
   function onSelectBeing(beingID) {
     console.log('set selected card in hand:', beingID)
     moves.selectBeingCard(beingID);
-    setSelectedBeingID(G.players[ctx.currentPlayer].selectedBeingID == beingID ? null : beingID);
+    // setSelectedBeingID(G.players[ctx.currentPlayer].selectedBeingID == beingID ? null : beingID);
   }
 
   function onSelectLandscape(landscapeID) {
     console.log('set selected landscape:', landscapeID)
     moves.selectLandscapeCard(landscapeID);
-    setSelectedLandscapeID(G.players[ctx.currentPlayer].selectedLandscapeID == landscapeID ? null : landscapeID);
+    // setSelectedLandscapeID(G.players[ctx.currentPlayer].selectedLandscapeID == landscapeID ? null : landscapeID);
   }
 
   function onPlayCard() {
     const cardID = G.players[ctx.currentPlayer].selectedHandCardID
     if (cardID) {
       moves.playCard(cardID);
-    }
-    setConsoleMessages([...consoleMessages, `player ${playerID} played card ${cards.find(c => c.id === cardID).name}`])
-    setSelectedLandscapeID(null);
-    setSelectedHandCardID(null);
-    setSelectedBeingID(null);
-  }
+    } 
+    console.log(G.players[ctx.currentPlayer].selectedHandCardID)
 
-  function onSelectBattleFieldCard(cardId) {
-    console.log("selected battlefield card ID:", cardId);
+    // if (G.players[ctx.currentPlayer].selectedHandCardID === null)
+    setConsoleMessages([...consoleMessages, `player ${playerID} played card ${cards.find(c => c.id === cardID).name}`])
+
+    // else {
+      // setConsoleMessages([...consoleMessages, `player ${playerID} tried to play card ${cards.find(c => c.id === cardID).name} but failed!`])
+    
+    // setSelectedLandscapeID(null);
+    // setSelectedHandCardID(null);
+    // setSelectedBeingID(null);
   }
 
   const landscapes = G.landscapes;
@@ -154,7 +158,6 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
     onSelectBeing={onSelectBeing}
     onSelectLandscape={onSelectLandscape}
     onPlayCard={onPlayCard}
-    onSelectBattleFieldCard={onSelectBattleFieldCard}
   />;
 }
 
@@ -170,7 +173,7 @@ export function Board({ G, ctx, moves, events, playerID }) {
           decks={G.decks}
           onDeckSelect={onDeckSelect}
         /> : 
-        <GameBoardWrapper
+        <GameBoardWrapper 
           G={G}
           ctx={ctx}
           moves={moves}
