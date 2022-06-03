@@ -11,7 +11,7 @@ function Being({ being, items, cards, onSelect }) {
     />
     { items?.map((item) => <Card
       key={item.id}
-      card={cards.find(c => c.id === item.cardID)}
+      card={cards.find(c => c.id === item.id)}
       onSelect={onSelect}
     />) }
   </div>
@@ -25,7 +25,7 @@ function Party({ beings, cards, onSelectCard }) {
           being={being}
           items={ being.equipment }
           cards={cards}
-          onSelect={e => onSelectCard(being.id)}
+          onSelect={e => onSelectCard(being.beingCardID)}
         />)}
   </div>
 }
