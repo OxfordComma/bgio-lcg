@@ -38,6 +38,6 @@
 
 .edit-mode-control {
   position: fixed;
-  top: 1em;
-  right: 21em;
+  top: 10px;
+  right: 350px;
 }
