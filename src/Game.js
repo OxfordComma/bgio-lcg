@@ -120,7 +120,9 @@ function playCard(G, ctx, id) {
       if (player.selectedHandCardID && player.selectedLandscapeID && allEligibleLocations.includes(`${landscape.x}, ${landscape.y}`)) {
         console.log('you can play this location card!');
         player['handIDs'] = player['handIDs'].filter(cid => cid !== player.selectedHandCardID);
+        
         landscapes[parseInt(player.selectedLandscapeID)]['landscapeCardID'] = player.selectedHandCardID;
+        landscapes[parseInt(player.selectedLandscapeID)]['playerID'] = ctx.currentPlayer;
         G.players[ctx.currentPlayer].selectedHandCardID = null
 			  G.players[ctx.currentPlayer].selectedLandscapeID = null
 			  G.players[ctx.currentPlayer].selectedBeingID = null
