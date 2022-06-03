@@ -1,4 +1,4 @@
-.myhand  {
+.myhand {
   display: flex;
   justify-content: center;
   height: 100%;
@@ -6,8 +6,8 @@
 }
 
 .myhand .card-slots {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
   font-size: 0.6em;
   aspect-ratio: 5;
 }
@@ -15,4 +15,3 @@
 .myhand .card-slots > .card-slot.is-selected {
   background-color: yellow;
 }
-

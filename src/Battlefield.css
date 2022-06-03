@@ -1,18 +1,18 @@
 .battlefield {
-	display: grid;
-	grid-template-rows: 50% 50%;
+  display: grid;
+  grid-template-rows: 50% 50%;
   font-size: 0.6em;
   height: 100%;
-  width:100%;
+  width: 100%;
 }
 
 .battlefield .party {
-	display: grid;
-	grid-template-rows: 25% 25% 25% 25%;
+  display: grid;
+  grid-template-rows: 25% 25% 25% 25%;
 }
 
 .battlefield .party .being {
   height: 100%;
   display: flex;
-	flex-direction: row;
+  flex-direction: row;
 }

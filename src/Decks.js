@@ -1,16 +1,16 @@
 export function Decks() {
   return [
     {
-      name: 'Water Deck',
-      id: 'water',
-      startingBeing: 'Mister Wizard',
-      startingLocation: 'Wizard Tower',
+      name: "Water Deck",
+      id: "water",
+      startingBeing: "Mister Wizard",
+      startingLocation: "Wizard Tower",
       decklist: {
-        'Tank': 4,
-        'Short Sword': 3,
-        'Small Shield': 3,
-        'Dense Forest': 4,
-        'Iron Mine': 4,
+        Tank: 4,
+        "Short Sword": 3,
+        "Small Shield": 3,
+        "Dense Forest": 4,
+        "Iron Mine": 4,
         // 'Commerce': 3,
         // 'Campfire': 3,
         // 'Obsidian Mine': 3,
@@ -24,20 +24,19 @@ export function Decks() {
         // 'Dwarven Fortress': 2,
         // 'Shortsword': 3,
         // 'Sledgehammer': 3
-
-      }
+      },
     },
     {
-      name: 'Fire Deck',
-      id: 'fire',
-      startingBeing: 'Stinky Goblin',
-      startingLocation: 'Goblinhole',
+      name: "Fire Deck",
+      id: "fire",
+      startingBeing: "Stinky Goblin",
+      startingLocation: "Goblinhole",
       decklist: {
-        'Tank': 4,
-        'Short Sword': 3,
-        'Small Shield': 3,
-        'Dense Forest': 4,
-        'Iron Mine': 4,
+        Tank: 4,
+        "Short Sword": 3,
+        "Small Shield": 3,
+        "Dense Forest": 4,
+        "Iron Mine": 4,
         // 'Commerce': 3,
         // 'Campfire': 3,
         // 'Obsidian Mine': 3,
@@ -51,8 +50,7 @@ export function Decks() {
         // 'Dwarven Fortress': 2,
         // 'Shortsword': 3,
         // 'Sledgehammer': 3
-
-      }
-    }
-  ]
+      },
+    },
+  ];
 }
