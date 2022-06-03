@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Tooltip } from './Tooltip';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import './Card.css';
 
 function CardDetails({ card }) { 
@@ -46,23 +46,44 @@ function CardSummary({ card }) {
   </div>
 }
 
+const Tooltip = ({children}) => {
+  const mount = document.getElementById('tooltip-anchor');
+
+  return createPortal(children, mount)
+};
+
 
 function CardSlot({ card, isSelected, onSelect, children }) {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [x, setX] = useState();
-  const [y, setY] = useState();
+  const [cursor, setCursor] = useState({ x : 0, y : 0 });
 
   function onHover(e) {
     setShowTooltip(true);
-    setX(e.screenX < 0 ? 0 : e.screenX)
-    setY(e.screenY < 0 ? 0 : e.screenY)
+    const x = e.clientX + 15 + window.scrollX;
+    const y = e.clientY - 55 + window.scrollY;
+    const maxWidth = window.innerwidth - 115;
+    const maxHeight = window.innerHeight - 110;
+
+
+    setCursor({
+      x: (x < 0) ? 0 : ((maxWidth < x) ? maxWidth :  x),
+      y: (y < 0) ? 0 : ((maxHeight < y) ? maxHeight :  y),
+    });
   }
 
   return (
-    <div className={'card-slot' + (isSelected ? ' is-selected': '')}
-      onMouseMove={onHover} onMouseOut={e => setShowTooltip(false)}
-      onClick={e => {e.preventDefault(); onSelect(card.id)} }>
-      { showTooltip && <Tooltip x={x+5} y={y-240} ><CardDetails card={card} /></Tooltip> }
+    <div 
+      className={'card-slot' + (isSelected ? ' is-selected': '')} 
+      onMouseMove={onHover} 
+      onMouseOut={e => setShowTooltip(false)}
+      onClick={e => {e.preventDefault(); onSelect(card.id)} }
+    >
+      { showTooltip && 
+        <Tooltip>
+          <div className='card-tooltip' style={{ 'left': cursor.x, 'top': cursor.y }}>
+            <CardDetails card={card} />
+          </div>
+        </Tooltip> }
       { children }
     </div>
   );
