@@ -272,6 +272,9 @@ function addLocationResources(G, ctx, id) {
       if ("metal" in card.production) {
         G.resources[ctx.currentPlayer].metal += card.production.metal;
       }
+      if ("mana" in card.production) {
+        G.resources[ctx.currentPlayer].mana += card.production.mana;
+      }
       if ("soul" in card.production) {
         G.resources[ctx.currentPlayer].soul += card.production.soul;
       }

@@ -7,13 +7,7 @@ import { GameStateBar } from "./GameStateBar";
 import { GameInterface } from "./GameInterface";
 import "./Board.css";
 
-function Controls({
-  isPlayerTurn,
-  onPlayCard,
-  attack,
-  endTurn,
-  consoleMessages,
-}) {
+function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, chatMessages }) {
   return (
     <div className="controls">
       <div>
@@ -46,8 +40,8 @@ function Controls({
         </button>
       </div>
       <div className="output">
-        {consoleMessages.map((msg, i) => (
-          <div key={i}>{msg}</div>
+        {chatMessages.map((msg, i) => (
+          <div key={i}>{`player ${msg.sender}: ${msg.payload}`}</div>
         ))}
       </div>
     </div>
@@ -66,7 +60,7 @@ function GameBoard({
   selectedLandscapeID,
   selectedHandCardID,
   selectedBeingID,
-  consoleMessages,
+  chatMessages,
   onSelectLandscape,
   onSelectHand,
   onSelectBeing,
@@ -105,13 +99,21 @@ function GameBoard({
         attack={onAttack}
         onPlayCard={onPlayCard}
         endTurn={onEndTurn}
-        consoleMessages={consoleMessages}
+        chatMessages={chatMessages}
       />
     </GameInterface>
   );
 }
 
-function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
+function GameBoardWrapper({
+  ctx,
+  G,
+  moves,
+  events,
+  playerID,
+  sendChatMessage,
+  chatMessages,
+}) {
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find((p) => p !== playerID);
@@ -124,7 +126,7 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   // const [selectedBeingID, setSelectedBeingID] = useState(null);
   const selectedBeingID = G.players[ctx.currentPlayer].selectedBeingID;
 
-  const [consoleMessages, setConsoleMessages] = useState([]);
+  // const [chatMessages, setChatMessages] = useState([]);
 
   function onSelectHand(cardID) {
     console.log("set selected card in hand:", cardID);
@@ -153,15 +155,14 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
     console.log(G.players[ctx.currentPlayer].selectedHandCardID);
 
     // if (G.players[ctx.currentPlayer].selectedHandCardID === null)
-    setConsoleMessages([
-      ...consoleMessages,
+    sendChatMessage(
       `player ${playerID} played card ${
         cards.find((c) => c.id === cardID).name
-      }`,
-    ]);
+      }`
+    );
 
     // else {
-    // setConsoleMessages([...consoleMessages, `player ${playerID} tried to play card ${cards.find(c => c.id === cardID).name} but failed!`])
+    // setChatMessages([...chatMessages, `player ${playerID} tried to play card ${cards.find(c => c.id === cardID).name} but failed!`])
 
     // setSelectedLandscapeID(null);
     // setSelectedHandCardID(null);
@@ -177,11 +178,11 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   );
 
   const attack = function () {
-    setConsoleMessages([...consoleMessages, `player ${playerID} attack!`]);
+    sendChatMessage(`player ${playerID} attack!`);
     moves.attack();
   };
   const endTurn = function () {
-    setConsoleMessages([...consoleMessages, `player ${playerID} end turn`]);
+    sendChatMessage(`player ${playerID} end turn`);
     events.endTurn();
   };
 
@@ -197,7 +198,7 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
       playerHand={playerHand}
       playerID={playerID}
       isPlayerTurn={isPlayerTurn}
-      consoleMessages={consoleMessages}
+      chatMessages={chatMessages}
       onAttack={attack}
       onEndTurn={endTurn}
       selectedHandCardID={selectedHandCardID}
@@ -211,7 +212,15 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   );
 }
 
-export function Board({ G, ctx, moves, events, playerID }) {
+export function Board({
+  G,
+  ctx,
+  moves,
+  events,
+  playerID,
+  sendChatMessage,
+  chatMessages,
+}) {
   function onDeckSelect(deckID) {
     moves.selectDeck(deckID, playerID);
   }
@@ -226,6 +235,8 @@ export function Board({ G, ctx, moves, events, playerID }) {
           moves={moves}
           events={events}
           playerID={playerID}
+          sendChatMessage={sendChatMessage}
+          chatMessages={chatMessages}
         />
       )}
     </div>
