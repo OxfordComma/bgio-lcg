@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import classNames from "classnames";
 import "./Card.css";
 
 function CardDetails({ card }) {
   return (
-    <div className="card">
+    <>
       <div className="card-id">
         <div>id{card.id}</div>
         <div>#{card.number}</div>
@@ -34,13 +35,13 @@ function CardDetails({ card }) {
             .join(", ")}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 function CardSummary({ card }) {
   return (
-    <div className="card">
+    <>
       <div className="card-name">{card?.name}</div>
       <div>{card.type + (card?.subtype && " - " + card.subtype)}</div>
       {card?.stats && (
@@ -58,17 +59,28 @@ function CardSummary({ card }) {
             .join(", ")}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-const Tooltip = ({ children }) => {
+const Tooltip = ({ cursor, children }) => {
   const mount = document.getElementById("tooltip-anchor");
 
-  return createPortal(children, mount);
+  return createPortal(
+    <div className="card-tooltip" style={{ left: cursor.x, top: cursor.y }}>
+      {children}
+    </div>,
+    mount
+  );
 };
 
-function CardSlot({ card, isSelected, onSelect, children }) {
+function CardSlot({
+  card,
+  isHorizontal = false,
+  isSelected,
+  onSelect,
+  children,
+}) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
 
@@ -87,7 +99,12 @@ function CardSlot({ card, isSelected, onSelect, children }) {
 
   return (
     <div
-      className={"card-slot" + (isSelected ? " is-selected" : "")}
+      className={classNames({
+        card: true,
+        "card-slot": true,
+        "is-selected": isSelected,
+        horizontal: isHorizontal,
+      })}
       onMouseMove={onHover}
       onMouseOut={(e) => setShowTooltip(false)}
       onClick={(e) => {
@@ -96,13 +113,10 @@ function CardSlot({ card, isSelected, onSelect, children }) {
       }}
     >
       {showTooltip && (
-        <Tooltip>
-          <div
-            className="card-tooltip"
-            style={{ left: cursor.x, top: cursor.y }}
-          >
+        <Tooltip cursor={cursor}>
+          <CardSlot card={card} isSelected={isSelected} onSelect={onSelect}>
             <CardDetails card={card} />
-          </div>
+          </CardSlot>
         </Tooltip>
       )}
       {children}
@@ -112,8 +126,13 @@ function CardSlot({ card, isSelected, onSelect, children }) {
 
 export function SmallCard({ card, isSelected, onSelect }) {
   return (
-    <CardSlot card={card} isSelected={isSelected} onSelect={onSelect}>
-      <CardSummary card={card} isSelected={isSelected} />
+    <CardSlot
+      card={card}
+      isSelected={isSelected}
+      onSelect={onSelect}
+      isHorizontal
+    >
+      <CardSummary card={card} isSelected={isSelected} isHorizontal />
     </CardSlot>
   );
 }
