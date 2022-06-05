@@ -151,10 +151,11 @@ function playCard(G, ctx, id, sendChatMessage) {
 
         return resources[c] >= cost[c] ? true : false;
       }, true);
-      console.log("can play?", canPlay);
 
       if (player.selectedHandCardID && canPlay) {
         console.log("you can play this being card!");
+
+        sendChatMessage(`Played card ${card.name}`);
         player["handIDs"] = player["handIDs"].filter(
           (cid) => cid !== player.selectedHandCardID
         );
@@ -190,6 +191,8 @@ function playCard(G, ctx, id, sendChatMessage) {
       if (player.selectedHandCardID && player.selectedBeingID && canPlay) {
         console.log("you can play this equipment card!");
 
+        sendChatMessage(`Played card ${card.name}`);
+
         player["handIDs"] = player["handIDs"].filter(
           (cid) => cid !== player.selectedHandCardID
         );
@@ -222,7 +225,7 @@ function playCard(G, ctx, id, sendChatMessage) {
   }
 }
 
-function attack(G, ctx, id) {
+function attack(G, ctx, sendChatMessage) {
   let myBeings = G.beings[ctx.currentPlayer];
   let oppBeings = G.beings[["0", "1"].filter((b) => b !== ctx.currentPlayer)];
   const cards = G.cards[ctx.currentPlayer];
@@ -263,6 +266,12 @@ function attack(G, ctx, id) {
   );
   opponent.discardIDs = player.deckIDs.slice(
     player.deckIDs.length - Math.max(totalStrength + totalArmor, 0)
+  );
+  sendChatMessage(
+    `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${Math.max(
+      totalStrength + totalArmor,
+      0
+    )}`
   );
 }
 

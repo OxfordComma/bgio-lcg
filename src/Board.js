@@ -163,8 +163,8 @@ function GameBoardWrapper({
   );
 
   const attack = function () {
-    sendChatMessage(`attack!`);
-    moves.attack();
+    // sendChatMessage(`attack!`);
+    moves.attack(sendChatMessage);
   };
   const endTurn = function () {
     sendChatMessage(`end turn`);
