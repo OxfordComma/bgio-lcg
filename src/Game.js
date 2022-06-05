@@ -168,10 +168,8 @@ function playCard(G, ctx, id, sendChatMessage) {
         G.players[ctx.currentPlayer].selectedHandCardID = null;
         G.players[ctx.currentPlayer].selectedLandscapeID = null;
         G.players[ctx.currentPlayer].selectedBeingID = null;
-        G.moveSuccess = true;
       } else {
         console.log("You cannnot play this card!");
-        G.moveSuccess = false;
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -275,6 +273,8 @@ function attack(G, ctx, sendChatMessage) {
   );
 }
 
+function move(G, ctx, id) {}
+
 function addLocationResources(G, ctx, id) {
   console.log(id);
   if (!!id) {
@@ -317,10 +317,7 @@ export const CardGame = {
       y: parseInt(i / 5),
     }));
 
-    const landscape0 = landscapes.slice(0, 15);
-    const landscape1 = landscapes.slice(15, 30);
     return {
-      moveSuccess: null,
       players: {
         0: {
           handIDs: [],
@@ -342,6 +339,10 @@ export const CardGame = {
       decks: Decks().map((d) => {
         return { id: d.id, name: d.name };
       }),
+      partyLocations: {
+        0: null,
+        1: null,
+      },
       resources: {
         0: {
           metal: 0,
@@ -452,7 +453,8 @@ export const CardGame = {
             ).id,
             playerID: player,
           };
-          // console.log(G.cards[player].find(c => c.name === decklist.startingLocation).id)
+
+          G.partyLocations[parseInt(player)] = landscapeIndex;
 
           G.players[player].handIDs = handIDs;
           G.players[player].deckIDs = deckIDs;

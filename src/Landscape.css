@@ -18,3 +18,7 @@
 .land-area.highlighted {
   background-color: yellow;
 }
+
+.land-area.party-location {
+  background-color: cornflowerblue;
+}

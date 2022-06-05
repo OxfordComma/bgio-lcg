@@ -52,6 +52,7 @@ function GameBoard({
   cards,
   landscapes,
   beings,
+  partyLocation,
   isPlayerTurn,
   playerID,
   playerResources,
@@ -81,6 +82,7 @@ function GameBoard({
         cards={cards}
         onSelect={onSelectLandscape}
         selectedLandscapeID={selectedLandscapeID}
+        partyLocation={partyLocation}
       />
       <Battlefield
         playerID={playerID}
@@ -161,6 +163,8 @@ function GameBoardWrapper({
   const playerHand = player?.handIDs.map((handId) =>
     cards.find(({ id }) => id === handId)
   );
+  const partyLocation = G.partyLocations[playerID];
+  console.log("partyLocation", partyLocation);
 
   const attack = function () {
     // sendChatMessage(`attack!`);
@@ -179,6 +183,7 @@ function GameBoardWrapper({
       landscapes={landscapes}
       beings={beings}
       life={life}
+      partyLocation={partyLocation}
       playerResources={resources}
       playerHand={playerHand}
       playerID={playerID}
