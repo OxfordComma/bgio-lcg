@@ -150,23 +150,8 @@ function GameBoardWrapper({
   function onPlayCard() {
     const cardID = G.players[ctx.currentPlayer].selectedHandCardID;
     if (cardID) {
-      moves.playCard(cardID);
+      moves.playCard(cardID, sendChatMessage);
     }
-    console.log(G.players[ctx.currentPlayer].selectedHandCardID);
-
-    // if (G.players[ctx.currentPlayer].selectedHandCardID === null)
-    sendChatMessage(
-      `player ${playerID} played card ${
-        cards.find((c) => c.id === cardID).name
-      }`
-    );
-
-    // else {
-    // setChatMessages([...chatMessages, `player ${playerID} tried to play card ${cards.find(c => c.id === cardID).name} but failed!`])
-
-    // setSelectedLandscapeID(null);
-    // setSelectedHandCardID(null);
-    // setSelectedBeingID(null);
   }
 
   const landscapes = G.landscapes;
@@ -178,11 +163,11 @@ function GameBoardWrapper({
   );
 
   const attack = function () {
-    sendChatMessage(`player ${playerID} attack!`);
-    moves.attack();
+    // sendChatMessage(`attack!`);
+    moves.attack(sendChatMessage);
   };
   const endTurn = function () {
-    sendChatMessage(`player ${playerID} end turn`);
+    sendChatMessage(`end turn`);
     events.endTurn();
   };
 
