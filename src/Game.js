@@ -73,14 +73,14 @@ function selectLandscapeCard(G, ctx, id) {
   // }
 }
 
-function selectBeingCard(G, ctx, id) {
-  console.log("select being card at id:", id);
-
-  let currentPlayer = G.players[ctx.currentPlayer];
-
-  if (id === currentPlayer.selectedBeingID)
-    G.players[ctx.currentPlayer].selectedBeingID = null;
-  else G.players[ctx.currentPlayer].selectedBeingID = id;
+function selectPartyMember(G, ctx, position, beingId) {
+  console.log("select being card at id:", beingId);
+  if (beingId) {
+    const currentPlayer = G.players[ctx.currentPlayer];
+    G.players[ctx.currentPlayer].selectedBeingID =
+      beingId === currentPlayer.selectedBeingID ? null : beingId;
+  }
+  G.players[ctx.currentPlayer].selectedPartyPosition = position;
 }
 
 function calculateEligibleLocations(landscapes, playerID, targetLandscapeID) {
@@ -146,6 +146,7 @@ function playCard(G, ctx, id, sendChatMessage) {
         G.players[ctx.currentPlayer].selectedHandCardID = null;
         G.players[ctx.currentPlayer].selectedLandscapeID = null;
         G.players[ctx.currentPlayer].selectedBeingID = null;
+        G.players[ctx.currentPlayer].selectedPartyPosition = null;
       } else {
         console.log("You cannnot play this card!");
       }
@@ -157,13 +158,19 @@ function playCard(G, ctx, id, sendChatMessage) {
     if (card.type === "Being") {
       let cost = card.materials;
 
-      const canPlay = Object.keys(cost).reduce((acc, c) => {
-        if (!acc) return false;
+      const canPlay = Object.keys(cost).reduce(
+        (acc, c) => acc && resources[c] >= cost[c],
+        true
+      );
 
-        return resources[c] >= cost[c] ? true : false;
-      }, true);
-
-      if (player.selectedHandCardID && canPlay) {
+      if (
+        player.selectedPartyPosition &&
+        !beings?.find(
+          ({ position }) => position === player.selectedPartyPosition
+        ) &&
+        player.selectedHandCardID &&
+        canPlay
+      ) {
         console.log("you can play this being card!");
 
         sendChatMessage(`Played card ${card.name}`);
@@ -173,6 +180,7 @@ function playCard(G, ctx, id, sendChatMessage) {
         beings = beings.concat({
           beingCardID: player.selectedHandCardID,
           id: beings.length,
+          position: player.selectedPartyPosition,
           equipment: [],
         });
         Object.keys(cost).map((c) => (resources[c] = resources[c] - cost[c]));
@@ -285,14 +293,8 @@ function attack(G, ctx, sendChatMessage) {
 }
 
 function move(G, ctx) {
-  // const allEligibleLandscapes = calculateEligibleLocations(landscapes, playerID, startLandscapeID)
-
-  //  console.log(allEligibleLandscapes.includes(`${endLandscape.x}, ${endLandscape.y}` ) )
-  //  if (allEligibleLandscapes.includes(`${endLandscape.x}, ${endLandscape.y}`)) {
   G.partyLocations[ctx.currentPlayer] =
     G.players[ctx.currentPlayer].selectedLandscapeID;
-  //  }
-  //  sendChatMessage(`Move!`, G.partyLocations[playerID])
 }
 
 function addLocationResources(G, ctx, id) {
@@ -319,6 +321,7 @@ function reset(G, ctx) {
   G.players[ctx.currentPlayer].selectedHandCardID = null;
   G.players[ctx.currentPlayer].selectedLandscapeID = null;
   G.players[ctx.currentPlayer].selectedBeingID = null;
+  G.players[ctx.currentPlayer].selectedPartyPosition = null;
 
   return G;
 }
@@ -345,6 +348,7 @@ export const CardGame = {
           selectedHandCardID: null,
           selectedLandscapeID: null,
           selectedBeingID: null,
+          selectedPartyPosition: null,
         },
         1: {
           handIDs: [],
@@ -353,6 +357,7 @@ export const CardGame = {
           selectedHandCardID: null,
           selectedLandscapeID: null,
           selectedBeingID: null,
+          selectedPartyPosition: null,
         },
       },
       decks: Decks().map((d) => {
@@ -403,8 +408,8 @@ export const CardGame = {
       move: selectLandscapeCard,
       noLimit: true,
     },
-    selectBeingCard: {
-      move: selectBeingCard,
+    selectPartyMember: {
+      move: selectPartyMember,
       noLimit: true,
     },
     playCard: {
@@ -487,6 +492,7 @@ export const CardGame = {
                 (c) => c.name === decklist.startingBeing
               ).id,
               id: 0,
+              position: 1,
               equipment: [],
             },
           ];

@@ -67,20 +67,26 @@ function Controls({
 function GameBoard({
   cards,
   landscapes,
-  beings,
   partyLocation,
+  partyLocation,
+  playerBeings,
+  opponentBeings,
   isPlayerTurn,
   playerID,
+  opponentID,
   playerResources,
-  life,
+  playerLife,
   playerHand,
+  opponentResources,
+  opponentLife,
   selectedLandscapeID,
   selectedHandCardID,
   selectedBeingID,
+  selectedPartyPosition,
   chatMessages,
   onSelectLandscape,
   onSelectHand,
-  onSelectBeing,
+  onSelectPartyPosition,
   onPlayCard,
   onMove,
   onAttack,
@@ -90,8 +96,10 @@ function GameBoard({
     <GameInterface>
       <GameStateBar
         isPlayerTurn={!!isPlayerTurn}
-        resources={playerResources}
-        life={life}
+        playerResources={playerResources}
+        opponentResources={opponentResources}
+        playerLife={playerLife}
+        opponentLife={opponentLife}
       />
       <Landscape
         playerID={playerID}
@@ -103,10 +111,13 @@ function GameBoard({
       />
       <Battlefield
         playerID={playerID}
-        beings={beings}
+        opponentID={opponentID}
+        playerBeings={playerBeings}
+        opponentBeings={opponentBeings}
         cards={cards}
-        onSelectCard={onSelectBeing}
+        onSelectPartyPosition={onSelectPartyPosition}
         selectedBeingID={selectedBeingID}
+        selectedPartyPosition={selectedPartyPosition}
       />
       <PlayerHand
         hand={playerHand}
@@ -137,14 +148,14 @@ function GameBoardWrapper({
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find((p) => p !== playerID);
+  let opponent = G.players[opponentID];
   let cards = [...G.cards["0"], ...G.cards["1"]]; // for now
 
-  // const [selectedHandCardID, setSelectedHandCardID] = useState(null);
   const selectedHandCardID = G.players[ctx.currentPlayer].selectedHandCardID;
-  // const [selectedLandscapeID, setSelectedLandscapeID] = useState(null);
   const selectedLandscapeID = G.players[ctx.currentPlayer].selectedLandscapeID;
-  // const [selectedBeingID, setSelectedBeingID] = useState(null);
   const selectedBeingID = G.players[ctx.currentPlayer].selectedBeingID;
+  const selectedPartyPosition =
+    G.players[ctx.currentPlayer].selectedPartyPosition;
 
   // const [chatMessages, setChatMessages] = useState([]);
 
@@ -152,19 +163,19 @@ function GameBoardWrapper({
     console.log("set selected card in hand:", cardID);
     moves.selectHandCard(cardID);
     // This properly sets the hand ID to whatever was set in the move
-    // setSelectedHandCardID(G.players[ctx.currentPlayer].selectedHandCardID == cardID ? null : cardID);
   }
 
-  function onSelectBeing(beingID) {
-    console.log("set selected card in hand:", beingID);
-    moves.selectBeingCard(beingID);
-    // setSelectedBeingID(G.players[ctx.currentPlayer].selectedBeingID == beingID ? null : beingID);
+  function handleOnSelectPartyPosition({ positionID, beingCardID }) {
+    console.log(
+      `Selected party position (id:${positionID}) with being (id: ${beingCardID})`,
+      { positionID, beingCardID }
+    );
+    moves.selectPartyMember(positionID, beingCardID);
   }
 
   function onSelectLandscape(landscapeID) {
     console.log("set selected landscape:", landscapeID);
     moves.selectLandscapeCard(landscapeID);
-    // setSelectedLandscapeID(G.players[ctx.currentPlayer].selectedLandscapeID == landscapeID ? null : landscapeID);
   }
   function calculateEligibleLandscapes(
     landscapes,
@@ -228,8 +239,12 @@ function GameBoardWrapper({
 
   const landscapes = G.landscapes;
   const beings = G.beings;
-  const resources = G.resources[playerID];
-  const life = player.deckIDs.length;
+  const playerResources = G.resources[playerID];
+  const opponentResources = G.resources[opponentID];
+
+  const playerLife = player.deckIDs.length;
+  const opponentLife = opponent.deckIDs.length;
+
   const playerHand = player?.handIDs.map((handId) =>
     cards.find(({ id }) => id === handId)
   );
@@ -252,11 +267,16 @@ function GameBoardWrapper({
       cards={cards}
       landscapes={landscapes}
       beings={beings}
-      life={life}
       partyLocation={partyLocation}
       playerResources={resources}
+      partyLocation={partyLocation}
+      playerResources={playerResources}
+      playerLife={playerLife}
       playerHand={playerHand}
-      playerID={playerID}
+      playerBeings={beings[playerID]}
+      opponentBeings={beings[opponentID]}
+      opponentResources={opponentResources}
+      opponentLife={opponentLife}
       isPlayerTurn={isPlayerTurn}
       chatMessages={chatMessages}
       onMove={onMove}
@@ -265,8 +285,9 @@ function GameBoardWrapper({
       selectedHandCardID={selectedHandCardID}
       selectedLandscapeID={selectedLandscapeID}
       selectedBeingID={selectedBeingID}
+      selectedPartyPosition={selectedPartyPosition}
       onSelectHand={onSelectHand}
-      onSelectBeing={onSelectBeing}
+      onSelectPartyPosition={handleOnSelectPartyPosition}
       onSelectLandscape={onSelectLandscape}
       onPlayCard={onPlayCard}
     />

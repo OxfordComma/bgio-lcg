@@ -1,56 +1,97 @@
 import React, { useState } from "react";
-import { SmallCard as Card } from "./Card";
+import { SmallCard } from "./Card";
+import classNames from "classnames";
 import "./Battlefield.css";
 
-function Being({ being, items, cards, onSelect }) {
+function Being({ being, cards, onSelect }) {
+  const handleOnSelect = (cardID) =>
+    onSelect({ cardID, beingCardID: being.beingCardID });
   return (
     <div className="being">
-      <Card
-        card={cards.find((c) => c.id === being.beingCardID)}
-        onSelect={onSelect}
-      />
-      {items?.map((item) => (
-        <Card
-          key={item.id}
-          card={cards.find((c) => c.id === item.id)}
-          onSelect={onSelect}
-        />
-      ))}
+      {being && (
+        <>
+          <SmallCard
+            card={cards.find((c) => c.id === being.beingCardID)}
+            onSelect={handleOnSelect}
+          />
+          {being?.equipment.map((item) => (
+            <SmallCard
+              key={item.id}
+              card={cards.find((c) => c.id === item.id)}
+              onSelect={handleOnSelect}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 }
 
-function Party({ beings, cards, onSelectCard }) {
+function PartyPosition({ positionID, being, cards, onSelect, isSelected }) {
   return (
-    <div className="party">
-      {beings.map((being) => (
-        <Being
-          key={being.id}
-          being={being}
-          items={being.equipment}
-          cards={cards}
-          onSelect={(e) => onSelectCard(being.beingCardID)}
-        />
-      ))}
+    <div
+      className={classNames({
+        "party-position": true,
+        "is-selected": isSelected,
+      })}
+      onClick={() => onSelect({ positionID, beingCardID: being?.beingCardID })}
+    >
+      {being ? (
+        <Being being={being} cards={cards} onSelect={() => {}} />
+      ) : (
+        <div className="empty-slot" />
+      )}
     </div>
   );
 }
 
 export function Battlefield({
-  beings,
-  playerID,
+  playerBeings = [],
+  opponentBeings = [],
   cards,
   selectedBeingID,
-  onSelectCard,
+  selectedPartyPosition,
+  onSelectPartyPosition,
 }) {
+  const positions = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  // Need to give each slot a unique id
+  // and then attach each dude to a specific slot
   return (
     <div className="battlefield">
-      {beings && (
-        <Party beings={beings["0"]} cards={cards} onSelectCard={onSelectCard} />
-      )}
-      {beings && (
-        <Party beings={beings["1"]} cards={cards} onSelectCard={onSelectCard} />
-      )}
+      <div className="party their-party">
+        {positions
+          .slice()
+          .reverse()
+          .map(({ id }) => {
+            const being = opponentBeings.find(
+              ({ position }) => position === id
+            );
+            return (
+              <PartyPosition
+                key={id}
+                positionID={id}
+                being={being}
+                cards={cards}
+                onSelect={() => {}}
+              />
+            );
+          })}
+      </div>
+      <div className="party my-party">
+        {positions.map(({ id }) => {
+          const being = playerBeings.find(({ position }) => position === id);
+          return (
+            <PartyPosition
+              key={id}
+              positionID={id}
+              being={being}
+              cards={cards}
+              isSelected={id === selectedPartyPosition}
+              onSelect={onSelectPartyPosition}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
