@@ -68,7 +68,6 @@ function GameBoard({
   cards,
   landscapes,
   partyLocation,
-  partyLocation,
   playerBeings,
   opponentBeings,
   isPlayerTurn,
@@ -267,8 +266,6 @@ function GameBoardWrapper({
       cards={cards}
       landscapes={landscapes}
       beings={beings}
-      partyLocation={partyLocation}
-      playerResources={resources}
       partyLocation={partyLocation}
       playerResources={playerResources}
       playerLife={playerLife}

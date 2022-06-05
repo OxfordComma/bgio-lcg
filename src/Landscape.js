@@ -31,7 +31,6 @@ function GridLocation({
 export function Landscape({
   landscapes,
   playerID,
-  partyLocation,
   cards,
   selectedLandscapeID,
   partyLocation,
