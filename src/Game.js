@@ -83,13 +83,31 @@ function selectBeingCard(G, ctx, id) {
   else G.players[ctx.currentPlayer].selectedBeingID = id;
 }
 
+function calculateEligibleLocations(landscapes, playerID, targetLandscapeID) {
+  let allEligibleLocations = [];
+  landscapes
+    .filter((l) => l.playerID === playerID)
+    .map((l) => {
+      // Strings because javascript doesn't like comparing lists
+      allEligibleLocations = [
+        ...allEligibleLocations,
+        `${l.x}, ${l.y + 1}`,
+        `${l.x}, ${l.y - 1}`,
+        `${l.x - 1}, ${l.y}`,
+        `${l.x + 1}, ${l.y}`,
+      ];
+    });
+
+  return allEligibleLocations;
+}
+
 function playCard(G, ctx, id, sendChatMessage) {
   if (!!id) {
     console.log("play card:", id);
     const card = G.cards[ctx.currentPlayer].find((c) => c.id === id);
-    const player = G.players[ctx.currentPlayer];
-    const resources = G.resources[ctx.currentPlayer];
 
+    const resources = G.resources[ctx.currentPlayer];
+    const player = G.players[ctx.currentPlayer];
     const landscapes = G.landscapes;
     let beings = G.beings[ctx.currentPlayer];
 
@@ -97,24 +115,17 @@ function playCard(G, ctx, id, sendChatMessage) {
       let landscape = landscapes.find(
         (l) => l.id === player.selectedLandscapeID
       );
-      let allEligibleLocations = [];
-      landscapes
-        .filter((l) => l.playerID === ctx.currentPlayer)
-        .map((l) => {
-          // Strings because javascript doesn't like comparing lists
-          allEligibleLocations = [
-            ...allEligibleLocations,
-            `${l.x}, ${l.y + 1}`,
-            `${l.x}, ${l.y - 1}`,
-            `${l.x - 1}, ${l.y}`,
-            `${l.x + 1}, ${l.y}`,
-          ];
-        });
 
-      console.log("eligible spots:", allEligibleLocations, [
-        landscape.x,
-        landscape.y,
-      ]);
+      const allEligibleLocations = calculateEligibleLocations(
+        landscapes,
+        ctx.currentPlayer,
+        player.selectedLandscapeID
+      );
+
+      // console.log("eligible spots:", allEligibleLocations, [
+      //   landscape.x,
+      //   landscape.y,
+      // ]);
       if (
         player.selectedHandCardID &&
         player.selectedLandscapeID &&
@@ -168,10 +179,8 @@ function playCard(G, ctx, id, sendChatMessage) {
         G.players[ctx.currentPlayer].selectedHandCardID = null;
         G.players[ctx.currentPlayer].selectedLandscapeID = null;
         G.players[ctx.currentPlayer].selectedBeingID = null;
-        G.moveSuccess = true;
       } else {
         console.log("You cannnot play this card!");
-        G.moveSuccess = false;
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -275,8 +284,18 @@ function attack(G, ctx, sendChatMessage) {
   );
 }
 
+function move(G, ctx) {
+  // const allEligibleLandscapes = calculateEligibleLocations(landscapes, playerID, startLandscapeID)
+
+  //  console.log(allEligibleLandscapes.includes(`${endLandscape.x}, ${endLandscape.y}` ) )
+  //  if (allEligibleLandscapes.includes(`${endLandscape.x}, ${endLandscape.y}`)) {
+  G.partyLocations[ctx.currentPlayer] =
+    G.players[ctx.currentPlayer].selectedLandscapeID;
+  //  }
+  //  sendChatMessage(`Move!`, G.partyLocations[playerID])
+}
+
 function addLocationResources(G, ctx, id) {
-  console.log(id);
   if (!!id) {
     let card = G.cards[ctx.currentPlayer].find((c) => c.id === id);
     if (card && "production" in card) {
@@ -317,10 +336,7 @@ export const CardGame = {
       y: parseInt(i / 5),
     }));
 
-    const landscape0 = landscapes.slice(0, 15);
-    const landscape1 = landscapes.slice(15, 30);
     return {
-      moveSuccess: null,
       players: {
         0: {
           handIDs: [],
@@ -342,6 +358,10 @@ export const CardGame = {
       decks: Decks().map((d) => {
         return { id: d.id, name: d.name };
       }),
+      partyLocations: {
+        0: null,
+        1: null,
+      },
       resources: {
         0: {
           metal: 0,
@@ -391,6 +411,7 @@ export const CardGame = {
       move: playCard,
       noLimit: true,
     },
+    move: move,
     attack: attack,
     selectDeck: {
       move: selectDeck,
@@ -452,7 +473,8 @@ export const CardGame = {
             ).id,
             playerID: player,
           };
-          // console.log(G.cards[player].find(c => c.name === decklist.startingLocation).id)
+
+          G.partyLocations[player] = landscapeIndex.toString();
 
           G.players[player].handIDs = handIDs;
           G.players[player].deckIDs = deckIDs;

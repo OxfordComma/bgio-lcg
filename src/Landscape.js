@@ -2,14 +2,24 @@ import React from "react";
 import { SmallCard } from "./Card";
 import "./Landscape.css";
 
-function GridLocation({ isSelected, onSelect, landscape, card }) {
+function GridLocation({
+  isSelected,
+  isPartyLocation,
+  onSelect,
+  landscape,
+  card,
+}) {
   return (
     <div
       onClick={(e) => {
         e.preventDefault();
         onSelect(landscape.id);
       }}
-      className={"land-area" + (isSelected ? " highlighted" : "")}
+      className={
+        "land-area" +
+        (isSelected ? " highlighted" : "") +
+        (isPartyLocation ? " party-location" : "")
+      }
     >
       {card && <SmallCard card={card} onSelect={(cardID) => {}} />}
     </div>
@@ -19,6 +29,7 @@ function GridLocation({ isSelected, onSelect, landscape, card }) {
 export function Landscape({
   landscapes,
   playerID,
+  partyLocation,
   cards,
   selectedLandscapeID,
   onSelect,
@@ -43,6 +54,7 @@ export function Landscape({
           landscape={landscape}
           card={cards.find((c) => c.id === landscape.landscapeCardID)}
           isSelected={selectedLandscapeID === landscape.id}
+          isPartyLocation={partyLocation.toString() === landscape.id}
           onSelect={onSelect}
         />
       ))}
