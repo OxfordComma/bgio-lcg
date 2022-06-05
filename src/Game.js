@@ -83,7 +83,7 @@ function selectPartyMember(G, ctx, position, beingId) {
   G.players[ctx.currentPlayer].selectedPartyPosition = position;
 }
 
-function playCard(G, ctx, id, targetID) {
+function playCard(G, ctx, id, sendChatMessage) {
   if (!!id) {
     console.log("play card:", id);
     const card = G.cards[ctx.currentPlayer].find((c) => c.id === id);
@@ -121,6 +121,9 @@ function playCard(G, ctx, id, targetID) {
         allEligibleLocations.includes(`${landscape.x}, ${landscape.y}`)
       ) {
         console.log("you can play this location card!");
+
+        sendChatMessage(`Played card ${card.name}`);
+
         player["handIDs"] = player["handIDs"].filter(
           (cid) => cid !== player.selectedHandCardID
         );
@@ -148,7 +151,6 @@ function playCard(G, ctx, id, targetID) {
         (acc, c) => acc && resources[c] >= cost[c],
         true
       );
-      console.log("can play?", canPlay);
 
       if (
         player.selectedPartyPosition &&
@@ -159,6 +161,8 @@ function playCard(G, ctx, id, targetID) {
         canPlay
       ) {
         console.log("you can play this being card!");
+
+        sendChatMessage(`Played card ${card.name}`);
         player["handIDs"] = player["handIDs"].filter(
           (cid) => cid !== player.selectedHandCardID
         );
@@ -173,8 +177,10 @@ function playCard(G, ctx, id, targetID) {
         G.players[ctx.currentPlayer].selectedLandscapeID = null;
         G.players[ctx.currentPlayer].selectedBeingID = null;
         G.players[ctx.currentPlayer].selectedPartyPosition = null;
+        G.moveSuccess = true;
       } else {
         console.log("You cannnot play this card!");
+        G.moveSuccess = false;
       }
 
       G.players[ctx.currentPlayer] = player;
@@ -193,6 +199,8 @@ function playCard(G, ctx, id, targetID) {
 
       if (player.selectedHandCardID && player.selectedBeingID && canPlay) {
         console.log("you can play this equipment card!");
+
+        sendChatMessage(`Played card ${card.name}`);
 
         player["handIDs"] = player["handIDs"].filter(
           (cid) => cid !== player.selectedHandCardID
@@ -226,7 +234,7 @@ function playCard(G, ctx, id, targetID) {
   }
 }
 
-function attack(G, ctx, id) {
+function attack(G, ctx, sendChatMessage) {
   let myBeings = G.beings[ctx.currentPlayer];
   let oppBeings = G.beings[["0", "1"].filter((b) => b !== ctx.currentPlayer)];
   const cards = G.cards[ctx.currentPlayer];
@@ -268,6 +276,12 @@ function attack(G, ctx, id) {
   opponent.discardIDs = player.deckIDs.slice(
     player.deckIDs.length - Math.max(totalStrength + totalArmor, 0)
   );
+  sendChatMessage(
+    `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${Math.max(
+      totalStrength + totalArmor,
+      0
+    )}`
+  );
 }
 
 function addLocationResources(G, ctx, id) {
@@ -280,6 +294,9 @@ function addLocationResources(G, ctx, id) {
       }
       if ("metal" in card.production) {
         G.resources[ctx.currentPlayer].metal += card.production.metal;
+      }
+      if ("mana" in card.production) {
+        G.resources[ctx.currentPlayer].mana += card.production.mana;
       }
       if ("soul" in card.production) {
         G.resources[ctx.currentPlayer].soul += card.production.soul;
@@ -313,6 +330,7 @@ export const CardGame = {
     const landscape0 = landscapes.slice(0, 15);
     const landscape1 = landscapes.slice(15, 30);
     return {
+      moveSuccess: null,
       players: {
         0: {
           handIDs: [],

@@ -7,13 +7,7 @@ import { GameStateBar } from "./GameStateBar";
 import { GameInterface } from "./GameInterface";
 import "./Board.css";
 
-function Controls({
-  isPlayerTurn,
-  onPlayCard,
-  attack,
-  endTurn,
-  consoleMessages,
-}) {
+function Controls({ isPlayerTurn, onPlayCard, attack, endTurn, chatMessages }) {
   return (
     <div className="controls">
       <div>
@@ -46,8 +40,8 @@ function Controls({
         </button>
       </div>
       <div className="output">
-        {consoleMessages.map((msg, i) => (
-          <div key={i}>{msg}</div>
+        {chatMessages.map((msg, i) => (
+          <div key={i}>{`player ${msg.sender}: ${msg.payload}`}</div>
         ))}
       </div>
     </div>
@@ -63,13 +57,15 @@ function GameBoard({
   playerID,
   opponentID,
   playerResources,
-  life,
+  playerLife,
   playerHand,
+  opponentResources,
+  opponentLife,
   selectedLandscapeID,
   selectedHandCardID,
   selectedBeingID,
   selectedPartyPosition,
-  consoleMessages,
+  chatMessages,
   onSelectLandscape,
   onSelectHand,
   onSelectPartyPosition,
@@ -81,8 +77,10 @@ function GameBoard({
     <GameInterface>
       <GameStateBar
         isPlayerTurn={!!isPlayerTurn}
-        resources={playerResources}
-        life={life}
+        playerResources={playerResources}
+        opponentResources={opponentResources}
+        playerLife={playerLife}
+        opponentLife={opponentLife}
       />
       <Landscape
         playerID={playerID}
@@ -111,16 +109,25 @@ function GameBoard({
         attack={onAttack}
         onPlayCard={onPlayCard}
         endTurn={onEndTurn}
-        consoleMessages={consoleMessages}
+        chatMessages={chatMessages}
       />
     </GameInterface>
   );
 }
 
-function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
+function GameBoardWrapper({
+  ctx,
+  G,
+  moves,
+  events,
+  playerID,
+  sendChatMessage,
+  chatMessages,
+}) {
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find((p) => p !== playerID);
+  let opponent = G.players[opponentID];
   let cards = [...G.cards["0"], ...G.cards["1"]]; // for now
 
   const selectedHandCardID = G.players[ctx.currentPlayer].selectedHandCardID;
@@ -129,7 +136,7 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   const selectedPartyPosition =
     G.players[ctx.currentPlayer].selectedPartyPosition;
 
-  const [consoleMessages, setConsoleMessages] = useState([]);
+  // const [chatMessages, setChatMessages] = useState([]);
 
   function onSelectHand(cardID) {
     console.log("set selected card in hand:", cardID);
@@ -153,35 +160,28 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   function onPlayCard() {
     const cardID = G.players[ctx.currentPlayer].selectedHandCardID;
     if (cardID) {
-      moves.playCard(cardID);
+      moves.playCard(cardID, sendChatMessage);
     }
-    console.log(G.players[ctx.currentPlayer].selectedHandCardID);
-
-    setConsoleMessages([
-      ...consoleMessages,
-      `player ${playerID} played card ${
-        cards.find((c) => c.id === cardID).name
-      }`,
-    ]);
-
-    // else {
-    // setConsoleMessages([...consoleMessages, `player ${playerID} tried to play card ${cards.find(c => c.id === cardID).name} but failed!`])
   }
 
   const landscapes = G.landscapes;
   const beings = G.beings;
-  const resources = G.resources[playerID];
-  const life = player.deckIDs.length;
+  const playerResources = G.resources[playerID];
+  const opponentResources = G.resources[opponentID];
+
+  const playerLife = player.deckIDs.length;
+  const opponentLife = opponent.deckIDs.length;
+
   const playerHand = player?.handIDs.map((handId) =>
     cards.find(({ id }) => id === handId)
   );
 
   const attack = function () {
-    setConsoleMessages([...consoleMessages, `player ${playerID} attack!`]);
-    moves.attack();
+    // sendChatMessage(`attack!`);
+    moves.attack(sendChatMessage);
   };
   const endTurn = function () {
-    setConsoleMessages([...consoleMessages, `player ${playerID} end turn`]);
+    sendChatMessage(`end turn`);
     events.endTurn();
   };
 
@@ -192,13 +192,15 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
       cards={cards}
       landscapes={landscapes}
       beings={beings}
-      life={life}
-      playerResources={resources}
+      playerResources={playerResources}
+      playerLife={playerLife}
       playerHand={playerHand}
       playerBeings={beings[playerID]}
       opponentBeings={beings[opponentID]}
+      opponentResources={opponentResources}
+      opponentLife={opponentLife}
       isPlayerTurn={isPlayerTurn}
-      consoleMessages={consoleMessages}
+      chatMessages={chatMessages}
       onAttack={attack}
       onEndTurn={endTurn}
       selectedHandCardID={selectedHandCardID}
@@ -213,7 +215,15 @@ function GameBoardWrapper({ ctx, G, moves, events, playerID }) {
   );
 }
 
-export function Board({ G, ctx, moves, events, playerID }) {
+export function Board({
+  G,
+  ctx,
+  moves,
+  events,
+  playerID,
+  sendChatMessage,
+  chatMessages,
+}) {
   function onDeckSelect(deckID) {
     moves.selectDeck(deckID, playerID);
   }
@@ -228,6 +238,8 @@ export function Board({ G, ctx, moves, events, playerID }) {
           moves={moves}
           events={events}
           playerID={playerID}
+          sendChatMessage={sendChatMessage}
+          chatMessages={chatMessages}
         />
       )}
     </div>
