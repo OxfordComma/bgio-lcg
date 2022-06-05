@@ -56,7 +56,7 @@ export function Landscape({
           landscape={landscape}
           card={cards.find((c) => c.id === landscape.landscapeCardID)}
           isSelected={selectedLandscapeID === landscape.id}
-          isPartyLocation={partyLocation == landscape.id}
+          isPartyLocation={partyLocation.toString() === landscape.id}
           onSelect={onSelect}
         />
       ))}
