@@ -55,8 +55,10 @@ function GameBoard({
   isPlayerTurn,
   playerID,
   playerResources,
-  life,
+  playerLife,
   playerHand,
+  opponentResources,
+  opponentLife,
   selectedLandscapeID,
   selectedHandCardID,
   selectedBeingID,
@@ -72,8 +74,10 @@ function GameBoard({
     <GameInterface>
       <GameStateBar
         isPlayerTurn={!!isPlayerTurn}
-        resources={playerResources}
-        life={life}
+        playerResources={playerResources}
+        opponentResources={opponentResources}
+        playerLife={playerLife}
+        opponentLife={opponentLife}
       />
       <Landscape
         playerID={playerID}
@@ -117,6 +121,7 @@ function GameBoardWrapper({
   // This state management needs refactoring later
   let player = G.players[playerID];
   let opponentID = ctx.playOrder.find((p) => p !== playerID);
+  let opponent = G.players[opponentID];
   let cards = [...G.cards["0"], ...G.cards["1"]]; // for now
 
   // const [selectedHandCardID, setSelectedHandCardID] = useState(null);
@@ -156,8 +161,12 @@ function GameBoardWrapper({
 
   const landscapes = G.landscapes;
   const beings = G.beings;
-  const resources = G.resources[playerID];
-  const life = player.deckIDs.length;
+  const playerResources = G.resources[playerID];
+  const opponentResources = G.resources[opponentID];
+
+  const playerLife = player.deckIDs.length;
+  const opponentLife = opponent.deckIDs.length;
+
   const playerHand = player?.handIDs.map((handId) =>
     cards.find(({ id }) => id === handId)
   );
@@ -178,10 +187,12 @@ function GameBoardWrapper({
       cards={cards}
       landscapes={landscapes}
       beings={beings}
-      life={life}
-      playerResources={resources}
+      playerResources={playerResources}
+      playerLife={playerLife}
       playerHand={playerHand}
       playerID={playerID}
+      opponentResources={opponentResources}
+      opponentLife={opponentLife}
       isPlayerTurn={isPlayerTurn}
       chatMessages={chatMessages}
       onAttack={attack}
