@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card } from "./Card";
+import { PlayerHandCard } from "./Card";
 import "./PlayerHand.css";
 
 export function PlayerHand({ hand, selectedCardID, onSelect }) {
@@ -9,7 +9,7 @@ export function PlayerHand({ hand, selectedCardID, onSelect }) {
         {hand
           ?.filter((c) => c)
           .map((card) => (
-            <Card
+            <PlayerHandCard
               key={"card" + card.id}
               card={card}
               isSelected={card.id === selectedCardID}
