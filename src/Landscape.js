@@ -21,7 +21,9 @@ function GridLocation({
         (isPartyLocation ? " party-location" : "")
       }
     >
-      {card && <SmallCard card={card} onSelect={(cardID) => {}} />}
+      {card && (
+        <SmallCard card={card} isSelected={isSelected} onSelect={() => {}} />
+      )}
     </div>
   );
 }
