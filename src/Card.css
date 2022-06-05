@@ -1,4 +1,4 @@
-.card-slot {
+.card {
   background-color: white;
   display: block;
   margin: 2px;
@@ -7,10 +7,14 @@
   aspect-ratio: 1 / 1.6;
 }
 
-.card-slot.horizontal {
+.card.horizontal {
   /* horizontal card */
   aspect-ratio: 1.6;
   padding: 1px;
+}
+
+.card.is-selected {
+  background-color: yellow;
 }
 
 .card > * {

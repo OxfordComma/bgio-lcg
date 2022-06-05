@@ -17,7 +17,3 @@
   top: 50%;
   transform: translate(0, -50%);
 }
-
-.myhand .card-slots > .card-slot.is-selected {
-  background-color: yellow;
-}

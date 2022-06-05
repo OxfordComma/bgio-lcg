@@ -11,7 +11,9 @@ function GridLocation({ isSelected, onSelect, landscape, card }) {
       }}
       className={"land-area" + (isSelected ? " highlighted" : "")}
     >
-      {card && <SmallCard card={card} onSelect={(cardID) => {}} />}
+      {card && (
+        <SmallCard card={card} isSelected={isSelected} onSelect={() => {}} />
+      )}
     </div>
   );
 }

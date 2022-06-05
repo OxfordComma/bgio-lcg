@@ -74,7 +74,33 @@ const Tooltip = ({ cursor, children }) => {
   );
 };
 
-function CardSlot({
+function Card({
+  card,
+  isHorizontal = false,
+  isSelected,
+  onSelect,
+  children,
+  ...rest
+}) {
+  return (
+    <div
+      className={classNames({
+        card: true,
+        "is-selected": isSelected,
+        horizontal: isHorizontal,
+      })}
+      onClick={(e) => {
+        e.preventDefault();
+        onSelect(card.id);
+      }}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CardWithTooltip({
   card,
   isHorizontal = false,
   isSelected,
@@ -98,49 +124,43 @@ function CardSlot({
   }
 
   return (
-    <div
-      className={classNames({
-        card: true,
-        "card-slot": true,
-        "is-selected": isSelected,
-        horizontal: isHorizontal,
-      })}
+    <Card
+      card={card}
+      isSelected={isSelected}
+      isHorizontal={isHorizontal}
       onMouseMove={onHover}
       onMouseOut={(e) => setShowTooltip(false)}
-      onClick={(e) => {
-        e.preventDefault();
-        onSelect(card.id);
-      }}
+      onSelect={onSelect}
     >
       {showTooltip && (
         <Tooltip cursor={cursor}>
-          <CardSlot card={card} isSelected={isSelected} onSelect={onSelect}>
+          <Card card={card} onSelect={() => {}}>
             <CardDetails card={card} />
-          </CardSlot>
+          </Card>
         </Tooltip>
       )}
       {children}
-    </div>
+    </Card>
   );
 }
 
 export function SmallCard({ card, isSelected, onSelect }) {
   return (
-    <CardSlot
+    <CardWithTooltip
       card={card}
       isSelected={isSelected}
       onSelect={onSelect}
       isHorizontal
     >
       <CardSummary card={card} isSelected={isSelected} isHorizontal />
-    </CardSlot>
+    </CardWithTooltip>
   );
 }
 
-export function Card({ card, isSelected, onSelect }) {
+export function PlayerHandCard({ card, isSelected, onSelect }) {
   return (
-    <CardSlot card={card} isSelected={isSelected} onSelect={onSelect}>
+    <CardWithTooltip card={card} isSelected={isSelected} onSelect={onSelect}>
       <CardDetails card={card} isSelected={isSelected} />
-    </CardSlot>
+    </CardWithTooltip>
   );
 }
