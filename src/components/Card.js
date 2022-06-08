@@ -23,16 +23,26 @@ function CardDetails({ card }) {
       )}
       {card?.materials && (
         <div>
-          {Object.entries(card.materials)
-            ?.map((k, v) => `${v} ${k}`)
-            .join(", ")}
+          <span>Cost:</span>
+          <span>
+            {Object.entries(card.materials).map(([resource, amount]) => (
+              <div key={resource}>
+                -{amount} {resource}
+              </div>
+            ))}
+          </span>
         </div>
       )}
       {card?.production && (
         <div>
-          {Object.entries(card.production)
-            ?.map((k, v) => `${v} ${k}`)
-            .join(", ")}
+          <span>Gain:</span>
+          <span>
+            {Object.entries(card.production).map(([resource, amount]) => (
+              <div key={resource}>
+                +{amount} {resource}
+              </div>
+            ))}
+          </span>
         </div>
       )}
     </>
@@ -54,9 +64,11 @@ function CardSummary({ card }) {
       )}
       {card?.production && (
         <div>
-          {Object.entries(card.production)
-            ?.map((k, v) => `${v} ${k}`)
-            .join(", ")}
+          {Object.entries(card.production)?.map(([resource, amount]) => (
+            <div key={resource}>
+              +{amount} {resource}
+            </div>
+          ))}
         </div>
       )}
     </>

@@ -782,3 +782,5 @@ export function generateDeckFromDecklist(decklist) {
 export function Cards() {
   return cardlist;
 }
+
+export const CardCatalog = () => cardlist;

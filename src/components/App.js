@@ -1,6 +1,6 @@
 import { Client, Lobby } from "boardgame.io/react";
 import { Local, SocketIO } from "boardgame.io/multiplayer";
-import { CardGame } from "./Game";
+import { CardGame } from "../Game";
 import { Board } from "./Board";
 import { NavigationMenu, Tab } from "./Navigation";
 
