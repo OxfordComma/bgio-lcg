@@ -1,6 +1,7 @@
 import React from "react";
 import { SmallCard } from "./Card";
 import "./Landscape.css";
+import classNames from "classnames";
 
 function GridLocation({
   isSelected,
@@ -15,11 +16,12 @@ function GridLocation({
         e.preventDefault();
         onSelect(landscape.id);
       }}
-      className={
-        "land-area" +
-        (isSelected ? " highlighted" : "") +
-        (isPartyLocation ? " party-location" : "")
-      }
+      className={classNames({
+        "land-area": true,
+        highlighted: isSelected,
+        "party-location": isPartyLocation,
+        "can-place-card": landscape.canPlaceCard,
+      })}
     >
       {card && (
         <SmallCard card={card} isSelected={isSelected} onSelect={() => {}} />
@@ -36,27 +38,15 @@ export function Landscape({
   partyLocation,
   onSelect,
 }) {
-  // const myLandscapes = landscapes
-  // let theirLandscapes = [ ...landscapes[['0', '1'].filter(p => p !== playerID)] ].reverse()
-
   return (
     <div className="landscape">
-      {/*{theirLandscapes.map(landscape => 
-      <GridLocation
-        key={playerID+"_landscape" + landscape.id.toString()}
-        landscape={landscape}
-        card={cards.find(c => c.id === landscape.landscapeCardID)}
-        isSelected={ false }
-        onSelect={onSelect}
-      />
-    )}*/}
       {landscapes.map((landscape) => (
         <GridLocation
-          key={playerID + "_landscape" + landscape.id.toString()}
+          key={playerID + "_landscape" + landscape.id}
           landscape={landscape}
           card={cards.find((c) => c.id === landscape.landscapeCardID)}
           isSelected={selectedLandscapeID === landscape.id}
-          isPartyLocation={partyLocation.toString() === landscape.id}
+          isPartyLocation={partyLocation === landscape.id}
           onSelect={onSelect}
         />
       ))}
