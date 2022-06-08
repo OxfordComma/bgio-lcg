@@ -1,23 +1,68 @@
 import { PlayerView, TurnOrder } from "boardgame.io/core";
-import { generateDeckFromDecklist } from "./Cards";
-import { Decks } from "./Decks";
-import { Cards } from "./Cards";
 // import { CardFunctions } from './CardFunctions'
+import globalStateReducer, { initialState } from "./globalStateReducer";
+import {
+  createCardsDrawn,
+  createHandCardSelected,
+  createLandscapeSelected,
+  createDeckSelected,
+  createCardPlayed,
+  createPartyPositionSelected,
+  createAttack,
+  createPartyMoved,
+  createBeginTurn,
+} from "./actions";
+import {
+  selectTopCardIDsFromDeck,
+  selectDeckByID,
+  selectCardByID,
+  canPlayCard,
+  selectSelectedBeingID,
+  selectSelectedLandscapeID,
+  selectTotalStrength,
+  selectTotalDefense,
+  selectOpponentID,
+  selectSelectedPartyPosition,
+  selectDecklist,
+  selectIncome,
+  canMoveOnLocation,
+  selectLandscapeByID,
+} from "./selectors";
+import { generateDeckFromDecklist } from "./Cards";
+import { createContext } from "react";
 
 function selectDeck(G, ctx, deckID, playerID) {
-  console.log(deckID);
+  const deck = selectDeckByID(G, deckID);
+  if (!deck) return G;
 
-  const deck = Decks().find((d) => d.id === deckID);
-  let decklist = deck.decklist;
+  const decklist = {
+    ...deck.decklist,
+    [deck.startingLocation]: 1,
+    [deck.startingBeing]: 1,
+  };
+  const cards = generateDeckFromDecklist(decklist);
 
-  decklist[deck.startingLocation] = 1;
-  decklist[deck.startingBeing] = 1;
+  const deckCardIDs = ctx.random
+    .Shuffle(cards)
+    .filter(
+      ({ name }) =>
+        name !== deck.startingLocation && name !== deck.startingLocation
+    )
+    .map(({ id }) => id);
 
-  G.cards["0"] = generateDeckFromDecklist(decklist);
-  G.cards["1"] = generateDeckFromDecklist(decklist);
-
-  G.decklists["0"] = deck;
-  G.decklists["1"] = deck;
+  return globalStateReducer(
+    G,
+    createDeckSelected(
+      deck,
+      playerID,
+      cards,
+      decklist,
+      deckCardIDs,
+      cards.find(({ name }) => name === deck.startingLocation).id,
+      cards.find(({ name }) => name === deck.startingBeing).id
+    ),
+    ctx.currentPlayer
+  );
 }
 
 function shuffle(array) {
@@ -41,280 +86,84 @@ function shuffle(array) {
 }
 
 function drawCard(G, ctx) {
-  let deck = G.players[ctx.currentPlayer].deckIDs;
-  let hand = G.players[ctx.currentPlayer].handIDs.concat(deck.pop());
-  G.players[ctx.currentPlayer].handIDs = hand;
-  G.players[ctx.currentPlayer].deckIDs = deck;
-  console.log("draw card:", hand);
+  return globalStateReducer(
+    G,
+    createCardsDrawn(selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1)),
+    ctx.currentPlayer
+  );
 }
 
 function selectHandCard(G, ctx, id) {
   console.log("select hand card with id:", id);
-  let currentPlayer = G.players[ctx.currentPlayer];
-
-  if (id == currentPlayer.selectedHandCardID)
-    G.players[ctx.currentPlayer].selectedHandCardID = null;
-  else G.players[ctx.currentPlayer].selectedHandCardID = id;
+  return globalStateReducer(G, createHandCardSelected(id), ctx.currentPlayer);
 }
 
 function selectLandscapeCard(G, ctx, id) {
-  const landscape = G.landscapes.find((l) => l.id == id);
-  console.log(`select landscape card at (${landscape.x}, ${landscape.y})`, id);
-
-  let currentPlayer = G.players[ctx.currentPlayer];
-
-  if (id === currentPlayer.selectedLandscapeID)
-    G.players[ctx.currentPlayer].selectedLandscapeID = null;
-  else G.players[ctx.currentPlayer].selectedLandscapeID = id;
-
-  // if (currentPlayer.selectedHandCardID && currentPlayer.selectedLandscapeID) {
-  // 	console.log('play card')
-  // 	ctx.moves.playCard(G, ctx, currentPlayer.selectedHandCardID)
-  // }
+  return globalStateReducer(G, createLandscapeSelected(id), ctx.currentPlayer);
 }
 
 function selectPartyMember(G, ctx, position, beingId) {
-  console.log("select being card at id:", beingId);
-  if (beingId) {
-    const currentPlayer = G.players[ctx.currentPlayer];
-    G.players[ctx.currentPlayer].selectedBeingID =
-      beingId === currentPlayer.selectedBeingID ? null : beingId;
-  }
-  G.players[ctx.currentPlayer].selectedPartyPosition = position;
+  return globalStateReducer(
+    G,
+    createPartyPositionSelected(position, beingId),
+    ctx.currentPlayer
+  );
 }
 
-function calculateEligibleLocations(landscapes, playerID, targetLandscapeID) {
-  let allEligibleLocations = [];
-  landscapes
-    .filter((l) => l.playerID === playerID)
-    .map((l) => {
-      // Strings because javascript doesn't like comparing lists
-      allEligibleLocations = [
-        ...allEligibleLocations,
-        `${l.x}, ${l.y + 1}`,
-        `${l.x}, ${l.y - 1}`,
-        `${l.x - 1}, ${l.y}`,
-        `${l.x + 1}, ${l.y}`,
-      ];
-    });
+function playCard(G, ctx, id) {
+  if (!id) return G;
 
-  return allEligibleLocations;
-}
+  console.log("play card:", id);
 
-function playCard(G, ctx, id, sendChatMessage) {
-  if (!!id) {
-    console.log("play card:", id);
-    const card = G.cards[ctx.currentPlayer].find((c) => c.id === id);
+  const card = selectCardByID(G, ctx.currentPlayer, id);
 
-    const resources = G.resources[ctx.currentPlayer];
-    const player = G.players[ctx.currentPlayer];
-    const landscapes = G.landscapes;
-    let beings = G.beings[ctx.currentPlayer];
-
-    if (card.type === "Location") {
-      let landscape = landscapes.find(
-        (l) => l.id === player.selectedLandscapeID
-      );
-
-      const allEligibleLocations = calculateEligibleLocations(
-        landscapes,
-        ctx.currentPlayer,
-        player.selectedLandscapeID
-      );
-
-      // console.log("eligible spots:", allEligibleLocations, [
-      //   landscape.x,
-      //   landscape.y,
-      // ]);
-      if (
-        player.selectedHandCardID &&
-        player.selectedLandscapeID &&
-        allEligibleLocations.includes(`${landscape.x}, ${landscape.y}`)
-      ) {
-        console.log("you can play this location card!");
-
-        sendChatMessage(`Played card ${card.name}`);
-
-        player["handIDs"] = player["handIDs"].filter(
-          (cid) => cid !== player.selectedHandCardID
-        );
-
-        landscapes[parseInt(player.selectedLandscapeID)]["landscapeCardID"] =
-          player.selectedHandCardID;
-        landscapes[parseInt(player.selectedLandscapeID)]["playerID"] =
-          ctx.currentPlayer;
-        G.players[ctx.currentPlayer].selectedHandCardID = null;
-        G.players[ctx.currentPlayer].selectedLandscapeID = null;
-        G.players[ctx.currentPlayer].selectedBeingID = null;
-        G.players[ctx.currentPlayer].selectedPartyPosition = null;
-      } else {
-        console.log("You cannnot play this card!");
-      }
-
-      G.players[ctx.currentPlayer] = player;
-      G.landscapes = landscapes;
-    }
-
-    if (card.type === "Being") {
-      let cost = card.materials;
-
-      const canPlay = Object.keys(cost).reduce(
-        (acc, c) => acc && resources[c] >= cost[c],
-        true
-      );
-
-      if (
-        player.selectedPartyPosition &&
-        !beings?.find(
-          ({ position }) => position === player.selectedPartyPosition
-        ) &&
-        player.selectedHandCardID &&
-        canPlay
-      ) {
-        console.log("you can play this being card!");
-
-        sendChatMessage(`Played card ${card.name}`);
-        player["handIDs"] = player["handIDs"].filter(
-          (cid) => cid !== player.selectedHandCardID
-        );
-        beings = beings.concat({
-          beingCardID: player.selectedHandCardID,
-          id: beings.length,
-          position: player.selectedPartyPosition,
-          equipment: [],
-        });
-        Object.keys(cost).map((c) => (resources[c] = resources[c] - cost[c]));
-        G.players[ctx.currentPlayer].selectedHandCardID = null;
-        G.players[ctx.currentPlayer].selectedLandscapeID = null;
-        G.players[ctx.currentPlayer].selectedBeingID = null;
-      } else {
-        console.log("You cannnot play this card!");
-      }
-
-      G.players[ctx.currentPlayer] = player;
-      G.beings[ctx.currentPlayer] = beings;
-      G.resources[ctx.currentPlayer] = resources;
-    }
-
-    if (card.type === "Item" && card.subtype === "Equipment") {
-      let cost = card.materials;
-
-      const canPlay = Object.keys(cost).reduce((acc, c) => {
-        if (!acc) return false;
-
-        return resources[c] >= cost[c] ? true : false;
-      }, true);
-
-      if (player.selectedHandCardID && player.selectedBeingID && canPlay) {
-        console.log("you can play this equipment card!");
-
-        sendChatMessage(`Played card ${card.name}`);
-
-        player["handIDs"] = player["handIDs"].filter(
-          (cid) => cid !== player.selectedHandCardID
-        );
-
-        let being = beings.find(
-          (b) => b.beingCardID === player.selectedBeingID
-        );
-        console.log(being);
-        being.equipment = [
-          ...being.equipment,
-          {
-            id: player.selectedHandCardID,
-          },
-        ];
-
-        // Replace in array and preserve order
-        beings = beings.map((b) => (b.id == being.id ? b : being));
-
-        Object.keys(cost).map((c) => (resources[c] = resources[c] - cost[c]));
-        reset(G, ctx);
-      } else {
-        console.log("You cannnot play this card!");
-      }
-
-      G.players[ctx.currentPlayer] = player;
-      G.beings[ctx.currentPlayer] = beings;
-      G.resources[ctx.currentPlayer] = resources;
-    }
+  if (!canPlayCard(G, ctx, card, ctx.currentPlayer)) {
+    console.log("Can't play this card. Missing Resources.", id);
     return G;
   }
+
+  return globalStateReducer(
+    G,
+    createCardPlayed(
+      card,
+      ctx.currentPlayer,
+      selectSelectedPartyPosition(G, ctx.currentPlayer),
+      selectSelectedBeingID(G, ctx.currentPlayer),
+      selectSelectedLandscapeID(G, ctx.currentPlayer)
+    ),
+    ctx.currentPlayer
+  );
 }
 
-function attack(G, ctx, sendChatMessage) {
-  let myBeings = G.beings[ctx.currentPlayer];
-  let oppBeings = G.beings[["0", "1"].filter((b) => b !== ctx.currentPlayer)];
-  const cards = G.cards[ctx.currentPlayer];
-
-  let totalStrength = myBeings.reduce((acc, being) => {
-    let card = cards.find((c) => c.id === being.beingCardID);
-    let equipment = being.equipment;
-
-    let equipmentStrength = equipment.reduce(
-      (acc, eq) => acc + cards.find((c) => c.id === eq.id).stats.strength,
-      0
-    );
-    return acc + (card.stats.strength + equipmentStrength) ?? 0;
-  }, 0);
-  console.log("total strength:", totalStrength);
-
-  // Total armor of their front row?
-  let totalArmor = oppBeings.slice(0, 2).reduce((acc, being) => {
-    let card = cards.find((c) => c.id === being.beingCardID);
-
-    let equipment = being.equipment;
-    let equipmentArmor = equipment.reduce(
-      (acc, eq) => acc + cards.find((c) => c.id === eq.id).stats.armor,
-      0
-    );
-
-    return card.stats.armor + equipmentArmor ?? 0;
-  }, 0);
-  console.log("total armor:", totalArmor);
-
-  // Opponent takes the damage!
-  let player = G.players[ctx.currentPlayer];
-  let opponent = G.players[["0", "1"].filter((b) => b !== ctx.currentPlayer)];
-
-  opponent.deckIDs = player.deckIDs.slice(
-    0,
-    player.deckIDs.length - Math.max(totalStrength + totalArmor, 0)
-  );
-  opponent.discardIDs = player.deckIDs.slice(
-    player.deckIDs.length - Math.max(totalStrength + totalArmor, 0)
-  );
-  sendChatMessage(
-    `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${Math.max(
-      totalStrength + totalArmor,
-      0
-    )}`
+function attack(G, ctx) {
+  return globalStateReducer(
+    G,
+    createAttack(
+      ctx.currentPlayer,
+      selectOpponentID(G, ctx.currentPlayer),
+      selectTopCardIDsFromDeck(
+        G,
+        ctx.currentPlayer,
+        Math.max(
+          selectTotalStrength(G, ctx.currentPlayer) -
+            selectTotalDefense(G, selectOpponentID(ctx.currentPlayer)),
+          0
+        )
+      )
+    ),
+    ctx.currentPlayer
   );
 }
 
 function move(G, ctx) {
-  G.partyLocations[ctx.currentPlayer] =
-    G.players[ctx.currentPlayer].selectedLandscapeID;
-}
-
-function addLocationResources(G, ctx, id) {
-  if (!!id) {
-    let card = G.cards[ctx.currentPlayer].find((c) => c.id === id);
-    if (card && "production" in card) {
-      if ("wood" in card.production) {
-        G.resources[ctx.currentPlayer].wood += card.production.wood;
-      }
-      if ("metal" in card.production) {
-        G.resources[ctx.currentPlayer].metal += card.production.metal;
-      }
-      if ("mana" in card.production) {
-        G.resources[ctx.currentPlayer].mana += card.production.mana;
-      }
-      if ("soul" in card.production) {
-        G.resources[ctx.currentPlayer].soul += card.production.soul;
-      }
-    }
-  }
+  const destinationID = selectSelectedLandscapeID(G, ctx.currentPlayer);
+  const desination = selectLandscapeByID(G, destinationID);
+  if (desination && canMoveOnLocation(G, ctx.currentPlayer, desination))
+    return globalStateReducer(
+      G,
+      createPartyMoved(ctx.currentPlayer, desination),
+      ctx.currentPlayer
+    );
 }
 
 function reset(G, ctx) {
@@ -326,75 +175,17 @@ function reset(G, ctx) {
   return G;
 }
 
+const STARTING_HAND_SIZE = 7;
+
 export const CardGame = {
   name: "battle-dudes",
   setup: (ctx) => {
-    // Changed this id back so the indices would make sense from the perspective of both players,
-    // otherwise one player has high indices
-    const landscapes = Array.from({ length: 30 }).map((_, i) => ({
-      id: i.toString(),
-      landscapeCardID: null,
-      playerID: null,
-      x: i % 5,
-      y: parseInt(i / 5),
-    }));
-
-    return {
-      players: {
-        0: {
-          handIDs: [],
-          deckIDs: [],
-          discardIDs: [],
-          selectedHandCardID: null,
-          selectedLandscapeID: null,
-          selectedBeingID: null,
-          selectedPartyPosition: null,
-        },
-        1: {
-          handIDs: [],
-          deckIDs: [],
-          discardIDs: [],
-          selectedHandCardID: null,
-          selectedLandscapeID: null,
-          selectedBeingID: null,
-          selectedPartyPosition: null,
-        },
-      },
-      decks: Decks().map((d) => {
-        return { id: d.id, name: d.name };
-      }),
-      partyLocations: {
-        0: null,
-        1: null,
-      },
-      resources: {
-        0: {
-          metal: 0,
-          wood: 0,
-          soul: 0,
-          mana: 0,
-        },
-        1: {
-          metal: 0,
-          wood: 0,
-          soul: 0,
-          mana: 0,
-        },
-      },
-      landscapes: landscapes,
-      beings: {
-        0: [],
-        1: [],
-      },
-      cards: {
-        0: null,
-        1: null,
-      },
-      decklists: {
-        0: null,
-        1: null,
-      },
-    };
+    const G = globalStateReducer(
+      initialState,
+      { type: "__INITIALIZE__" },
+      ctx.currentPlayer
+    );
+    return G;
   },
 
   // playerView: PlayerView.STRIP_SECRETS,
@@ -429,74 +220,35 @@ export const CardGame = {
   },
   turn: {
     order: TurnOrder.RESET,
-    onBegin: (G, ctx) => {
-      console.log("turn begin");
-      drawCard(G, ctx);
-      G.landscapes.forEach((f) => {
-        if (f.landscapeCardID != null && f.playerID == ctx.currentPlayer)
-          addLocationResources(G, ctx, f.landscapeCardID);
-      });
-    },
     minMoves: 0,
     maxMoves: 2,
+    onBegin: (G, ctx) => {
+      console.log("turn begin");
+      const cardsToDrawCount =
+        ctx.turn === 3 || ctx.turn === 4 ? STARTING_HAND_SIZE : 1;
+      return globalStateReducer(
+        G,
+        createBeginTurn(
+          ctx.currentPlayer,
+          selectIncome(G, ctx.currentPlayer),
+          selectTopCardIDsFromDeck(G, ctx.currentPlayer, cardsToDrawCount)
+        ),
+        ctx.currentPlayer
+      );
+    },
   },
   phases: {
     menu: {
       start: true,
       next: "play",
-      endIf: (G) =>
-        "decklists" in G &&
-        G.decklists["0"] != null &&
-        G.decklists["1"] != null,
+      endIf: (G, ctx) =>
+        !!selectDecklist(G, ctx.currentPlayer) &&
+        !!selectDecklist(G, selectOpponentID(G, ctx.currentPlayer)),
     },
     play: {
       onBegin: (G, ctx) => {
-        let startingHandSize = 7;
-
-        // Initialize each player
-        ctx.playOrder.forEach((player) => {
-          const decklist = G.decklists[player];
-          let deckIDs = shuffle(G.cards[player].map((c) => c.id)).filter(
-            (c) =>
-              ![decklist.startingBeing, decklist.startingLocation].includes(
-                c.name
-              )
-          );
-          let handIDs = [];
-
-          for (let i = 0; i < startingHandSize; i++) {
-            handIDs = handIDs.concat(deckIDs.pop());
-          }
-
-          // Starting location
-          let landscapes = G.landscapes;
-          let landscapeIndex = player == "0" ? 0 : 29;
-          landscapes[landscapeIndex] = {
-            ...landscapes[landscapeIndex],
-            landscapeCardID: G.cards[player].find(
-              (c) => c.name === decklist.startingLocation
-            ).id,
-            playerID: player,
-          };
-
-          G.partyLocations[player] = landscapeIndex.toString();
-
-          G.players[player].handIDs = handIDs;
-          G.players[player].deckIDs = deckIDs;
-
-          G.landscapes = landscapes;
-
-          G.beings[player] = [
-            {
-              beingCardID: G.cards[player].find(
-                (c) => c.name === decklist.startingBeing
-              ).id,
-              id: 0,
-              position: 1,
-              equipment: [],
-            },
-          ];
-        });
+        console.log("phase begin");
+        return G;
       },
     },
   },

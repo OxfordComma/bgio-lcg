@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SelectDeckMenu } from "./SelectDeckMenu";
 import { PlayerHand } from "./PlayerHand";
 import { Landscape } from "./Landscape";
@@ -6,6 +7,26 @@ import { Battlefield } from "./Battlefield";
 import { GameStateBar } from "./GameStateBar";
 import { GameInterface } from "./GameInterface";
 import "./Board.css";
+import {
+  canPlayCard,
+  selectCardByID,
+  selectOpponentID,
+  selectSelectedHandCardID,
+  selectTotalDefense,
+  selectTotalStrength,
+  selectSelectedLandscapeID,
+  selectSelectedBeingID,
+  selectSelectedPartyPosition,
+  selectLandscapes,
+  canPlaceCardOnLocation,
+  selectPlayerBeings,
+  selectPlayerResources,
+  selectPlayerLife,
+  selectPartyLocationID,
+  selectPlayerHandCards,
+  selectAllCards,
+  canMoveOnLocation,
+} from "./selectors";
 
 function Controls({
   isPlayerTurn,
@@ -144,19 +165,25 @@ function GameBoardWrapper({
   sendChatMessage,
   chatMessages,
 }) {
-  // This state management needs refactoring later
-  let player = G.players[playerID];
-  let opponentID = ctx.playOrder.find((p) => p !== playerID);
-  let opponent = G.players[opponentID];
-  let cards = [...G.cards["0"], ...G.cards["1"]]; // for now
-
-  const selectedHandCardID = G.players[ctx.currentPlayer].selectedHandCardID;
-  const selectedLandscapeID = G.players[ctx.currentPlayer].selectedLandscapeID;
-  const selectedBeingID = G.players[ctx.currentPlayer].selectedBeingID;
-  const selectedPartyPosition =
-    G.players[ctx.currentPlayer].selectedPartyPosition;
-
-  // const [chatMessages, setChatMessages] = useState([]);
+  const isPlayerTurn = playerID === ctx.currentPlayer;
+  const opponentID = selectOpponentID(G, playerID);
+  const cards = selectAllCards(G);
+  const selectedHandCardID = selectSelectedHandCardID(G, playerID);
+  const selectedLandscapeID = selectSelectedLandscapeID(G, playerID);
+  const selectedBeingID = selectSelectedBeingID(G, playerID);
+  const selectedPartyPosition = selectSelectedPartyPosition(G, playerID);
+  const playerBeings = selectPlayerBeings(G, playerID);
+  const playerResources = selectPlayerResources(G, playerID);
+  const playerLife = selectPlayerLife(G, playerID);
+  const opponentBeings = selectPlayerBeings(G, opponentID);
+  const opponentResources = selectPlayerResources(G, opponentID);
+  const opponentLife = selectPlayerLife(G, opponentID);
+  const partyLocation = selectPartyLocationID(G, playerID);
+  const playerHand = selectPlayerHandCards(G, playerID);
+  const landscapes = selectLandscapes(G).map((landscape) => ({
+    ...landscape,
+    canPlaceCard: canPlaceCardOnLocation(G, playerID, landscape),
+  }));
 
   function onSelectHand(cardID) {
     console.log("set selected card in hand:", cardID);
@@ -176,102 +203,60 @@ function GameBoardWrapper({
     console.log("set selected landscape:", landscapeID);
     moves.selectLandscapeCard(landscapeID);
   }
-  function calculateEligibleLandscapes(
-    landscapes,
-    playerID,
-    targetLandscapeID
-  ) {
-    let allEligibleLandscapes = [];
-    landscapes
-      .filter((l) => l.id === targetLandscapeID)
-      .map((l) => {
-        // Strings because javascript doesn't like comparing lists
-        allEligibleLandscapes = [
-          ...allEligibleLandscapes,
-          `${l.x}, ${l.y + 1}`,
-          `${l.x}, ${l.y - 1}`,
-          `${l.x - 1}, ${l.y}`,
-          `${l.x + 1}, ${l.y}`,
-        ];
-      });
-
-    return allEligibleLandscapes;
-  }
 
   function onMove() {
-    const playerID = ctx.currentPlayer;
-    const player = G.players[ctx.currentPlayer];
-    const landscapes = G.landscapes;
+    const targetId = selectSelectedLandscapeID(G, playerID);
+    const targetLandscape = landscapes.find((l) => l.id === targetId);
 
-    const startLandscapeID = G.partyLocations[ctx.currentPlayer];
-    const startLandscape = landscapes.find((l) => l.id === startLandscapeID);
-
-    const endLandscapeID = player.selectedLandscapeID;
-    const endLandscape = landscapes.find((l) => l.id === endLandscapeID);
-
-    if (!!playerID && startLandscapeID != null && endLandscapeID != null) {
-      const allEligibleLandscapes = calculateEligibleLandscapes(
-        landscapes,
-        playerID,
-        startLandscapeID
+    if (
+      isPlayerTurn &&
+      targetLandscape &&
+      selectSelectedLandscapeID(G, playerID) &&
+      canMoveOnLocation(G, playerID, targetLandscape)
+    ) {
+      moves.move();
+      sendChatMessage(
+        `Player ${playerID} party moved to (x: ${targetLandscape.x}, y: ${targetLandscape.y})`
       );
-
-      console.log(
-        allEligibleLandscapes,
-        `${endLandscape.x}, ${endLandscape.y}`
-      );
-      if (
-        allEligibleLandscapes.includes(`${endLandscape.x}, ${endLandscape.y}`)
-      ) {
-        moves.move();
-      }
-      sendChatMessage(`Move from ${startLandscapeID} to ${endLandscapeID}`);
     }
   }
 
   function onPlayCard() {
-    const cardID = G.players[ctx.currentPlayer].selectedHandCardID;
-    if (cardID) {
-      moves.playCard(cardID, sendChatMessage);
+    const cardID = selectSelectedHandCardID(G, playerID);
+    const card = cardID && selectCardByID(G, playerID, cardID);
+    if (!card || !canPlayCard(G, ctx, card, playerID)) {
+      console.log("Can't play this card.", cardID);
+      return;
     }
+    moves.playCard(cardID);
+    sendChatMessage(`Played card ${card.name}`);
   }
 
-  const landscapes = G.landscapes;
-  const beings = G.beings;
-  const playerResources = G.resources[playerID];
-  const opponentResources = G.resources[opponentID];
+  const attack = () => {
+    const totalStrength = selectTotalStrength(G, playerID);
+    const totalArmor = selectTotalDefense(G, selectOpponentID(G, playerID));
+    const damage = Math.max(totalStrength - totalArmor, 0);
 
-  const playerLife = player.deckIDs.length;
-  const opponentLife = opponent.deckIDs.length;
-
-  const playerHand = player?.handIDs.map((handId) =>
-    cards.find(({ id }) => id === handId)
-  );
-  const partyLocation = G.partyLocations[playerID];
-  console.log("partyLocation", partyLocation);
-
-  const attack = function () {
-    // sendChatMessage(`attack!`);
     moves.attack(sendChatMessage);
+    sendChatMessage(
+      `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${damage}`
+    );
   };
   const endTurn = function () {
     sendChatMessage(`end turn`);
     events.endTurn();
   };
 
-  const isPlayerTurn = playerID === ctx.currentPlayer;
-
   return (
     <GameBoard
       cards={cards}
       landscapes={landscapes}
-      beings={beings}
       partyLocation={partyLocation}
       playerResources={playerResources}
       playerLife={playerLife}
       playerHand={playerHand}
-      playerBeings={beings[playerID]}
-      opponentBeings={beings[opponentID]}
+      playerBeings={playerBeings}
+      opponentBeings={opponentBeings}
       opponentResources={opponentResources}
       opponentLife={opponentLife}
       isPlayerTurn={isPlayerTurn}
@@ -300,8 +285,17 @@ export function Board({
   sendChatMessage,
   chatMessages,
 }) {
+  const navigate = useNavigate();
+  const opponentID = selectOpponentID(G, playerID);
+
   function onDeckSelect(deckID) {
     moves.selectDeck(deckID, playerID);
+    events.endTurn();
+
+    // for development
+    if (window.location.pathname === `/${playerID}`) {
+      navigate(`/${opponentID}`);
+    }
   }
   return (
     <div className="container">

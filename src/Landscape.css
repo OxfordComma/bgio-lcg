@@ -15,6 +15,10 @@
   background-color: white;
 }
 
+.land-area.can-place-card:not(.highlighted) {
+  background-color: rgb(221, 221, 221);
+}
+
 .land-area.highlighted {
   background-color: yellow;
 }
