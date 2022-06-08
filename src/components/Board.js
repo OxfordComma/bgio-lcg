@@ -26,7 +26,7 @@ import {
   selectPlayerHandCards,
   selectAllCards,
   canMoveOnLocation,
-} from "./selectors";
+} from "../selectors";
 
 function Controls({
   isPlayerTurn,

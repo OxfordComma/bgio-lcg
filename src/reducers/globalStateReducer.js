@@ -1,10 +1,10 @@
-import { Decks } from "./Decks";
+import { Decks } from "../Decks";
 import landscapesReducer from "./landscapesReducer";
 import resourcesReducer from "./resourcesReducer";
 import partyLocationReducer from "./partyLocationReducer";
 import playerReducer from "./playerReducer";
 import beingsReducer from "./beingsReducer";
-import { CardCatalog, generateDeckFromDecklist } from "./Cards";
+import { CardCatalog, generateDeckFromDecklist } from "../Cards";
 
 function cardsReducer(state = null, action) {
   switch (action.type) {

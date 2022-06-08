@@ -1,6 +1,8 @@
 import { PlayerView, TurnOrder } from "boardgame.io/core";
 // import { CardFunctions } from './CardFunctions'
-import globalStateReducer, { initialState } from "./globalStateReducer";
+import globalStateReducer, {
+  initialState,
+} from "./reducers/globalStateReducer";
 import {
   createCardsDrawn,
   createHandCardSelected,
