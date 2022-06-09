@@ -17,11 +17,7 @@ export const selectTopCardIDsFromDeck = (G, playerID, count) =>
 
 export const selectDeckByID = (G, id) => G.decks.find((deck) => deck.id === id);
 
-// export const selectPlayersStartingBeing = (G, playerID) =>
-//   G.factions[playerID]?.startingBeing;
-
-// export const selectPlayersStartingLocation = (G, playerID) =>
-//   G.factions[playerID]?.startingLocation;
+export const selectAllDecks = (G) => G.decks;
 
 export const selectDecklist = (G, playerID) => {
   return G.decklists[playerID];
@@ -32,10 +28,15 @@ export const selectCardByID = (G, playerID, id) =>
 
 export const selectPlayerBeings = (G, playerID) => G.beings[playerID] || [];
 
+export const selectPlayerBeingByPosition = (G, playerID, positionID) =>
+  selectPlayerBeings(G, playerID).find(
+    ({ position }) => position === positionID
+  );
+
 export const selectLandscapeByID = (G, id) =>
   G.landscapes.find((l) => l.id === id);
 
-export const selectLandscapes = (G) => G.landscapes;
+export const selectLandscapes = (G) => G.landscapes || [];
 
 export const selectSelectedHandCardID = (G, playerID) =>
   G.players[playerID].selectedHandCardID;
@@ -104,6 +105,10 @@ export const selectIncome = (G, playerID) =>
       { wood: 0, metal: 0, soul: 0 }
     );
 
+export const selectIsSelectedCardLocation = (G, playerID) =>
+  selectCardByID(G, playerID, selectSelectedHandCardID(G, playerID))?.type ===
+  "Location";
+
 // -------------------------------------------------------
 
 export const hasEnoughResourcesForCard = (G, card, playerID) =>
@@ -127,24 +132,20 @@ export const canPlaceCardOnLocation = (G, playerID, location) =>
       landscape.playerID == playerID && isAdjacentLocation(landscape, location)
   );
 
-export const canMoveOnLocation = (G, playerID, destination) => {
-  const landscapes = selectLandscapes(G);
-  return (
-    destination.playerID === playerID &&
-    isAdjacentLocation(selectPartyLandscape(G, playerID), destination)
-  );
-};
+export const canMoveOnLocation = (G, playerID, destination) =>
+  destination.playerID === playerID &&
+  isAdjacentLocation(selectPartyLandscape(G, playerID), destination);
 
-export const canPlayCard = (G, ctx, card) => {
-  if (!hasEnoughResourcesForCard(G, card, ctx.currentPlayer)) {
+export const canPlayCard = (G, playerID, card) => {
+  if (!hasEnoughResourcesForCard(G, card, playerID)) {
     return false;
   }
-  const player = selectPlayer(G, ctx.currentPlayer);
+  const player = selectPlayer(G, playerID);
   switch (card.type) {
     case "Being":
       return (
         player.selectedPartyPosition &&
-        !selectPlayerBeings(G, ctx.currentPlayer).find(
+        !selectPlayerBeings(G, playerID).find(
           (being) => being.position === player.selectedPartyPosition
         )
       );
@@ -153,7 +154,7 @@ export const canPlayCard = (G, ctx, card) => {
         player.selectedLandscapeID &&
         canPlaceCardOnLocation(
           G,
-          ctx.currentPlayer,
+          playerID,
           selectLandscapeByID(G, player.selectedLandscapeID)
         )
       );

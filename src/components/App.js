@@ -2,11 +2,12 @@ import { Client, Lobby } from "boardgame.io/react";
 import { Local, SocketIO } from "boardgame.io/multiplayer";
 import { CardGame } from "../Game";
 import { Board } from "./Board";
+import { Client as ForkedClient } from "../forks/Client";
 import { NavigationMenu, Tab } from "./Navigation";
 
 import React from "react";
 
-const CardGameClient = Client({
+const CardGameClient = ForkedClient({
   game: CardGame,
   board: Board,
   multiplayer: Local(),
