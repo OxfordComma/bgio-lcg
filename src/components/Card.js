@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import "./Card.css";
+import { selectCardByID } from "../selectors";
 
 function CardDetails({ card }) {
   return (
@@ -156,7 +158,8 @@ function CardWithTooltip({
   );
 }
 
-export function SmallCard({ card, isSelected, onSelect }) {
+export function SmallCard({ playerID, id, isSelected, onSelect }) {
+  const card = useSelector(({ G }) => selectCardByID(G, playerID, id));
   return (
     <CardWithTooltip
       card={card}
@@ -169,7 +172,8 @@ export function SmallCard({ card, isSelected, onSelect }) {
   );
 }
 
-export function PlayerHandCard({ card, isSelected, onSelect }) {
+export function PlayerHandCard({ playerID, id, isSelected, onSelect }) {
+  const card = useSelector(({ G }) => selectCardByID(G, playerID, id));
   return (
     <CardWithTooltip card={card} isSelected={isSelected} onSelect={onSelect}>
       <CardDetails card={card} isSelected={isSelected} />
