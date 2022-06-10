@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SelectDeckMenu } from "./SelectDeckMenu";
-import { PlayerHand } from "./PlayerHand";
+import PlayerHand from "./PlayerHand";
 import { Landscape } from "./Landscape";
 import { Battlefield } from "./Battlefield";
 import { GameStateBar } from "./GameStateBar";
@@ -19,23 +20,19 @@ import {
   selectSelectedPartyPosition,
   selectLandscapes,
   canPlaceCardOnLocation,
-  selectPlayerBeings,
-  selectPlayerResources,
-  selectPlayerLife,
-  selectPartyLocationID,
-  selectPlayerHandCards,
-  selectAllCards,
   canMoveOnLocation,
+  selectLandscapeByID,
 } from "../selectors";
 
 function Controls({
-  isPlayerTurn,
+  playerID,
   onPlayCard,
   move,
   attack,
   endTurn,
   chatMessages,
 }) {
+  const isPlayerTurn = useSelector(({ ctx }) => ctx.currentPlayer === playerID);
   return (
     <div className="controls">
       <div>
@@ -86,23 +83,8 @@ function Controls({
 }
 
 function GameBoard({
-  cards,
-  landscapes,
-  partyLocation,
-  playerBeings,
-  opponentBeings,
-  isPlayerTurn,
   playerID,
   opponentID,
-  playerResources,
-  playerLife,
-  playerHand,
-  opponentResources,
-  opponentLife,
-  selectedLandscapeID,
-  selectedHandCardID,
-  selectedBeingID,
-  selectedPartyPosition,
   chatMessages,
   onSelectLandscape,
   onSelectHand,
@@ -114,38 +96,16 @@ function GameBoard({
 }) {
   return (
     <GameInterface>
-      <GameStateBar
-        isPlayerTurn={!!isPlayerTurn}
-        playerResources={playerResources}
-        opponentResources={opponentResources}
-        playerLife={playerLife}
-        opponentLife={opponentLife}
-      />
-      <Landscape
-        playerID={playerID}
-        landscapes={landscapes}
-        cards={cards}
-        onSelect={onSelectLandscape}
-        selectedLandscapeID={selectedLandscapeID}
-        partyLocation={partyLocation}
-      />
+      <GameStateBar playerID={playerID} opponentID={opponentID} />
+      <Landscape playerID={playerID} onSelect={onSelectLandscape} />
       <Battlefield
         playerID={playerID}
         opponentID={opponentID}
-        playerBeings={playerBeings}
-        opponentBeings={opponentBeings}
-        cards={cards}
         onSelectPartyPosition={onSelectPartyPosition}
-        selectedBeingID={selectedBeingID}
-        selectedPartyPosition={selectedPartyPosition}
       />
-      <PlayerHand
-        hand={playerHand}
-        selectedCardID={selectedHandCardID}
-        onSelect={onSelectHand}
-      />
+      <PlayerHand playerID={playerID} onSelect={onSelectHand} />
       <Controls
-        isPlayerTurn={isPlayerTurn}
+        playerID={playerID}
         move={onMove}
         attack={onAttack}
         onPlayCard={onPlayCard}
@@ -167,19 +127,10 @@ function GameBoardWrapper({
 }) {
   const isPlayerTurn = playerID === ctx.currentPlayer;
   const opponentID = selectOpponentID(G, playerID);
-  const cards = selectAllCards(G);
   const selectedHandCardID = selectSelectedHandCardID(G, playerID);
   const selectedLandscapeID = selectSelectedLandscapeID(G, playerID);
   const selectedBeingID = selectSelectedBeingID(G, playerID);
   const selectedPartyPosition = selectSelectedPartyPosition(G, playerID);
-  const playerBeings = selectPlayerBeings(G, playerID);
-  const playerResources = selectPlayerResources(G, playerID);
-  const playerLife = selectPlayerLife(G, playerID);
-  const opponentBeings = selectPlayerBeings(G, opponentID);
-  const opponentResources = selectPlayerResources(G, opponentID);
-  const opponentLife = selectPlayerLife(G, opponentID);
-  const partyLocation = selectPartyLocationID(G, playerID);
-  const playerHand = selectPlayerHandCards(G, playerID);
   const landscapes = selectLandscapes(G).map((landscape) => ({
     ...landscape,
     canPlaceCard: canPlaceCardOnLocation(G, playerID, landscape),
@@ -205,13 +156,14 @@ function GameBoardWrapper({
   }
 
   function onMove() {
-    const targetId = selectSelectedLandscapeID(G, playerID);
-    const targetLandscape = landscapes.find((l) => l.id === targetId);
+    const targetLandscape = selectLandscapeByID(
+      G,
+      selectSelectedLandscapeID(G, playerID)
+    );
 
     if (
       isPlayerTurn &&
       targetLandscape &&
-      selectSelectedLandscapeID(G, playerID) &&
       canMoveOnLocation(G, playerID, targetLandscape)
     ) {
       moves.move();
@@ -224,7 +176,7 @@ function GameBoardWrapper({
   function onPlayCard() {
     const cardID = selectSelectedHandCardID(G, playerID);
     const card = cardID && selectCardByID(G, playerID, cardID);
-    if (!card || !canPlayCard(G, ctx, card, playerID)) {
+    if (!card || !canPlayCard(G, playerID, card)) {
       console.log("Can't play this card.", cardID);
       return;
     }
@@ -249,17 +201,8 @@ function GameBoardWrapper({
 
   return (
     <GameBoard
-      cards={cards}
-      landscapes={landscapes}
-      partyLocation={partyLocation}
-      playerResources={playerResources}
-      playerLife={playerLife}
-      playerHand={playerHand}
-      playerBeings={playerBeings}
-      opponentBeings={opponentBeings}
-      opponentResources={opponentResources}
-      opponentLife={opponentLife}
-      isPlayerTurn={isPlayerTurn}
+      playerID={playerID}
+      opponentID={opponentID}
       chatMessages={chatMessages}
       onMove={onMove}
       onAttack={attack}
@@ -297,10 +240,10 @@ export function Board({
       navigate(`/${opponentID}`);
     }
   }
-  return (
+  const WrappedBoard = (
     <div className="container">
       {ctx.phase === "menu" ? (
-        <SelectDeckMenu decks={G.decks} onDeckSelect={onDeckSelect} />
+        <SelectDeckMenu onDeckSelect={onDeckSelect} />
       ) : (
         <GameBoardWrapper
           G={G}
@@ -314,4 +257,5 @@ export function Board({
       )}
     </div>
   );
+  return WrappedBoard;
 }

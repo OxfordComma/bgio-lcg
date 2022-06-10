@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectAllDecks } from "../selectors";
 
-export function SelectDeckMenu({ decks, onDeckSelect }) {
+export function SelectDeckMenu({ onDeckSelect }) {
+  const decks = useSelector(({ G }) => selectAllDecks(G));
   let [selectedDeckID, setSelectedDeckID] = useState(null);
   return (
     <div>

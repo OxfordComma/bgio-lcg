@@ -9,20 +9,28 @@
 .land-area {
   display: flex;
   justify-content: center;
-  border: 1px solid #555;
-  width: 100%;
-  height: 100%;
   background-color: white;
+  border: 1px solid #555;
 }
 
 .land-area.can-place-card:not(.highlighted) {
-  background-color: rgb(221, 221, 221);
+  background-color: #80d3e1;
+}
+
+.land-area.ally:not(.highlighted) {
+  background-color: #00a6fb;
+}
+
+.land-area.enemy:not(.highlighted) {
+  background-color: #de3c4b;
 }
 
 .land-area.highlighted {
   background-color: yellow;
 }
 
-.land-area.party-location {
-  background-color: navy;
+.land-area.party-location > .card {
+  border-color: #0a1128;
+  border-width: 4px;
+  margin: 1px;
 }

@@ -1,5 +1,4 @@
 import { PlayerView, TurnOrder } from "boardgame.io/core";
-// import { CardFunctions } from './CardFunctions'
 import globalStateReducer, {
   initialState,
 } from "./reducers/globalStateReducer";
@@ -31,7 +30,6 @@ import {
   selectLandscapeByID,
 } from "./selectors";
 import { generateDeckFromDecklist } from "./Cards";
-import { createContext } from "react";
 
 function selectDeck(G, ctx, deckID, playerID) {
   const deck = selectDeckByID(G, deckID);
@@ -119,7 +117,7 @@ function playCard(G, ctx, id) {
 
   const card = selectCardByID(G, ctx.currentPlayer, id);
 
-  if (!canPlayCard(G, ctx, card, ctx.currentPlayer)) {
+  if (!canPlayCard(G, ctx.currentPlayer, card)) {
     console.log("Can't play this card. Missing Resources.", id);
     return G;
   }
