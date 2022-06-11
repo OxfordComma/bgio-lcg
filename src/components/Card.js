@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import "./Card.css";
 import { selectCardByID } from "../selectors";
 
-function CardDetails({ card }) {
+export function CardDetails({ card }) {
   return (
     <>
       <div className="card-id">
@@ -114,7 +114,7 @@ function Card({
   );
 }
 
-function CardWithTooltip({
+export function CardWithTooltip({
   card,
   isHorizontal = false,
   isSelected,
@@ -168,15 +168,6 @@ export function SmallCard({ playerID, id, isSelected, onSelect }) {
       isHorizontal
     >
       <CardSummary card={card} isSelected={isSelected} isHorizontal />
-    </CardWithTooltip>
-  );
-}
-
-export function PlayerHandCard({ playerID, id, isSelected, onSelect }) {
-  const card = useSelector(({ G }) => selectCardByID(G, playerID, id));
-  return (
-    <CardWithTooltip card={card} isSelected={isSelected} onSelect={onSelect}>
-      <CardDetails card={card} isSelected={isSelected} />
     </CardWithTooltip>
   );
 }

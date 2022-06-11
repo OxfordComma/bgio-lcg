@@ -18,69 +18,12 @@ import {
   selectSelectedLandscapeID,
   selectSelectedBeingID,
   selectSelectedPartyPosition,
-  selectLandscapes,
-  canPlaceCardOnLocation,
   canMoveOnLocation,
   selectLandscapeByID,
+  selectPlayerBeingByPosition,
+  selectSelectedItemID,
 } from "../selectors";
-
-function Controls({
-  playerID,
-  onPlayCard,
-  move,
-  attack,
-  endTurn,
-  chatMessages,
-}) {
-  const isPlayerTurn = useSelector(({ ctx }) => ctx.currentPlayer === playerID);
-  return (
-    <div className="controls">
-      <div>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            onPlayCard();
-          }}
-          disabled={!isPlayerTurn}
-        >
-          play
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            move();
-          }}
-          disabled={!isPlayerTurn}
-        >
-          move
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            attack();
-          }}
-          disabled={!isPlayerTurn}
-        >
-          attack
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            endTurn();
-          }}
-          disabled={!isPlayerTurn}
-        >
-          end
-        </button>
-      </div>
-      <div className="output">
-        {chatMessages.map((msg, i) => (
-          <div key={i}>{`player ${msg.sender}: ${msg.payload}`}</div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import Controls from "./Controls";
 
 function GameBoard({
   playerID,
@@ -117,7 +60,6 @@ function GameBoard({
 }
 
 function GameBoardWrapper({
-  ctx,
   G,
   moves,
   events,
@@ -125,41 +67,46 @@ function GameBoardWrapper({
   sendChatMessage,
   chatMessages,
 }) {
-  const isPlayerTurn = playerID === ctx.currentPlayer;
-  const opponentID = selectOpponentID(G, playerID);
-  const selectedHandCardID = selectSelectedHandCardID(G, playerID);
-  const selectedLandscapeID = selectSelectedLandscapeID(G, playerID);
-  const selectedBeingID = selectSelectedBeingID(G, playerID);
-  const selectedPartyPosition = selectSelectedPartyPosition(G, playerID);
-  const landscapes = selectLandscapes(G).map((landscape) => ({
-    ...landscape,
-    canPlaceCard: canPlaceCardOnLocation(G, playerID, landscape),
-  }));
+  const navigate = useNavigate();
+  const isPlayerTurn = useSelector(({ ctx }) => playerID === ctx.currentPlayer);
+  const opponentID = useSelector(({ G }) => selectOpponentID(G, playerID));
+  const selectedHandCardID = useSelector(({ G }) =>
+    selectSelectedHandCardID(G, playerID)
+  );
+  const selectedLandscapeID = useSelector(({ G }) =>
+    selectSelectedLandscapeID(G, playerID)
+  );
+  const selectedPartyPosition = useSelector(({ G }) =>
+    selectSelectedPartyPosition(G, playerID)
+  );
+  const selectedBeingID = useSelector(({ G }) =>
+    selectSelectedBeingID(G, playerID)
+  );
+  const selectedItemID = useSelector(({ G }) =>
+    selectSelectedItemID(G, playerID)
+  );
 
   function onSelectHand(cardID) {
-    console.log("set selected card in hand:", cardID);
-    moves.selectHandCard(cardID);
-    // This properly sets the hand ID to whatever was set in the move
+    moves.selectHandCard(selectedHandCardID !== cardID ? cardID : null);
   }
 
-  function handleOnSelectPartyPosition({ positionID, beingCardID }) {
-    console.log(
-      `Selected party position (id:${positionID}) with being (id: ${beingCardID})`,
-      { positionID, beingCardID }
-    );
-    moves.selectPartyMember(positionID, beingCardID);
+  function handleOnSelectPartyPosition({ positionID, itemID }) {
+    if (positionID === selectedPartyPosition && itemID === selectedItemID) {
+      moves.selectPartyMember(null, null, null);
+    } else {
+      const being = selectPlayerBeingByPosition(G, playerID, positionID);
+      moves.selectPartyMember(positionID, being?.id, itemID);
+    }
   }
 
   function onSelectLandscape(landscapeID) {
-    console.log("set selected landscape:", landscapeID);
-    moves.selectLandscapeCard(landscapeID);
+    moves.selectLandscapeCard(
+      selectedLandscapeID !== landscapeID ? landscapeID : null
+    );
   }
 
   function onMove() {
-    const targetLandscape = selectLandscapeByID(
-      G,
-      selectSelectedLandscapeID(G, playerID)
-    );
+    const targetLandscape = selectLandscapeByID(G, selectedLandscapeID);
 
     if (
       isPlayerTurn &&
@@ -174,25 +121,33 @@ function GameBoardWrapper({
   }
 
   function onPlayCard() {
-    const cardID = selectSelectedHandCardID(G, playerID);
-    const card = cardID && selectCardByID(G, playerID, cardID);
+    const card =
+      selectedHandCardID && selectCardByID(G, playerID, selectedHandCardID);
     if (!card || !canPlayCard(G, playerID, card)) {
-      console.log("Can't play this card.", cardID);
+      console.log("Can't play this card.", selectedHandCardID);
       return;
     }
-    moves.playCard(cardID);
+    moves.playCard(selectedHandCardID);
     sendChatMessage(`Played card ${card.name}`);
   }
 
   const attack = () => {
     const totalStrength = selectTotalStrength(G, playerID);
-    const totalArmor = selectTotalDefense(G, selectOpponentID(G, playerID));
+    const totalArmor = selectTotalDefense(G, opponentID);
     const damage = Math.max(totalStrength - totalArmor, 0);
 
     moves.attack(sendChatMessage);
     sendChatMessage(
       `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${damage}`
     );
+
+    events.endTurn();
+    sendChatMessage(`end turn`);
+
+    // for development
+    if (window.location.pathname === `/${playerID}`) {
+      navigate(`/${opponentID}`);
+    }
   };
   const endTurn = function () {
     sendChatMessage(`end turn`);
@@ -243,11 +198,10 @@ export function Board({
   const WrappedBoard = (
     <div className="container">
       {ctx.phase === "menu" ? (
-        <SelectDeckMenu onDeckSelect={onDeckSelect} />
+        <SelectDeckMenu playerID={playerID} onDeckSelect={onDeckSelect} />
       ) : (
         <GameBoardWrapper
           G={G}
-          ctx={ctx}
           moves={moves}
           events={events}
           playerID={playerID}
