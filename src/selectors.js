@@ -15,18 +15,18 @@ export const selectSelectedLandscapeID = (G, playerID) =>
 export const selectTopCardIDsFromDeck = (G, playerID, count) =>
   selectPlayer(G, playerID)?.deckIDs?.slice(0, count);
 
-export const selectDeckByID = (G, id) => G.decks.find((deck) => deck.id === id);
+export const selectDeckByID = (G, id) =>
+  selectAllDecks(G).find((deck) => deck.id === id);
 
 export const selectAllDecks = (G) => G.decks;
 
-export const selectDecklist = (G, playerID) => {
-  return G.decklists[playerID];
-};
+export const selectPlayerCards = (G, playerID) => G.cards[playerID] || [];
 
 export const selectCardByID = (G, playerID, id) =>
-  G.cards[playerID].find((c) => c.id === id);
+  selectPlayerCards(G, playerID).find((c) => c.id === id);
 
-export const selectPlayerBeings = (G, playerID) => G.beings[playerID] || [];
+export const selectPlayerBeings = (G, playerID) =>
+  G.beings.filter((being) => being.playerID === playerID);
 
 export const selectPlayerBeingByPosition = (G, playerID, positionID) =>
   selectPlayerBeings(G, playerID).find(
@@ -34,20 +34,28 @@ export const selectPlayerBeingByPosition = (G, playerID, positionID) =>
   );
 
 export const selectLandscapeByID = (G, id) =>
-  G.landscapes.find((l) => l.id === id);
+  selectLandscapes(G).find((l) => l.id === id);
 
 export const selectLandscapes = (G) => G.landscapes || [];
 
 export const selectSelectedHandCardID = (G, playerID) =>
-  G.players[playerID].selectedHandCardID;
+  selectPlayer(G, playerID).selectedHandCardID;
+
+export const selectSelectedItemID = (G, playerID) =>
+  selectPlayer(G, playerID).selectedItemID;
+
+export const selectBeingItems = (G, playerID, beingID) =>
+  G.items.filter(
+    (item) => item.playerID === playerID && item.beingID === beingID
+  );
 
 export const selectTotalStrength = (G, playerID) =>
   selectPlayerBeings(G, playerID).reduce(
     (total, being) =>
       total +
       (selectCardByID(G, playerID, being.beingCardID).stats.strength +
-        being.equipment.reduce(
-          (acc, eq) => acc + selectCardByID(eq.id).stats.strength,
+        selectBeingItems(G, playerID, being.id).reduce(
+          (acc, eq) => acc + selectCardByID(G, playerID, eq.id).stats.strength,
           0
         ) || 0),
     0
@@ -58,8 +66,8 @@ export const selectTotalDefense = (G, playerID) =>
     (total, being) =>
       total +
       (selectCardByID(G, playerID, being.beingCardID).stats.armor +
-        being.equipment.reduce(
-          (acc, eq) => acc + selectCardByID(eq.id).stats.armor,
+        selectBeingItems(G, playerID, being.id).reduce(
+          (acc, eq) => acc + selectCardByID(G, playerID, eq.id).stats.armor,
           0
         ) || 0),
     0
@@ -83,13 +91,8 @@ export const selectPlayerHandCardIDs = (G, playerID) =>
 
 export const selectPlayerHandCards = (G, playerID) =>
   selectPlayerHandCardIDs(G, playerID).map((id) =>
-    selectAllCards(G).find((card) => card.id === id)
+    selectCardByID(G, playerID, id)
   );
-
-export const selectAllCards = (G) =>
-  Object.values(G.cards)
-    .filter((c) => c)
-    .flat();
 
 export const selectIncome = (G, playerID) =>
   selectLandscapes(G)
@@ -112,7 +115,7 @@ export const selectIsSelectedCardLocation = (G, playerID) =>
 // -------------------------------------------------------
 
 export const hasEnoughResourcesForCard = (G, card, playerID) =>
-  Object.entries(G.resources[playerID]).reduce(
+  Object.entries(selectPlayerResources(G, playerID)).reduce(
     (canAfford, [type, amount]) =>
       canAfford && (!card?.materials || amount >= (card?.materials[type] || 0)),
     true
@@ -137,32 +140,32 @@ export const canMoveOnLocation = (G, playerID, destination) =>
   isAdjacentLocation(selectPartyLandscape(G, playerID), destination);
 
 export const canPlayCard = (G, playerID, card) => {
-  // if (!hasEnoughResourcesForCard(G, card, playerID)) {
-  //   return false;
-  // }
-  const player = selectPlayer(G, playerID);
+  if (!hasEnoughResourcesForCard(G, card, playerID)) {
+    return false;
+  }
   switch (card.type) {
     case "Being":
+      const position = selectSelectedPartyPosition(G, playerID);
       return (
-        player.selectedPartyPosition &&
+        position &&
         !selectPlayerBeings(G, playerID).find(
-          (being) => being.position === player.selectedPartyPosition
+          (being) => being.position === position
         )
       );
     case "Location":
+      const landscape = selectSelectedLandscapeID(G, playerID);
       return (
-        player.selectedLandscapeID &&
-        canPlaceCardOnLocation(
-          G,
-          playerID,
-          selectLandscapeByID(G, player.selectedLandscapeID)
-        )
+        landscape &&
+        canPlaceCardOnLocation(G, playerID, selectLandscapeByID(G, landscape))
       );
     case "Item":
-      return player.selectedPartyPosition && 1;
+      return !!selectSelectedBeingID(G, playerID);
     case "Ability":
-      return player.selectedPartyPosition && 1;
+      return false;
     default:
       return false;
   }
 };
+
+export const hasPlayerSelectedDeck = (G, playerID) =>
+  !!selectPlayer(G, playerID).deckSelected;

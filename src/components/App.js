@@ -4,6 +4,7 @@ import { CardGame } from "../Game";
 import { Board } from "./Board";
 import { Client as ForkedClient } from "../forks/Client";
 import { NavigationMenu, Tab } from "./Navigation";
+import "./App.css";
 
 import React from "react";
 

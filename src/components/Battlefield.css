@@ -28,6 +28,4 @@
   height: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: left;
-  aspect-ratio: 1.6;
 }

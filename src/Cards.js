@@ -1218,11 +1218,24 @@ export function generateDeckFromDecklist(decklist) {
           : populatedDeck,
       []
     )
-    .map((card, i) => ({ ...card, id: i.toString() }));
+    .map((card, i) => ({
+      ...card,
+      id: i.toString(),
+      catalogId: cardCatalog().find(({ name }) => name === card.name).catalogId,
+    }));
 }
 
 export function Cards() {
   return cardlist;
 }
 
-export const CardCatalog = () => cardlist;
+let _uniqueIncrementalID = 0;
+let _catalog;
+export const cardCatalog = () => {
+  if (_catalog) return _catalog;
+  _catalog = cardlist.map((card) => ({
+    ...card,
+    catalogId: _uniqueIncrementalID++,
+  }));
+  return _catalog;
+};

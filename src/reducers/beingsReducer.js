@@ -1,55 +1,54 @@
-export default function beingsReducer(state = [], action) {
+// const positions = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+
+export function itemReducer(state = [], action) {
+  switch (action.type) {
+    case "CARD_PLAYED":
+      switch (action.card.type) {
+        case "Item":
+          return [
+            ...state,
+            {
+              id: action.card.id,
+              playerID: action.playerID,
+              beingID: action.beingID,
+            },
+          ];
+        default:
+          return state;
+      }
+    default:
+      return state || [];
+  }
+}
+
+export function beingsReducer(state = [], action) {
   switch (action.type) {
     case "DECK_SELECTED":
       return [
+        ...state,
         {
-          id: 0,
+          id: action.startingBeingCardID,
+          playerID: action.playerID,
           beingCardID: action.startingBeingCardID,
           position: 1,
-          equipment: [],
         },
       ];
     case "CARD_PLAYED":
       switch (action.card.type) {
         case "Being":
-          return state.concat({
-            beingCardID: action.card.id,
-            id: state.length,
-            position: action.targetPartyPosition,
-            equipment: [],
-          });
-        case "Item":
-          return state.map((being) =>
-            being.id == action.targetPartyPosition
-              ? being
-              : {
-                  ...being,
-                  equipment: [
-                    ...being.equipment,
-                    {
-                      id: action.card.id,
-                    },
-                  ],
-                }
-          );
-        case "Ability":
-          return state.map((being) =>
-            being.id == action.targetPartyPosition
-              ? being
-              : {
-                  ...being,
-                  abilities: [
-                    ...being.abilities,
-                    {
-                      id: action.card.id,
-                    },
-                  ],
-                }
-          );
+          return [
+            ...state,
+            {
+              id: action.card.id,
+              playerID: action.playerID,
+              beingCardID: action.card.id,
+              position: action.targetPartyPosition,
+            },
+          ];
         default:
           return state;
       }
     default:
-      return state;
+      return state || [];
   }
 }
