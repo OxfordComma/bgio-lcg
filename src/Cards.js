@@ -1,64 +1,133 @@
-// function Card(value, suit, rank) {
-// "number": "",
-//   // this.value = value;
-//   // this.suit = suit;
-//   // this.rank = rank;
-// }
+// GeneralType:
+// {
+//   number: Unique identifying integer for the "set" of cards
+//   name: Card name. Should be unique.
+//   type: One of ["Being", "Item", "Location"]
+//   subtype: Depends on the type, but usually something like "Equipment".
+//   rarity: ["common", "uncommon", "rare", "legendary rare"],
+//   element: ["fire", "water", "earth", "air", "light", "dark"],
+//
+//   traits: Identifying characteristics for the subject of the card:
+//           ["human", "archer", "flammable", "knight"],
+//   materials: An object containing the cost to play the card. Possible resources so far:
+//   {
+//     flax: plant based stuff (for cloth/clothing).
+//     metal: metal.
+//     wood: for making wooden things.
+//     food: For eating.
+//     soul: Human essence? Can be used to play beings and cast spells.
+//     gold: currency.
+//   },
+//   text: What the card does based on the above. Will probably be auto generated in many cases
+// },
+
+// Location:
+// {
+//   ...GeneralType,
+//   // Motherland = can start as home base
+//   subtype: ["Motherland"]
+//   stats: Any bonuses this card gives to party members at this location:
+//   {
+//     strength: 0-25, 0=insect, 25=strongest possible being
+//     armor: 0-25
+//     agility: 0-25
+//     will: 0-25
+//   },
+// },
+
+// Being:
+// {
+//   ...GeneralType,
+//   // Object containing the following character statistics:
+//   stats:
+//   {
+//     strength: 0-25, 0=insect, 25=strongest possible being
+//     armor: 0-25
+//     agility: 0-25
+//     will: 0-25
+//   },
+//   Will also need something here for special dude abilities
+// },
+
+// Item:
+// {
+//   ...GeneralType,
+//   stats: Any bonuses this card gives to party members using this item:
+//   {
+//     strength: 0-25, 0=insect, 25=strongest possible being
+//     armor: 0-25
+//     agility: 0-25
+//     will: 0-25
+//   },
+//   Similar to abilities below
+//   use: {
+//     damage: {
+//      amount: 0
+//    }
+//  }
+// },
+
+// Ability:
+// {
+//   ...GeneralType,
+//   One-off vs remains in play
+//   subtype: ["Instant", "Sorcery"]
+//   stats: probably should represent any stat bonuses:
+//   {
+//     strength: 0-25, 0=insect, 25=strongest possible being
+//     armor: 0-25
+//     agility: 0-25
+//     will: 0-25
+//   },
+//   Many abilities will do damage or healing, I think
+//   damage: {
+//     Flat damage bonus
+//     amount: 0
+//     Bonus from any stats
+//     statBonus: null
+//   },
+//   For example, this would heal 5 + the caster's Will stat
+//   healing: {
+//     amount: 5,
+//     statBonus: 'will'
+//   },
+// },
+
+// Quest:
+// {
+//   ...GeneralType,
+//   TBD
+// },
 
 const cardlist = [
-  // Fire Deck
+  // Locations (1-20)
   {
     number: 1,
-    name: "Pyromancer",
-    type: "Being",
-    subtype: "",
-    rarity: "common",
-    element: "fire",
-    stats: {
-      strength: 0,
-      armor: 0,
-      agility: 0,
-      will: 5,
-    },
-    traits: ["human"],
-    text: "Fire spells do +1 damage. Fire enchantments provide +1 to any stat bonuses.",
-    materials: {
-      soul: 1,
-    },
-  },
-  {
-    number: 18,
     name: "Bathurst",
     type: "Location",
-    subtype: "",
+    subtype: "Motherland",
     rarity: "common",
     element: "",
     text: "Discard a Fire element card: +1 metal.",
-    stats: {
-      strength: 0,
-      armor: 0,
-      agility: 0,
-      will: 2,
-    },
     production: {
       soul: 1,
     },
   },
   {
-    number: 15,
+    number: 2,
     name: "Iron Mine",
     type: "Location",
     subtype: "",
     rarity: "common",
     element: "Earth",
-    traits: ["dark"],
+    traits: ["underground"],
     text: "",
     production: {
       metal: 1,
     },
   },
   {
-    number: 14,
+    number: 3,
     name: "Dense Forest",
     type: "Location",
     subtype: "",
@@ -77,7 +146,7 @@ const cardlist = [
     },
   },
   {
-    number: 15,
+    number: 4,
     name: "Pathway",
     type: "Location",
     subtype: "",
@@ -87,35 +156,104 @@ const cardlist = [
     text: "Movement through this landscape costs 0.",
   },
   {
-    number: 24,
-    name: "Fireball",
-    type: "Ability",
-    subtype: "Ranged",
-    rarity: "common",
+    number: 5,
+    name: "Wizard Tower",
+    type: "Location",
+    subtype: "",
+    rarity: "uncommon",
     element: "",
-    text: "{Will} + 3 damage.",
-    traits: ["spell"],
+    text: "{Wizards} only.",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 1,
+    },
+    production: {
+      soul: 1,
+    },
   },
   {
-    number: 24,
-    name: "Flame Weapon",
-    type: "Ability",
+    number: 6,
+    name: "Suffragette City",
+    type: "Location",
+    subtype: "Motherland",
+    rarity: "rare",
+    element: "",
+    text: "Hey man, my workday's insane",
+    traits: ["city", "lodging", "shop"],
+    production: {
+      soul: 1,
+      gold: 1,
+    },
+  },
+  {
+    number: 7,
+    name: "Grumpy's Farm",
+    type: "Location",
     subtype: "",
     rarity: "common",
     element: "",
-    text: "Melee attacks with target weapon you control do +{will} damage.",
-    traits: ["enchantment"],
+    text: "They don't call him Grumpy for nothin'",
+    traits: [],
+    stats: {
+      strength: 0,
+      armor: 1,
+      agility: 0,
+      will: 0,
+    },
+    production: {
+      flax: 1,
+      food: 1,
+    },
+  },
+  // {
+  //   number: 23,
+  //   name: "Great Gate",
+  //   type: "Location",
+  //   subtype: "",
+  //   rarity: "common",
+  //   element: "",
+  //   text: "Must be played adjacent to a city.",
+  //   traits: [],
+  //   stats: {
+  //     strength: 0,
+  //     armor: 3,
+  //     agility: 0,
+  //     will: 0,
+  //   },
+  // },
+
+  // Beings (21-30)
+  {
+    number: 21,
+    name: "Pyromancer",
+    type: "Being",
+    subtype: "",
+    rarity: "common",
+    element: "fire",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 2,
+    },
+    traits: ["human", "wizard"],
+    text: "Fire {abilities} do +1 damage. Fire enchantments provide +1 to any stat bonuses.",
+    materials: {
+      soul: 1,
+    },
   },
   {
-    number: 1,
+    number: 22,
     name: "Tank",
     type: "Being",
     subtype: "",
     rarity: "common",
     element: "",
     stats: {
-      strength: 2,
-      armor: 0,
+      strength: 0,
+      armor: 2,
       agility: 0,
       will: 0,
     },
@@ -126,7 +264,7 @@ const cardlist = [
     },
   },
   {
-    number: 2,
+    number: 23,
     name: "Thief",
     type: "Being",
     subtype: "",
@@ -145,7 +283,7 @@ const cardlist = [
     },
   },
   {
-    number: 3,
+    number: 24,
     name: "Scary Lich",
     type: "Being",
     subtype: "",
@@ -164,11 +302,11 @@ const cardlist = [
     },
   },
   {
-    number: 4,
-    name: "Druid",
+    number: 25,
+    name: "Bear Druid",
     type: "Being",
     subtype: "",
-    rarity: "common",
+    rarity: "rare",
     element: "",
     stats: {
       strength: 2,
@@ -183,9 +321,65 @@ const cardlist = [
     },
   },
   {
-    number: 12,
+    number: 26,
+    name: "Water Wizard",
+    type: "Being",
+    subtype: "",
+    rarity: "common",
+    element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 2,
+    },
+    traits: ["human", "wizard"],
+    text: "Beware my waterball!",
+    materials: {
+      soul: 1,
+    },
+  },
+  {
+    number: 27,
+    name: "Necromancer",
+    type: "Being",
+    subtype: "",
+    rarity: "rare",
+    element: "",
+    stats: {
+      strength: 1,
+      armor: 1,
+      agility: 0,
+      will: 4,
+    },
+    traits: ["undead"],
+    text: "Spooky...",
+    materials: {
+      soul: 1,
+    },
+  },
+  // {
+  //   number: 28,
+  //   name: "Lil' Bear",
+  //   type: "Being",
+  //   subtype: "Companion",
+  //   rarity: "common",
+  //   element: "",
+  //   text: "He's a lil bear!",
+  //   traits: ["animal"],
+  //   stats: {
+  //     strength: 2,
+  //     armor: 2,
+  //     agility: 0,
+  //     will: 0,
+  //   },
+  // },
+
+  // Items (31-40)
+  {
+    number: 31,
     name: "Short Sword",
-    type: "Equipment",
+    type: "Item",
     subtype: "Weapon",
     rarity: "common",
     element: "",
@@ -202,9 +396,9 @@ const cardlist = [
     },
   },
   {
-    number: 13,
+    number: 32,
     name: "Small Shield",
-    type: "Equipment",
+    type: "Item",
     subtype: "Armor",
     rarity: "common",
     element: "",
@@ -214,130 +408,147 @@ const cardlist = [
       agility: 0,
       will: 0,
     },
-    traits: ["one-handed"],
+    traits: ["shield", "one-handed"],
     text: "",
     materials: {
       wood: 1,
     },
   },
-
-  // Water deck
   {
-    number: 16,
-    name: "Water Wizard",
-    type: "Being",
-    subtype: "",
+    number: 33,
+    name: "Silk Cloak",
+    type: "Item",
+    subtype: "Armor",
     rarity: "common",
     element: "",
     stats: {
       strength: 0,
       armor: 0,
-      agility: 0,
-      will: 4,
+      agility: 2,
+      will: 0,
     },
-    traits: [],
-    text: "Beware my fireball!",
+    traits: ["armor"],
+    text: "",
     materials: {
-      soul: 1,
+      flax: 1,
     },
   },
   {
-    number: 17,
-    name: "Necromancer",
-    type: "Being",
+    number: 33,
+    name: "Hearty Meal",
+    type: "Item",
     subtype: "",
     rarity: "common",
     element: "",
-    stats: {
-      strength: 1,
-      armor: 1,
-      agility: 0,
-      will: 4,
-    },
-    traits: ["undead"],
-    text: "Spooky...",
+    traits: ["food"],
+    text: "",
     materials: {
-      soul: 1,
+      food: 1,
+    },
+    effect: {
+      type: "use",
+      healing: {
+        amount: 2,
+      },
     },
   },
   {
-    number: 19,
-    name: "Wizard Tower",
-    type: "Location",
-    subtype: "",
+    number: 34,
+    name: "Silver Ring",
+    type: "Item",
+    subtype: "Armor",
     rarity: "common",
     element: "",
-    text: "Wizards only!",
     stats: {
       strength: 0,
       armor: 0,
       agility: 0,
       will: 1,
     },
-    production: {
-      soul: 1,
+    traits: ["accessory"],
+    text: "",
+    materials: {
+      metal: 2,
     },
   },
   {
-    number: 20,
-    name: "Suffragette City",
-    type: "Location",
-    subtype: "City",
-    rarity: "common",
-    element: "",
-    text: "Hey man, my workday's insane",
-    traits: ["Lodging", "Shop"],
-    production: {
-      soul: 1,
-    },
-  },
-  {
-    number: 21,
-    name: "Grumpy's Farm",
-    type: "Location",
+    number: 35,
+    name: "Firey Grenade",
+    type: "Item",
     subtype: "",
     rarity: "common",
     element: "",
-    text: "They don't call him Grumpy for nothin'",
-    traits: [],
-    stats: {
-      strength: 0,
-      armor: 1,
-      agility: 0,
-      will: 0,
+    text: "3 damage {ranged} attack.",
+    traits: ["ranged"],
+    materials: {
+      metal: 1,
     },
-    production: {
-      food: 1,
-      cloth: 1,
+    effect: {
+      type: "use",
+      damage: {
+        amount: 3,
+      },
     },
   },
   {
-    number: 22,
-    name: "Soul Searching",
-    type: "Quest",
+    number: 36,
+    name: "Little Red Potion",
+    type: "Item",
     subtype: "",
     rarity: "common",
     element: "",
-    text: "Travel at least 3 spaces away from your starting location. Reward: draw a card. Draw 3 cards if you are really far away.",
+    text: "Heal 3.",
+    traits: ["potion"],
+    effect: {
+      type: "use",
+      healing: {
+        amount: 3,
+      },
+    },
   },
+
+  // Abilities (41-50)
   {
-    number: 23,
-    name: "Great Gate",
-    type: "Location",
-    subtype: "",
+    number: 41,
+    name: "Fireball",
+    type: "Ability",
+    subtype: "Sorcery",
     rarity: "common",
     element: "",
-    text: "Must be played adjacent to a city.",
-    traits: [],
-    stats: {
-      strength: 0,
-      armor: 3,
-      agility: 0,
-      will: 0,
+    text: "{Will} + 3 damage.",
+    traits: ["spell"],
+    effect: {
+      cost: {
+        soul: 1,
+      },
+      type: "use",
+      damage: {
+        amount: 3,
+        statBonus: "will",
+      },
     },
   },
   {
-    number: 25,
+    number: 42,
+    name: "Flame Weapon",
+    type: "Ability",
+    subtype: "Sorcery",
+    rarity: "common",
+    element: "",
+    text: "Target melee weapon you control gets +{will} strength.",
+    traits: ["enchantment"],
+    effect: {
+      type: "ongoing",
+      stats: {
+        strength: "will",
+        armor: 0,
+        agility: 0,
+        will: 0,
+      },
+    },
+  },
+  {
+    number: 43,
     name: "Little Heal",
     type: "Ability",
     subtype: "",
@@ -345,48 +556,39 @@ const cardlist = [
     element: "",
     text: "Heal {Will}+1. I bet that feels good.",
     traits: ["spell"],
-  },
-  {
-    number: 26,
-    name: "Firey Grenade",
-    type: "Item",
-    subtype: "",
-    rarity: "common",
-    element: "",
-    text: "3 damage ranged attack! Ouch.",
-    traits: [],
-  },
-  {
-    number: 27,
-    name: "Little Red Potion",
-    type: "Item",
-    subtype: "",
-    rarity: "common",
-    element: "",
-    text: "Heal 3, but it tastes bad.",
-    traits: ["potion"],
-  },
-  {
-    number: 28,
-    name: "Lil' Bear",
-    type: "Being",
-    subtype: "Companion",
-    rarity: "common",
-    element: "",
-    text: "He's a lil bear!",
-    traits: ["animal"],
-    stats: {
-      strength: 2,
-      armor: 2,
-      agility: 0,
-      will: 0,
+    effect: {
+      type: "use",
+      healing: {
+        amount: 1,
+        statBonus: "will",
+      },
     },
   },
+
+  // Quests (51-55)
+  // {
+  //   number: 22,
+  //   name: "Soul Searching",
+  //   type: "Quest",
+  //   subtype: "",
+  //   rarity: "common",
+  //   element: "",
+  //   text: "Travel at least 3 spaces away from your starting location. Reward: draw a card. Draw 3 cards if you are really far away.",
+  //   complete: {
+  //     something
+  //   },
+  //   effect: {
+  //      something else
+  //   },
+  // },
+
+  // Older card ideas, to be incorporated later:
+
   // {
   //   "number": "5",
   //   "name": "Short Sword",
   //   "type": "Item",
-  //   "subtype": "Equipment",
+  //   "subtype": "Item",
   //   "element": "",
   //   "stats": {
   //     "strength": 1,

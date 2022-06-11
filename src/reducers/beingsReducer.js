@@ -19,13 +19,27 @@ export default function beingsReducer(state = [], action) {
             equipment: [],
           });
         case "Item":
-          return beings.map((being) =>
+          return state.map((being) =>
             being.id == action.targetPartyPosition
               ? being
               : {
                   ...being,
                   equipment: [
                     ...being.equipment,
+                    {
+                      id: action.card.id,
+                    },
+                  ],
+                }
+          );
+        case "Ability":
+          return state.map((being) =>
+            being.id == action.targetPartyPosition
+              ? being
+              : {
+                  ...being,
+                  abilities: [
+                    ...being.abilities,
                     {
                       id: action.card.id,
                     },

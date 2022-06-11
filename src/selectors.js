@@ -137,9 +137,9 @@ export const canMoveOnLocation = (G, playerID, destination) =>
   isAdjacentLocation(selectPartyLandscape(G, playerID), destination);
 
 export const canPlayCard = (G, playerID, card) => {
-  if (!hasEnoughResourcesForCard(G, card, playerID)) {
-    return false;
-  }
+  // if (!hasEnoughResourcesForCard(G, card, playerID)) {
+  //   return false;
+  // }
   const player = selectPlayer(G, playerID);
   switch (card.type) {
     case "Being":
@@ -159,7 +159,9 @@ export const canPlayCard = (G, playerID, card) => {
         )
       );
     case "Item":
-      return;
+      return player.selectedPartyPosition && 1;
+    case "Ability":
+      return player.selectedPartyPosition && 1;
     default:
       return false;
   }
