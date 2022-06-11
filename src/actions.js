@@ -2,7 +2,6 @@ export const createDeckSelected = (
   deck,
   playerID,
   cards,
-  decklist,
   deckIDs,
   startingLocationCardID,
   startingBeingCardID
@@ -11,14 +10,25 @@ export const createDeckSelected = (
   deck,
   playerID,
   cards,
-  decklist,
   deckIDs,
   startingLocationCardID,
   startingBeingCardID,
 });
 
-export const createCardsDrawn = (cards) => ({
+export const createStartGame = (
+  firstPlayerCardsDrawn,
+  secondPlayerCardsDrawn
+) => ({
+  type: "START_GAME",
+  drawnCards: {
+    "0": firstPlayerCardsDrawn,
+    "1": secondPlayerCardsDrawn,
+  },
+});
+
+export const createCardsDrawn = (playerID, cards) => ({
   type: "CARDS_DRAWN",
+  playerID,
   cards,
 });
 
@@ -43,24 +53,33 @@ export const createPartyMoved = (playerID, desination) => ({
   desination,
 });
 
-export const createPartyPositionSelected = (positionID, beingID) => ({
-  type: "PARTY_MEMBER_SELECTED",
+export const createPartyPositionSelected = (
+  playerID,
   positionID,
   beingID,
+  itemID
+) => ({
+  type: "PARTY_MEMBER_SELECTED",
+  playerID,
+  positionID,
+  beingID,
+  itemID,
 });
 
-export const createHandCardSelected = (id) => ({
+export const createHandCardSelected = (playerID, id) => ({
   type: "HAND_CARD_SELECTED",
+  playerID,
   id,
 });
 
-export const createLandscapeSelected = (id) => ({
+export const createLandscapeSelected = (playerID, id) => ({
   type: "LANDSCAPE_SELECTED",
+  playerID,
   id,
 });
 
-export const createAttack = (attackerID, targetID, cardIDsToDiscard) => ({
-  attackerID,
+export const createAttack = (playerID, targetID, cardIDsToDiscard) => ({
+  playerID,
   targetID,
   cardIDsToDiscard,
 });

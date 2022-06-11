@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {
+  selectCardByID,
   selectPlayerHandCardIDs,
   selectSelectedHandCardID,
 } from "../selectors";
-import { PlayerHandCard } from "./Card";
+import { CardDetails, CardWithTooltip } from "./Card";
 import "./PlayerHand.css";
+
+export function PlayerHandCard({ playerID, id, isSelected, onSelect }) {
+  const card = useSelector(({ G }) => selectCardByID(G, playerID, id));
+
+  return (
+    <CardWithTooltip card={card} isSelected={isSelected} onSelect={onSelect}>
+      <CardDetails card={card} isSelected={isSelected} />
+    </CardWithTooltip>
+  );
+}
 
 export default function PlayerHand({ playerID, onSelect }) {
   const hand = useSelector(({ G }) => selectPlayerHandCardIDs(G, playerID));

@@ -9,8 +9,6 @@ const initialState = () =>
 
 export default function landscapesReducer(state, action) {
   switch (action.type) {
-    case "__INITIALIZE__":
-      return initialState();
     case "DECK_SELECTED":
       return state.map((landscape) =>
         (action.playerID === "0" && landscape.id === 0) ||
@@ -35,6 +33,6 @@ export default function landscapesReducer(state, action) {
           )
         : state;
     default:
-      return state;
+      return state || initialState();
   }
 }

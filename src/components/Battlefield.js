@@ -4,28 +4,36 @@ import { SmallCard } from "./Card";
 import classNames from "classnames";
 import "./Battlefield.css";
 import {
+  selectBeingItems,
   selectPlayerBeingByPosition,
   selectSelectedPartyPosition,
 } from "../selectors";
 
-function Being({ playerID, being, onSelect }) {
+function Being({ being, onSelect }) {
+  const items = useSelector(({ G }) =>
+    selectBeingItems(G, being.playerID, being.id)
+  );
   return (
     <div className="being">
       {being && (
         <>
           <SmallCard
-            id={being.beingCardID}
-            playerID={playerID}
-            onSelect={(cardID) =>
-              onSelect({ cardID, beingCardID: being.beingCardID })
-            }
+            id={being.id}
+            playerID={being.playerID}
+            onSelect={(cardID) => onSelect({ cardID, beingID: being.id })}
           />
-          {being?.equipment.map((item) => (
+          {items.map((item) => (
             <SmallCard
               key={item.id}
               id={item.id}
-              playerID={playerID}
-              onSelect={(cardID) => onSelect({ cardID, equipmentID: item.id })}
+              playerID={being.playerID}
+              onSelect={(cardID) =>
+                onSelect({
+                  cardID,
+                  beingID: being.id,
+                  itemID: item.id,
+                })
+              }
             />
           ))}
         </>

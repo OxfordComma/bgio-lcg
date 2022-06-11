@@ -12,6 +12,7 @@ import {
   createAttack,
   createPartyMoved,
   createBeginTurn,
+  createStartGame,
 } from "./actions";
 import {
   selectTopCardIDsFromDeck,
@@ -24,10 +25,10 @@ import {
   selectTotalDefense,
   selectOpponentID,
   selectSelectedPartyPosition,
-  selectDecklist,
   selectIncome,
   canMoveOnLocation,
   selectLandscapeByID,
+  hasPlayerSelectedDeck,
 } from "./selectors";
 import { generateDeckFromDecklist } from "./Cards";
 
@@ -56,12 +57,10 @@ function selectDeck(G, ctx, deckID, playerID) {
       deck,
       playerID,
       cards,
-      decklist,
       deckCardIDs,
       cards.find(({ name }) => name === deck.startingLocation).id,
       cards.find(({ name }) => name === deck.startingBeing).id
-    ),
-    ctx.currentPlayer
+    )
   );
 }
 
@@ -88,25 +87,26 @@ function shuffle(array) {
 function drawCard(G, ctx) {
   return globalStateReducer(
     G,
-    createCardsDrawn(selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1)),
-    ctx.currentPlayer
+    createCardsDrawn(
+      ctx.currentPlayer,
+      selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1)
+    )
   );
 }
 
 function selectHandCard(G, ctx, id) {
   console.log("select hand card with id:", id);
-  return globalStateReducer(G, createHandCardSelected(id), ctx.currentPlayer);
+  return globalStateReducer(G, createHandCardSelected(ctx.currentPlayer, id));
 }
 
 function selectLandscapeCard(G, ctx, id) {
-  return globalStateReducer(G, createLandscapeSelected(id), ctx.currentPlayer);
+  return globalStateReducer(G, createLandscapeSelected(ctx.currentPlayer, id));
 }
 
-function selectPartyMember(G, ctx, position, beingId) {
+function selectPartyMember(G, ctx, position, beingID, itemID) {
   return globalStateReducer(
     G,
-    createPartyPositionSelected(position, beingId),
-    ctx.currentPlayer
+    createPartyPositionSelected(ctx.currentPlayer, position, beingID, itemID)
   );
 }
 
@@ -130,63 +130,53 @@ function playCard(G, ctx, id) {
       selectSelectedPartyPosition(G, ctx.currentPlayer),
       selectSelectedBeingID(G, ctx.currentPlayer),
       selectSelectedLandscapeID(G, ctx.currentPlayer)
-    ),
-    ctx.currentPlayer
+    )
   );
 }
 
 function attack(G, ctx) {
+  const opponentID = selectOpponentID(G, ctx.currentPlayer);
   return globalStateReducer(
     G,
     createAttack(
       ctx.currentPlayer,
-      selectOpponentID(G, ctx.currentPlayer),
+      opponentID,
       selectTopCardIDsFromDeck(
         G,
         ctx.currentPlayer,
         Math.max(
           selectTotalStrength(G, ctx.currentPlayer) -
-            selectTotalDefense(G, selectOpponentID(ctx.currentPlayer)),
+            selectTotalDefense(G, opponentID),
           0
         )
       )
-    ),
-    ctx.currentPlayer
+    )
   );
 }
 
 function move(G, ctx) {
   const destinationID = selectSelectedLandscapeID(G, ctx.currentPlayer);
   const desination = selectLandscapeByID(G, destinationID);
-  if (desination && canMoveOnLocation(G, ctx.currentPlayer, desination))
+  if (desination && canMoveOnLocation(G, ctx.currentPlayer, desination)) {
     return globalStateReducer(
       G,
-      createPartyMoved(ctx.currentPlayer, desination),
-      ctx.currentPlayer
+      createPartyMoved(ctx.currentPlayer, desination)
     );
+  }
 }
 
 function reset(G, ctx) {
-  G.players[ctx.currentPlayer].selectedHandCardID = null;
-  G.players[ctx.currentPlayer].selectedLandscapeID = null;
-  G.players[ctx.currentPlayer].selectedBeingID = null;
-  G.players[ctx.currentPlayer].selectedPartyPosition = null;
+  // G.players[ctx.currentPlayer].selectedHandCardID = null;
+  // G.players[ctx.currentPlayer].selectedLandscapeID = null;
+  // G.players[ctx.currentPlayer].selectedBeingID = null;
+  // G.players[ctx.currentPlayer].selectedPartyPosition = null;
 
   return G;
 }
 
-const STARTING_HAND_SIZE = 7;
-
 export const CardGame = {
   name: "battle-dudes",
-  setup: (ctx) => {
-    const G = globalStateReducer(
-      initialState,
-      { type: "__INITIALIZE__" },
-      ctx.currentPlayer
-    );
-    return G;
-  },
+  setup: () => globalStateReducer(undefined, { type: "__INITIALIZE__" }),
 
   // playerView: PlayerView.STRIP_SECRETS,
   moves: {
@@ -224,17 +214,11 @@ export const CardGame = {
     maxMoves: 2,
     onBegin: (G, ctx) => {
       console.log("turn begin");
-      const cardsToDrawCount =
-        ctx.turn === 3 || ctx.turn === 4 ? STARTING_HAND_SIZE : 1;
-      return globalStateReducer(
-        G,
-        createBeginTurn(
-          ctx.currentPlayer,
-          selectIncome(G, ctx.currentPlayer),
-          selectTopCardIDsFromDeck(G, ctx.currentPlayer, cardsToDrawCount)
-        ),
-        ctx.currentPlayer
-      );
+      let income = selectIncome(G, ctx.currentPlayer);
+      let cards = selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1);
+      let action = createBeginTurn(ctx.currentPlayer, income, cards);
+
+      return globalStateReducer(G, action);
     },
   },
   phases: {
@@ -242,13 +226,28 @@ export const CardGame = {
       start: true,
       next: "play",
       endIf: (G, ctx) =>
-        !!selectDecklist(G, ctx.currentPlayer) &&
-        !!selectDecklist(G, selectOpponentID(G, ctx.currentPlayer)),
+        hasPlayerSelectedDeck(G, ctx.currentPlayer) &&
+        hasPlayerSelectedDeck(G, selectOpponentID(G, ctx.currentPlayer)),
     },
     play: {
       onBegin: (G, ctx) => {
         console.log("phase begin");
-        return G;
+        const STARTING_HAND_SIZE = 7;
+        return globalStateReducer(
+          G,
+          createStartGame(
+            selectTopCardIDsFromDeck(
+              G,
+              ctx.currentPlayer,
+              STARTING_HAND_SIZE - 1
+            ),
+            selectTopCardIDsFromDeck(
+              G,
+              selectOpponentID(G, ctx.currentPlayer),
+              STARTING_HAND_SIZE
+            )
+          )
+        );
       },
     },
   },

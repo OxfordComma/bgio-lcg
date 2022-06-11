@@ -41,7 +41,7 @@ function GridLocation({ playerID, landscape, showCanPlayCard, onSelect }) {
     >
       {landscape.landscapeCardID && (
         <SmallCard
-          playerID={playerID}
+          playerID={landscape.playerID}
           id={landscape.landscapeCardID}
           isSelected={isSelected}
           onSelect={() => {}}
