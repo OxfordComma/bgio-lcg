@@ -10,6 +10,7 @@ import { GameInterface } from "./GameInterface";
 import "./Board.css";
 import {
   canPlayCard,
+  canUseCard,
   selectCardByID,
   selectOpponentID,
   selectSelectedHandCardID,
@@ -30,9 +31,12 @@ function GameBoard({
   opponentID,
   chatMessages,
   onSelectLandscape,
+  onSelectBeing,
+  onSelectItem,
   onSelectHand,
   onSelectPartyPosition,
   onPlayCard,
+  onUseCard,
   onMove,
   onAttack,
   onEndTurn,
@@ -45,6 +49,8 @@ function GameBoard({
         playerID={playerID}
         opponentID={opponentID}
         onSelectPartyPosition={onSelectPartyPosition}
+        onSelectBeing={onSelectBeing}
+        onSelectItem={onSelectItem}
       />
       <PlayerHand playerID={playerID} onSelect={onSelectHand} />
       <Controls
@@ -52,6 +58,7 @@ function GameBoard({
         move={onMove}
         attack={onAttack}
         onPlayCard={onPlayCard}
+        onUseCard={onUseCard}
         endTurn={onEndTurn}
         chatMessages={chatMessages}
       />
@@ -91,7 +98,8 @@ function GameBoardWrapper({
   }
 
   function handleOnSelectPartyPosition({ positionID, itemID }) {
-    if (positionID === selectedPartyPosition && itemID === selectedItemID) {
+    if (positionID === selectedPartyPosition) {
+      // && itemID === selectedItemID) {
       moves.selectPartyMember(null, null, null);
     } else {
       const being = selectPlayerBeingByPosition(G, playerID, positionID);
@@ -103,6 +111,14 @@ function GameBoardWrapper({
     moves.selectLandscapeCard(
       selectedLandscapeID !== landscapeID ? landscapeID : null
     );
+  }
+
+  function onSelectBeing(beingID) {
+    moves.selectBeingCard(selectedBeingID !== beingID ? beingID : null);
+  }
+
+  function onSelectItem(itemID) {
+    moves.selectItemCard(selectedItemID !== itemID ? itemID : null);
   }
 
   function onMove() {
@@ -129,6 +145,18 @@ function GameBoardWrapper({
     }
     moves.playCard(selectedHandCardID);
     sendChatMessage(`Played card ${card.name}`);
+  }
+
+  // Checking the items slot for now
+  function onUseCard() {
+    const card = selectedItemID && selectCardByID(G, playerID, selectedItemID);
+
+    if (!card || !canUseCard(G, playerID, card)) {
+      console.log("Can't use this card.", selectedItemID);
+      return;
+    }
+    moves.useCard(selectedItemID);
+    sendChatMessage(`Used card ${card.name}`);
   }
 
   const attack = () => {
@@ -169,7 +197,10 @@ function GameBoardWrapper({
       onSelectHand={onSelectHand}
       onSelectPartyPosition={handleOnSelectPartyPosition}
       onSelectLandscape={onSelectLandscape}
+      onSelectBeing={onSelectBeing}
+      onSelectItem={onSelectItem}
       onPlayCard={onPlayCard}
+      onUseCard={onUseCard}
     />
   );
 }

@@ -17,6 +17,8 @@ const removeResources = (old, change) =>
   );
 
 const emptyMaterialsBag = {
+  flax: 0,
+  food: 0,
   metal: 0,
   wood: 0,
   soul: 0,
@@ -35,6 +37,16 @@ export default function resourcesReducer(state, action) {
             [action.playerID]: removeResources(
               state[action.playerID],
               action.card.materials
+            ),
+          }
+        : state;
+    case "CARD_USED":
+      return action.card?.effect?.cost
+        ? {
+            ...state,
+            [action.playerID]: removeResources(
+              state[action.playerID],
+              action.card.effect.cost
             ),
           }
         : state;

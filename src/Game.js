@@ -6,12 +6,16 @@ import {
   createCardsDrawn,
   createHandCardSelected,
   createLandscapeSelected,
+  createBeingSelected,
+  createItemSelected,
   createDeckSelected,
   createCardPlayed,
+  createCardUsed,
   createPartyPositionSelected,
   createAttack,
   createPartyMoved,
   createBeginTurn,
+  createEndTurn,
   createStartGame,
 } from "./actions";
 import {
@@ -19,6 +23,7 @@ import {
   selectDeckByID,
   selectCardByID,
   canPlayCard,
+  canUseCard,
   selectSelectedBeingID,
   selectSelectedLandscapeID,
   selectTotalStrength,
@@ -29,6 +34,7 @@ import {
   canMoveOnLocation,
   selectLandscapeByID,
   hasPlayerSelectedDeck,
+  hasPlayerLost,
 } from "./selectors";
 import { generateDeckFromDecklist } from "./Cards";
 
@@ -103,6 +109,14 @@ function selectLandscapeCard(G, ctx, id) {
   return globalStateReducer(G, createLandscapeSelected(ctx.currentPlayer, id));
 }
 
+function selectItemCard(G, ctx, id) {
+  return globalStateReducer(G, createItemSelected(ctx.currentPlayer, id));
+}
+
+function selectBeingCard(G, ctx, id) {
+  return globalStateReducer(G, createBeingSelected(ctx.currentPlayer, id));
+}
+
 function selectPartyMember(G, ctx, position, beingID, itemID) {
   return globalStateReducer(
     G,
@@ -125,6 +139,31 @@ function playCard(G, ctx, id) {
   return globalStateReducer(
     G,
     createCardPlayed(
+      card,
+      ctx.currentPlayer,
+      selectSelectedPartyPosition(G, ctx.currentPlayer),
+      selectSelectedBeingID(G, ctx.currentPlayer),
+      selectSelectedLandscapeID(G, ctx.currentPlayer)
+    )
+  );
+}
+
+function useCard(G, ctx, id) {
+  if (!id) return G;
+
+  console.log("use card:", id);
+
+  const card = selectCardByID(G, ctx.currentPlayer, id);
+
+  // Not sure if this will ever trigger - we check this before using the move
+  if (!canUseCard(G, ctx.currentPlayer, card)) {
+    console.log("Can't use this card. Missing Resources.", id);
+    return G;
+  }
+
+  return globalStateReducer(
+    G,
+    createCardUsed(
       card,
       ctx.currentPlayer,
       selectSelectedPartyPosition(G, ctx.currentPlayer),
@@ -165,15 +204,6 @@ function move(G, ctx) {
   }
 }
 
-function reset(G, ctx) {
-  // G.players[ctx.currentPlayer].selectedHandCardID = null;
-  // G.players[ctx.currentPlayer].selectedLandscapeID = null;
-  // G.players[ctx.currentPlayer].selectedBeingID = null;
-  // G.players[ctx.currentPlayer].selectedPartyPosition = null;
-
-  return G;
-}
-
 export const CardGame = {
   name: "battle-dudes",
   setup: () => globalStateReducer(undefined, { type: "__INITIALIZE__" }),
@@ -189,13 +219,25 @@ export const CardGame = {
       move: selectLandscapeCard,
       noLimit: true,
     },
+    selectBeingCard: {
+      move: selectBeingCard,
+      noLimit: true,
+    },
+    selectItemCard: {
+      move: selectItemCard,
+      noLimit: true,
+    },
     selectPartyMember: {
       move: selectPartyMember,
       noLimit: true,
     },
     playCard: {
       move: playCard,
-      noLimit: true,
+      // noLimit: true,
+    },
+    useCard: {
+      move: useCard,
+      // noLimit: true,
     },
     move: move,
     attack: attack,
@@ -203,20 +245,27 @@ export const CardGame = {
       move: selectDeck,
       noLimit: true,
     },
-    reset: {
-      move: reset,
-      noLimit: true,
-    },
+    // reset: {
+    //   move: reset,
+    //   noLimit: true,
+    // },
   },
   turn: {
     order: TurnOrder.RESET,
     minMoves: 0,
     maxMoves: 2,
     onBegin: (G, ctx) => {
-      console.log("turn begin");
+      console.log("turn begins");
       let income = selectIncome(G, ctx.currentPlayer);
       let cards = selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1);
       let action = createBeginTurn(ctx.currentPlayer, income, cards);
+
+      return globalStateReducer(G, action);
+    },
+    onEnd: (G, ctx) => {
+      console.log("turn ends");
+
+      let action = createEndTurn(ctx.currentPlayer);
 
       return globalStateReducer(G, action);
     },
@@ -248,6 +297,9 @@ export const CardGame = {
             )
           )
         );
+      },
+      endIf: (G, ctx) => {
+        hasPlayerLost(G, "0") || hasPlayerLost(G, "1");
       },
     },
   },

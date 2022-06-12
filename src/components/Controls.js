@@ -6,6 +6,7 @@ import "./Controls.css";
 export default function Controls({
   playerID,
   onPlayCard,
+  onUseCard,
   move,
   attack,
   endTurn,
@@ -38,6 +39,14 @@ export default function Controls({
           }}
           disabled={!isPlayerTurn}
           text={"attack"}
+        />
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            onUseCard();
+          }}
+          disabled={!isPlayerTurn}
+          text={"use"}
         />
         <Button
           onClick={(e) => {

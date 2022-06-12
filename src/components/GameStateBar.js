@@ -11,6 +11,14 @@ function Stats({ life, resources }) {
         <div className="resouceCount">{life}</div>
       </div>
       <div>
+        <span>Flax:</span>
+        <div className="resouceCount">{resources.flax}</div>
+      </div>
+      <div>
+        <span>Food:</span>
+        <div className="resouceCount">{resources.food}</div>
+      </div>
+      <div>
         <span>Metal:</span>
         <div className="resouceCount">{resources.metal}</div>
       </div>

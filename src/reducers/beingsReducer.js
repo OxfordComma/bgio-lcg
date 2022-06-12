@@ -13,6 +13,24 @@ export function itemReducer(state = [], action) {
               beingID: action.beingID,
             },
           ];
+        case "Ability":
+          return [
+            ...state,
+            {
+              id: action.card.id,
+              playerID: action.playerID,
+              beingID: action.beingID,
+            },
+          ];
+        default:
+          return state;
+      }
+    case "CARD_USED":
+      switch (action.card.type) {
+        case "Item":
+          return [...state.filter((item) => item.id !== action.card.id)];
+        case "Ability":
+          return state;
         default:
           return state;
       }

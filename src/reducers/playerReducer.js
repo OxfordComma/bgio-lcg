@@ -40,6 +40,35 @@ const playerReducer = (state, action) => {
             selectedPartyPosition: null,
           }
         : state;
+    case "CARD_USED":
+      if (action.card.effect.hasOwnProperty("damage")) {
+        // This will apply to all other players, not just the targeted opponent
+        return state.id !== action.playerID
+          ? {
+              ...state,
+              deckIDs: state.deckIDs.slice(action.card.effect.damage.amount),
+              discardIDs: [
+                ...state.discardIDs,
+                ...state.deckIDs.slice(0, action.card.effect.damage.amount),
+              ],
+            }
+          : state;
+      }
+      if (action.card.effect.hasOwnProperty("healing")) {
+        return state.id === action.playerID
+          ? {
+              ...state,
+              deckIDs: [
+                ...state.deckIDs,
+                ...state.discardIDs.slice(action.card.effect.healing.amount),
+              ],
+              discardIDs: state.discardIDs.slice(
+                action.card.effect.healing.amount
+              ),
+            }
+          : state;
+      }
+    // }
     case "BEGIN_TURN":
       return state.id === action.playerID
         ? {
@@ -62,8 +91,8 @@ const playerReducer = (state, action) => {
         ? {
             ...state,
             selectedPartyPosition: action.positionID,
-            selectedBeingID: action.beingID,
-            selectedItemID: action.itemID,
+            // selectedBeingID: action.beingID,
+            // selectedItemID: action.itemID,
           }
         : state;
     case "LANDSCAPE_SELECTED":
@@ -71,6 +100,21 @@ const playerReducer = (state, action) => {
         ? {
             ...state,
             selectedLandscapeID: action.id,
+          }
+        : state;
+
+    case "ITEM_SELECTED":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedItemID: action.id,
+          }
+        : state;
+    case "BEING_SELECTED":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedBeingID: action.id,
           }
         : state;
     case "ATTACK":
@@ -81,6 +125,17 @@ const playerReducer = (state, action) => {
               ({ id }) => !action.cardIDsToDiscard.includes(id)
             ),
             discardIDs: [...state.discardIDs, ...action.cardIDsToDiscard],
+          }
+        : state;
+    case "END_TURN":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedLandscapeID: null,
+            selectedBeingID: null,
+            selectedPartyPosition: null,
+            selectedHandCardID: null,
+            selectedItemID: null,
           }
         : state;
     default:

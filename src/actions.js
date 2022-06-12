@@ -47,6 +47,21 @@ export const createCardPlayed = (
   targetLandscapeID,
 });
 
+export const createCardUsed = (
+  card,
+  playerID,
+  targetPartyPosition,
+  beingID,
+  targetLandscapeID
+) => ({
+  type: "CARD_USED",
+  card,
+  playerID,
+  targetPartyPosition,
+  beingID,
+  targetLandscapeID,
+});
+
 export const createPartyMoved = (playerID, desination) => ({
   type: "PARTY_MOVED",
   playerID,
@@ -78,6 +93,18 @@ export const createLandscapeSelected = (playerID, id) => ({
   id,
 });
 
+export const createBeingSelected = (playerID, id) => ({
+  type: "BEING_SELECTED",
+  playerID,
+  id,
+});
+
+export const createItemSelected = (playerID, id) => ({
+  type: "ITEM_SELECTED",
+  playerID,
+  id,
+});
+
 export const createAttack = (playerID, targetID, cardIDsToDiscard) => ({
   playerID,
   targetID,
@@ -89,4 +116,9 @@ export const createBeginTurn = (playerID, income, cardsDrawn) => ({
   playerID,
   income,
   cardsDrawn,
+});
+
+export const createEndTurn = (playerID) => ({
+  type: "END_TURN",
+  playerID,
 });
