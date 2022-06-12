@@ -155,7 +155,7 @@ function GameBoardWrapper({
       console.log("Can't use this card.", selectedItemID);
       return;
     }
-    moves.useCard(selectedHandCardID);
+    moves.useCard(selectedItemID);
     sendChatMessage(`Used card ${card.name}`);
   }
 
