@@ -12,6 +12,7 @@ import {
   createAttack,
   createPartyMoved,
   createBeginTurn,
+  createEndTurn,
   createStartGame,
 } from "./actions";
 import {
@@ -217,6 +218,13 @@ export const CardGame = {
       let income = selectIncome(G, ctx.currentPlayer);
       let cards = selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1);
       let action = createBeginTurn(ctx.currentPlayer, income, cards);
+
+      return globalStateReducer(G, action);
+    },
+    onEnd: (G, ctx) => {
+      console.log("turn endypoo");
+
+      let action = createEndTurn(ctx.currentPlayer);
 
       return globalStateReducer(G, action);
     },

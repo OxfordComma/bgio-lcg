@@ -83,6 +83,17 @@ const playerReducer = (state, action) => {
             discardIDs: [...state.discardIDs, ...action.cardIDsToDiscard],
           }
         : state;
+    case "END_TURN":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedLandscapeID: null,
+            selectedBeingID: null,
+            selectedPartyPosition: null,
+            selectedHandCardID: null,
+            selectedItemID: null,
+          }
+        : state;
     default:
       return state || null;
   }

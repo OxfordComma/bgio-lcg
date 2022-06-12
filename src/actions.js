@@ -90,3 +90,8 @@ export const createBeginTurn = (playerID, income, cardsDrawn) => ({
   income,
   cardsDrawn,
 });
+
+export const createEndTurn = (playerID) => ({
+  type: "END_TURN",
+  playerID,
+});
