@@ -41,9 +41,9 @@ const playerReducer = (state, action) => {
           }
         : state;
     case "CARD_USED":
-      // switch(action.card.type) {
       if (action.card.effect.hasOwnProperty("damage")) {
-        return state.id === action.playerID
+        // This will apply to all other players, not just the targeted opponent
+        return state.id !== action.playerID
           ? {
               ...state,
               deckIDs: state.deckIDs.slice(action.card.effect.damage.amount),

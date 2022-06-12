@@ -1,6 +1,15 @@
 export function Decks() {
   return [
     {
+      name: "test deck",
+      id: "test",
+      startingBeing: "Pyromancer",
+      startingLocation: "Bathurst",
+      decklist: {
+        "Fireball": 40,
+      },
+    },
+    {
       name: "Fire Deck",
       id: "fire",
       startingBeing: "Pyromancer",
@@ -10,8 +19,8 @@ export function Decks() {
         "Small Shield": 3,
         "Dense Forest": 4,
         "Iron Mine": 3,
-        Pathway: 2,
-        Fireball: 4,
+        "Pathway": 2,
+        "Fireball": 4,
         "Flame Weapon": 4,
         "Firey Grenade": 4,
         "Little Red Potion": 4,

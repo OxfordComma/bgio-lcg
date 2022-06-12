@@ -237,7 +237,7 @@ export const CardGame = {
     },
     useCard: {
       move: useCard,
-      noLimit: true,
+      // noLimit: true,
     },
     move: move,
     attack: attack,
