@@ -170,7 +170,8 @@ export const canPlayCard = (G, playerID, card) => {
 };
 
 export const canUseCard = (G, playerID, card) => {
-  return true;
+  if (card?.effect?.type === "use") return true;
+  else return false;
 };
 
 export const hasPlayerSelectedDeck = (G, playerID) =>

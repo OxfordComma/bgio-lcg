@@ -40,6 +40,35 @@ const playerReducer = (state, action) => {
             selectedPartyPosition: null,
           }
         : state;
+    case "CARD_USED":
+      // switch(action.card.type) {
+      if (action.card.effect.hasOwnProperty("damage")) {
+        return state.id === action.playerID
+          ? {
+              ...state,
+              deckIDs: state.deckIDs.slice(action.card.effect.damage.amount),
+              discardIDs: [
+                ...state.discardIDs,
+                ...state.deckIDs.slice(0, action.card.effect.damage.amount),
+              ],
+            }
+          : state;
+      }
+      if (action.card.effect.hasOwnProperty("healing")) {
+        return state.id === action.playerID
+          ? {
+              ...state,
+              deckIDs: [
+                ...state.deckIDs,
+                ...state.discardIDs.slice(action.card.effect.healing.amount),
+              ],
+              discardIDs: state.discardIDs.slice(
+                action.card.effect.healing.amount
+              ),
+            }
+          : state;
+      }
+    // }
     case "BEGIN_TURN":
       return state.id === action.playerID
         ? {

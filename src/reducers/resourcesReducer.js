@@ -40,6 +40,16 @@ export default function resourcesReducer(state, action) {
             ),
           }
         : state;
+    case "CARD_USED":
+      return action.card?.effect?.cost
+        ? {
+            ...state,
+            [action.playerID]: removeResources(
+              state[action.playerID],
+              action.card.effect.cost
+            ),
+          }
+        : state;
     case "BEGIN_TURN":
       return {
         ...state,
