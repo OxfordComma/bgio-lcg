@@ -72,7 +72,7 @@ export function Landscape({ playerID, onSelect }) {
         setIsHovering(false);
       }}
     >
-      {landscapes.map((landscape) => (
+      {landscapes.reverse().map((landscape) => (
         <GridLocation
           key={playerID + "_landscape" + landscape.id}
           playerID={playerID}
