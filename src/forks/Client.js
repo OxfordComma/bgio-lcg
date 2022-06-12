@@ -75,7 +75,7 @@ export function Client(opts) {
         matchID: props.matchID,
         playerID: props.playerID,
         credentials: props.credentials,
-        debug: false,
+        debug: true,
         enhancer,
       });
     }

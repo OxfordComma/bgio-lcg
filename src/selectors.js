@@ -101,11 +101,13 @@ export const selectIncome = (G, playerID) =>
     .reduce(
       (acc, card) => ({
         ...acc,
+        flax: (card.production?.flax || 0) + acc.flax,
+        food: (card.production?.food || 0) + acc.food,
         wood: (card.production?.wood || 0) + acc.wood,
         metal: (card.production?.metal || 0) + acc.metal,
         soul: (card.production?.soul || 0) + acc.soul,
       }),
-      { wood: 0, metal: 0, soul: 0 }
+      { flax: 0, food: 0, wood: 0, metal: 0, soul: 0 }
     );
 
 export const selectIsSelectedCardLocation = (G, playerID) =>
@@ -140,9 +142,9 @@ export const canMoveOnLocation = (G, playerID, destination) =>
   isAdjacentLocation(selectPartyLandscape(G, playerID), destination);
 
 export const canPlayCard = (G, playerID, card) => {
-  // if (!hasEnoughResourcesForCard(G, card, playerID)) {
-  //   return false;
-  // }
+  if (!hasEnoughResourcesForCard(G, card, playerID)) {
+    return false;
+  }
   switch (card.type) {
     case "Being":
       const position = selectSelectedPartyPosition(G, playerID);
@@ -161,7 +163,7 @@ export const canPlayCard = (G, playerID, card) => {
     case "Item":
       return !!selectSelectedBeingID(G, playerID);
     case "Ability":
-      return false;
+      return !!selectSelectedBeingID(G, playerID);
     default:
       return false;
   }

@@ -13,6 +13,15 @@ export function itemReducer(state = [], action) {
               beingID: action.beingID,
             },
           ];
+        case "Ability":
+          return [
+            ...state,
+            {
+              id: action.card.id,
+              playerID: action.playerID,
+              beingID: action.beingID,
+            },
+          ];
         default:
           return state;
       }

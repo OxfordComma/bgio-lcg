@@ -6,6 +6,8 @@ import {
   createCardsDrawn,
   createHandCardSelected,
   createLandscapeSelected,
+  createBeingSelected,
+  createItemSelected,
   createDeckSelected,
   createCardPlayed,
   createPartyPositionSelected,
@@ -104,6 +106,14 @@ function selectLandscapeCard(G, ctx, id) {
   return globalStateReducer(G, createLandscapeSelected(ctx.currentPlayer, id));
 }
 
+function selectItemCard(G, ctx, id) {
+  return globalStateReducer(G, createItemSelected(ctx.currentPlayer, id));
+}
+
+function selectBeingCard(G, ctx, id) {
+  return globalStateReducer(G, createBeingSelected(ctx.currentPlayer, id));
+}
+
 function selectPartyMember(G, ctx, position, beingID, itemID) {
   return globalStateReducer(
     G,
@@ -166,15 +176,6 @@ function move(G, ctx) {
   }
 }
 
-function reset(G, ctx) {
-  // G.players[ctx.currentPlayer].selectedHandCardID = null;
-  // G.players[ctx.currentPlayer].selectedLandscapeID = null;
-  // G.players[ctx.currentPlayer].selectedBeingID = null;
-  // G.players[ctx.currentPlayer].selectedPartyPosition = null;
-
-  return G;
-}
-
 export const CardGame = {
   name: "battle-dudes",
   setup: () => globalStateReducer(undefined, { type: "__INITIALIZE__" }),
@@ -188,6 +189,14 @@ export const CardGame = {
     },
     selectLandscapeCard: {
       move: selectLandscapeCard,
+      noLimit: true,
+    },
+    selectBeingCard: {
+      move: selectBeingCard,
+      noLimit: true,
+    },
+    selectItemCard: {
+      move: selectItemCard,
       noLimit: true,
     },
     selectPartyMember: {
@@ -214,7 +223,7 @@ export const CardGame = {
     minMoves: 0,
     maxMoves: 2,
     onBegin: (G, ctx) => {
-      console.log("turn begin");
+      console.log("turn begins");
       let income = selectIncome(G, ctx.currentPlayer);
       let cards = selectTopCardIDsFromDeck(G, ctx.currentPlayer, 1);
       let action = createBeginTurn(ctx.currentPlayer, income, cards);
@@ -222,7 +231,7 @@ export const CardGame = {
       return globalStateReducer(G, action);
     },
     onEnd: (G, ctx) => {
-      console.log("turn endypoo");
+      console.log("turn ends");
 
       let action = createEndTurn(ctx.currentPlayer);
 

@@ -30,6 +30,8 @@ function GameBoard({
   opponentID,
   chatMessages,
   onSelectLandscape,
+  onSelectBeing,
+  onSelectItem,
   onSelectHand,
   onSelectPartyPosition,
   onPlayCard,
@@ -45,6 +47,8 @@ function GameBoard({
         playerID={playerID}
         opponentID={opponentID}
         onSelectPartyPosition={onSelectPartyPosition}
+        onSelectBeing={onSelectBeing}
+        onSelectItem={onSelectItem}
       />
       <PlayerHand playerID={playerID} onSelect={onSelectHand} />
       <Controls
@@ -91,7 +95,8 @@ function GameBoardWrapper({
   }
 
   function handleOnSelectPartyPosition({ positionID, itemID }) {
-    if (positionID === selectedPartyPosition && itemID === selectedItemID) {
+    if (positionID === selectedPartyPosition) {
+      // && itemID === selectedItemID) {
       moves.selectPartyMember(null, null, null);
     } else {
       const being = selectPlayerBeingByPosition(G, playerID, positionID);
@@ -103,6 +108,14 @@ function GameBoardWrapper({
     moves.selectLandscapeCard(
       selectedLandscapeID !== landscapeID ? landscapeID : null
     );
+  }
+
+  function onSelectBeing(beingID) {
+    moves.selectBeingCard(selectedBeingID !== beingID ? beingID : null);
+  }
+
+  function onSelectItem(itemID) {
+    moves.selectItemCard(selectedItemID !== itemID ? itemID : null);
   }
 
   function onMove() {
@@ -169,6 +182,8 @@ function GameBoardWrapper({
       onSelectHand={onSelectHand}
       onSelectPartyPosition={handleOnSelectPartyPosition}
       onSelectLandscape={onSelectLandscape}
+      onSelectBeing={onSelectBeing}
+      onSelectItem={onSelectItem}
       onPlayCard={onPlayCard}
     />
   );

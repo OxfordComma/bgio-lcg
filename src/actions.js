@@ -78,6 +78,18 @@ export const createLandscapeSelected = (playerID, id) => ({
   id,
 });
 
+export const createBeingSelected = (playerID, id) => ({
+  type: "BEING_SELECTED",
+  playerID,
+  id,
+});
+
+export const createItemSelected = (playerID, id) => ({
+  type: "ITEM_SELECTED",
+  playerID,
+  id,
+});
+
 export const createAttack = (playerID, targetID, cardIDsToDiscard) => ({
   playerID,
   targetID,

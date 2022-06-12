@@ -62,8 +62,8 @@ const playerReducer = (state, action) => {
         ? {
             ...state,
             selectedPartyPosition: action.positionID,
-            selectedBeingID: action.beingID,
-            selectedItemID: action.itemID,
+            // selectedBeingID: action.beingID,
+            // selectedItemID: action.itemID,
           }
         : state;
     case "LANDSCAPE_SELECTED":
@@ -71,6 +71,21 @@ const playerReducer = (state, action) => {
         ? {
             ...state,
             selectedLandscapeID: action.id,
+          }
+        : state;
+
+    case "ITEM_SELECTED":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedItemID: action.id,
+          }
+        : state;
+    case "BEING_SELECTED":
+      return state.id === action.playerID
+        ? {
+            ...state,
+            selectedBeingID: action.id,
           }
         : state;
     case "ATTACK":

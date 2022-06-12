@@ -17,6 +17,8 @@ const removeResources = (old, change) =>
   );
 
 const emptyMaterialsBag = {
+  flax: 0,
+  food: 0,
   metal: 0,
   wood: 0,
   soul: 0,

@@ -7,12 +7,23 @@ import {
   selectBeingItems,
   selectPlayerBeingByPosition,
   selectSelectedPartyPosition,
+  selectSelectedItemID,
+  selectSelectedBeingID,
 } from "../selectors";
 
-function Being({ being, onSelect }) {
+function Being({ being, onSelectBeing, onSelectItem }) {
   const items = useSelector(({ G }) =>
     selectBeingItems(G, being.playerID, being.id)
   );
+
+  const selectedItemID = useSelector(({ G }) =>
+    selectSelectedItemID(G, being.playerID)
+  );
+
+  const selectedBeingID = useSelector(({ G }) =>
+    selectSelectedBeingID(G, being.playerID)
+  );
+
   return (
     <div className="being">
       {being && (
@@ -20,20 +31,16 @@ function Being({ being, onSelect }) {
           <SmallCard
             id={being.id}
             playerID={being.playerID}
-            onSelect={(cardID) => onSelect({ cardID, beingID: being.id })}
+            isSelected={being.id === selectedBeingID}
+            onSelect={() => onSelectBeing(being.id)}
           />
           {items.map((item) => (
             <SmallCard
               key={item.id}
               id={item.id}
               playerID={being.playerID}
-              onSelect={(cardID) =>
-                onSelect({
-                  cardID,
-                  beingID: being.id,
-                  itemID: item.id,
-                })
-              }
+              isSelected={item.id === selectedItemID}
+              onSelect={() => onSelectItem(item.id)}
             />
           ))}
         </>
@@ -42,7 +49,13 @@ function Being({ being, onSelect }) {
   );
 }
 
-function PartyPosition({ playerID, positionID, onSelect }) {
+function PartyPosition({
+  playerID,
+  positionID,
+  onSelectPartyPosition,
+  onSelectBeing,
+  onSelectItem,
+}) {
   const being = useSelector(({ G }) =>
     selectPlayerBeingByPosition(G, playerID, positionID)
   );
@@ -56,10 +69,15 @@ function PartyPosition({ playerID, positionID, onSelect }) {
         "party-position": true,
         "is-selected": isSelected,
       })}
-      onClick={() => onSelect({ positionID, beingCardID: being?.beingCardID })}
+      onClick={() => onSelectPartyPosition({ positionID: positionID })}
     >
       {being ? (
-        <Being playerID={playerID} being={being} onSelect={() => {}} />
+        <Being
+          playerID={playerID}
+          being={being}
+          onSelectBeing={onSelectBeing}
+          onSelectItem={onSelectItem}
+        />
       ) : (
         <div className="empty-slot" />
       )}
@@ -67,12 +85,19 @@ function PartyPosition({ playerID, positionID, onSelect }) {
   );
 }
 
-export function Battlefield({ playerID, opponentID, onSelectPartyPosition }) {
+export function Battlefield({
+  playerID,
+  opponentID,
+  onSelectPartyPosition,
+  onSelectBeing,
+  onSelectItem,
+}) {
   const positions = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
 
   const selectedPartyPosition = useSelector(({ G }) =>
     selectSelectedPartyPosition(G, playerID)
   );
+
   // Need to give each slot a unique id
   // and then attach each dude to a specific slot
   return (
@@ -100,7 +125,9 @@ export function Battlefield({ playerID, opponentID, onSelectPartyPosition }) {
               playerID={playerID}
               positionID={id}
               isSelected={id === selectedPartyPosition}
-              onSelect={onSelectPartyPosition}
+              onSelectPartyPosition={onSelectPartyPosition}
+              onSelectBeing={onSelectBeing}
+              onSelectItem={onSelectItem}
             />
           );
         })}

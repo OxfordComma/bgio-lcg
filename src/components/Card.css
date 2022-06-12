@@ -5,6 +5,9 @@
   padding: 8px;
   border: 1px solid #555;
   aspect-ratio: 1 / 1.6;
+  z-index: 5;
+  background: white;
+  z-index: 100;
 }
 
 .card.horizontal {
