@@ -32,6 +32,7 @@ import {
   canMoveOnLocation,
   selectLandscapeByID,
   hasPlayerSelectedDeck,
+  hasPlayerLost,
 } from "./selectors";
 import { generateDeckFromDecklist } from "./Cards";
 
@@ -145,6 +146,31 @@ function playCard(G, ctx, id) {
   );
 }
 
+function useCard(G, ctx, id) {
+  if (!id) return G;
+
+  console.log("use card:", id);
+
+  const card = selectCardByID(G, ctx.currentPlayer, id);
+
+  // Not sure if this will ever trigger - we check this before using the move
+  if (!canUseCard(G, ctx.currentPlayer, card)) {
+    console.log("Can't use this card. Missing Resources.", id);
+    return G;
+  }
+
+  return globalStateReducer(
+    G,
+    createCardUsed(
+      card,
+      ctx.currentPlayer,
+      selectSelectedPartyPosition(G, ctx.currentPlayer),
+      selectSelectedBeingID(G, ctx.currentPlayer),
+      selectSelectedLandscapeID(G, ctx.currentPlayer)
+    )
+  );
+}
+
 function attack(G, ctx) {
   const opponentID = selectOpponentID(G, ctx.currentPlayer);
   return globalStateReducer(
@@ -205,6 +231,10 @@ export const CardGame = {
     },
     playCard: {
       move: playCard,
+      // noLimit: true,
+    },
+    useCard: {
+      move: useCard,
       noLimit: true,
     },
     move: move,
@@ -213,10 +243,10 @@ export const CardGame = {
       move: selectDeck,
       noLimit: true,
     },
-    reset: {
-      move: reset,
-      noLimit: true,
-    },
+    // reset: {
+    //   move: reset,
+    //   noLimit: true,
+    // },
   },
   turn: {
     order: TurnOrder.RESET,
@@ -265,6 +295,9 @@ export const CardGame = {
             )
           )
         );
+      },
+      endIf: (G, ctx) => {
+        hasPlayerLost(G, "0") || hasPlayerLost(G, "1");
       },
     },
   },

@@ -169,5 +169,13 @@ export const canPlayCard = (G, playerID, card) => {
   }
 };
 
+export const canUseCard = (G, playerID, card) => {
+  return true;
+};
+
 export const hasPlayerSelectedDeck = (G, playerID) =>
   !!selectPlayer(G, playerID).deckSelected;
+
+export const hasPlayerLost = (G, playerID) => {
+  return selectPlayerLife(G, playerID) > 0;
+};

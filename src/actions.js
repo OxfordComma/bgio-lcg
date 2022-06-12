@@ -47,6 +47,21 @@ export const createCardPlayed = (
   targetLandscapeID,
 });
 
+export const createCardUsed = (
+  card,
+  playerID,
+  targetPartyPosition,
+  beingID,
+  targetLandscapeID
+) => ({
+  type: "CARD_USED",
+  card,
+  playerID,
+  targetPartyPosition,
+  beingID,
+  targetLandscapeID,
+});
+
 export const createPartyMoved = (playerID, desination) => ({
   type: "PARTY_MOVED",
   playerID,

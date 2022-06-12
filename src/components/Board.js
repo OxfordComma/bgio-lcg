@@ -10,6 +10,7 @@ import { GameInterface } from "./GameInterface";
 import "./Board.css";
 import {
   canPlayCard,
+  canUseCard,
   selectCardByID,
   selectOpponentID,
   selectSelectedHandCardID,
@@ -35,6 +36,7 @@ function GameBoard({
   onSelectHand,
   onSelectPartyPosition,
   onPlayCard,
+  onUseCard,
   onMove,
   onAttack,
   onEndTurn,
@@ -56,6 +58,7 @@ function GameBoard({
         move={onMove}
         attack={onAttack}
         onPlayCard={onPlayCard}
+        onUseCard={onUseCard}
         endTurn={onEndTurn}
         chatMessages={chatMessages}
       />
@@ -144,6 +147,18 @@ function GameBoardWrapper({
     sendChatMessage(`Played card ${card.name}`);
   }
 
+  // Checking the items slot for now
+  function onUseCard() {
+    const card = selectedItemID && selectCardByID(G, playerID, selectedItemID);
+
+    if (!card || !canUseCard(G, playerID, card)) {
+      console.log("Can't use this card.", selectedItemID);
+      return;
+    }
+    moves.useCard(selectedHandCardID);
+    sendChatMessage(`Used card ${card.name}`);
+  }
+
   const attack = () => {
     const totalStrength = selectTotalStrength(G, playerID);
     const totalArmor = selectTotalDefense(G, opponentID);
@@ -185,6 +200,7 @@ function GameBoardWrapper({
       onSelectBeing={onSelectBeing}
       onSelectItem={onSelectItem}
       onPlayCard={onPlayCard}
+      onUseCard={onUseCard}
     />
   );
 }
