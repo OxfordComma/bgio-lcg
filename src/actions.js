@@ -105,10 +105,20 @@ export const createItemSelected = (playerID, id) => ({
   id,
 });
 
-export const createAttack = (playerID, targetID, cardIDsToDiscard) => ({
+export const createAttack = (
   playerID,
   targetID,
-  cardIDsToDiscard,
+  attackerId,
+  defenderId,
+  damageToTake
+) => ({
+  type: "ATTACK",
+  playerID,
+  targetID,
+  attackerId,
+  defenderId,
+  // cardIDsToDiscard,
+  damageToTake,
 });
 
 export const createBeginTurn = (playerID, income, cardsDrawn) => ({

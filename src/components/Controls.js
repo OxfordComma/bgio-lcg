@@ -9,6 +9,7 @@ export default function Controls({
   onUseCard,
   move,
   attack,
+  goToCombat,
   endTurn,
   chatMessages,
 }) {
@@ -31,6 +32,14 @@ export default function Controls({
           }}
           disabled={!isPlayerTurn}
           text={"move"}
+        />
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            goToCombat();
+          }}
+          disabled={!isPlayerTurn}
+          text={"combat"}
         />
         <Button
           onClick={(e) => {

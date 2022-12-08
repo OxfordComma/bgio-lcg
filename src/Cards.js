@@ -233,7 +233,7 @@ const cardlist = [
     rarity: "common",
     element: "fire",
     stats: {
-      strength: 0,
+      strength: 2,
       armor: 0,
       agility: 0,
       will: 2,
@@ -384,8 +384,8 @@ const cardlist = [
     rarity: "common",
     element: "",
     stats: {
-      strength: 1,
-      armor: 1,
+      strength: 2,
+      armor: 0,
       agility: 0,
       will: 0,
     },
@@ -404,7 +404,7 @@ const cardlist = [
     element: "",
     stats: {
       strength: 0,
-      armor: 2,
+      armor: 1,
       agility: 0,
       will: 0,
     },
@@ -424,7 +424,7 @@ const cardlist = [
     stats: {
       strength: 0,
       armor: 0,
-      agility: 2,
+      agility: 0,
       will: 0,
     },
     traits: ["armor"],
@@ -440,12 +440,18 @@ const cardlist = [
     subtype: "",
     rarity: "common",
     element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
     traits: ["food"],
     text: "",
     materials: {
       food: 1,
     },
-    effect: {
+    onUse: {
       type: "use",
       healing: {
         amount: 2,
@@ -473,18 +479,23 @@ const cardlist = [
   },
   {
     number: 35,
-    name: "Firey Grenade",
+    name: "Fiery Grenade",
     type: "Item",
     subtype: "",
     rarity: "common",
     element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
     text: "3 damage {ranged} attack.",
     traits: ["ranged"],
     materials: {
       metal: 1,
     },
-    effect: {
-      type: "use",
+    onUse: {
       damage: {
         amount: 3,
       },
@@ -497,12 +508,40 @@ const cardlist = [
     subtype: "",
     rarity: "common",
     element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
     text: "Heal 3.",
     traits: ["potion"],
-    effect: {
-      type: "use",
+    onUse: {
       healing: {
         amount: 3,
+      },
+    },
+  },
+  {
+    number: 37,
+    name: "Little Strength Potion",
+    type: "Item",
+    subtype: "",
+    rarity: "common",
+    element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
+    text: "Strength +3",
+    traits: ["potion"],
+    onUse: {
+      buff: {
+        amount: 3,
+        stat: "strength",
+        // duration: 'endOfTurn'
       },
     },
   },
@@ -515,13 +554,18 @@ const cardlist = [
     subtype: "Sorcery",
     rarity: "common",
     element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
     text: "{Will} + 3 damage.",
     traits: ["spell"],
-    effect: {
+    onUse: {
       cost: {
         soul: 1,
       },
-      type: "use",
       damage: {
         amount: 3,
         statBonus: "will",
@@ -535,15 +579,17 @@ const cardlist = [
     subtype: "Sorcery",
     rarity: "common",
     element: "",
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
     text: "Target melee weapon you control gets +{will} strength.",
     traits: ["enchantment"],
-    effect: {
-      type: "ongoing",
-      stats: {
-        strength: "will",
-        armor: 0,
-        agility: 0,
-        will: 0,
+    onUse: {
+      damage: {
+        amount: 1,
       },
     },
   },
@@ -556,7 +602,13 @@ const cardlist = [
     element: "",
     text: "Heal {Will}+1. I bet that feels good.",
     traits: ["spell"],
-    effect: {
+    stats: {
+      strength: 0,
+      armor: 0,
+      agility: 0,
+      will: 0,
+    },
+    onUse: {
       type: "use",
       healing: {
         amount: 1,
@@ -577,7 +629,7 @@ const cardlist = [
   //   complete: {
   //     something
   //   },
-  //   effect: {
+  //   onUse: {
   //      something else
   //   },
   // },

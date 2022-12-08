@@ -11,6 +11,7 @@ import {
   selectPartyLocationID,
   selectSelectedHandCardID,
   selectSelectedLandscapeID,
+  selectOpponentID,
 } from "../selectors";
 
 function GridLocation({ playerID, landscape, showCanPlayCard, onSelect }) {
@@ -24,6 +25,11 @@ function GridLocation({ playerID, landscape, showCanPlayCard, onSelect }) {
     ({ G }) => landscape.id === selectPartyLocationID(G, playerID)
   );
 
+  const isEnemyPartyLocation = useSelector(
+    ({ G }) =>
+      landscape.id === selectPartyLocationID(G, selectOpponentID(G, playerID))
+  );
+
   return (
     <div
       onClick={(e) => {
@@ -34,6 +40,7 @@ function GridLocation({ playerID, landscape, showCanPlayCard, onSelect }) {
         "land-area": true,
         highlighted: isSelected,
         "party-location": isPartyLocation,
+        "enemy-party-location": isEnemyPartyLocation,
         "can-place-card": showCanPlayCard && canPlaceCard,
         ally: landscape.playerID === playerID,
         enemy: landscape.playerID && landscape.playerID !== playerID,

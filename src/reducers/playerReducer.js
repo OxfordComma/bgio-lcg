@@ -27,6 +27,7 @@ const playerReducer = (state, action) => {
           (id) => !action.drawnCards[state.id].includes(id)
         ),
         handIDs: [...state.handIDs, ...action.drawnCards[state.id]],
+        life: 20,
       };
     case "CARD_PLAYED":
       return state.id === action.playerID
@@ -41,30 +42,32 @@ const playerReducer = (state, action) => {
           }
         : state;
     case "CARD_USED":
-      if (action.card.effect.hasOwnProperty("damage")) {
+      if (action.card.onUse.hasOwnProperty("damage")) {
         // This will apply to all other players, not just the targeted opponent
         return state.id !== action.playerID
           ? {
               ...state,
-              deckIDs: state.deckIDs.slice(action.card.effect.damage.amount),
-              discardIDs: [
-                ...state.discardIDs,
-                ...state.deckIDs.slice(0, action.card.effect.damage.amount),
-              ],
+              life: state.life - parseInt(action.card.onUse.damage.amount),
+              // deckIDs: state.deckIDs.slice(action.card.effect.damage.amount),
+              // discardIDs: [
+              //   ...state.discardIDs,
+              //   ...state.deckIDs.slice(0, action.card.effect.damage.amount),
+              // ],
             }
           : state;
       }
-      if (action.card.effect.hasOwnProperty("healing")) {
+      if (action.card.onUse.hasOwnProperty("healing")) {
         return state.id === action.playerID
           ? {
               ...state,
-              deckIDs: [
-                ...state.deckIDs,
-                ...state.discardIDs.slice(action.card.effect.healing.amount),
-              ],
-              discardIDs: state.discardIDs.slice(
-                action.card.effect.healing.amount
-              ),
+              life: state.life + parseInt(action.card.onUse.healing.amount),
+              // deckIDs: [
+              //   ...state.deckIDs,
+              //   ...state.discardIDs.slice(action.card.effect.healing.amount),
+              // ],
+              // discardIDs: state.discardIDs.slice(
+              //   action.card.effect.healing.amount
+              // ),
             }
           : state;
       }
@@ -121,10 +124,11 @@ const playerReducer = (state, action) => {
       return state.id === action.targetID
         ? {
             ...state,
-            deckIDs: state.deckIDs.filter(
-              ({ id }) => !action.cardIDsToDiscard.includes(id)
-            ),
-            discardIDs: [...state.discardIDs, ...action.cardIDsToDiscard],
+            life: state.life - action.damageToTake,
+            // deckIDs: state.deckIDs.filter(
+            //   (id) => !action.cardIDsToDiscard.includes(id)
+            // ),
+            // discardIDs: [...state.discardIDs, ...action.cardIDsToDiscard],
           }
         : state;
     case "END_TURN":

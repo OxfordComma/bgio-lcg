@@ -51,17 +51,53 @@ export function CardDetails({ card }) {
   );
 }
 
-function CardSummary({ card }) {
+function CardSummary({ card, statChanges }) {
+  const strBuff = statChanges.strength ?? 0;
+  const armBuff = statChanges.armor ?? 0;
+  const agiBuff = statChanges.agility ?? 0;
+  const willBuff = statChanges.will ?? 0;
   return (
     <>
       <div className="card-name">{card?.name}</div>
       <div>{card.type + (card?.subtype && " - " + card.subtype)}</div>
       {card?.stats && (
         <div className="stats">
-          <div style={{ gridArea: "str" }}>S {card.stats.strength}</div>
-          <div style={{ gridArea: "arm" }}>D {card.stats.armor}</div>
-          <div style={{ gridArea: "agi" }}>A {card.stats.agility}</div>
-          <div style={{ gridArea: "will" }}>W {card.stats.will}</div>
+          <div
+            className={
+              strBuff > 0 ? "stat-buffed" : strBuff < 0 ? "stat-debuffed" : null
+            }
+            style={{ gridArea: "str" }}
+          >
+            St {card.stats.strength + strBuff}
+          </div>
+          <div
+            className={
+              armBuff > 0 ? "stat-buffed" : armBuff < 0 ? "stat-debuffed" : null
+            }
+            style={{ gridArea: "arm" }}
+          >
+            Ar {card.stats.armor + armBuff}
+          </div>
+          <div
+            className={
+              agiBuff > 0 ? "stat-buffed" : agiBuff < 0 ? "stat-debuffed" : null
+            }
+            style={{ gridArea: "agi" }}
+          >
+            Ag {card.stats.agility + agiBuff}
+          </div>
+          <div
+            className={
+              willBuff > 0
+                ? "stat-buffed"
+                : willBuff < 0
+                ? "stat-debuffed"
+                : null
+            }
+            style={{ gridArea: "will" }}
+          >
+            Wi {card.stats.will + willBuff}
+          </div>
         </div>
       )}
       {card?.production && (
@@ -158,8 +194,15 @@ export function CardWithTooltip({
   );
 }
 
-export function SmallCard({ playerID, id, isSelected, onSelect }) {
+export function SmallCard({
+  playerID,
+  id,
+  isSelected,
+  onSelect,
+  statChanges = {},
+}) {
   const card = useSelector(({ G }) => selectCardByID(G, playerID, id));
+
   return (
     <CardWithTooltip
       card={card}
@@ -167,7 +210,12 @@ export function SmallCard({ playerID, id, isSelected, onSelect }) {
       onSelect={onSelect}
       isHorizontal
     >
-      <CardSummary card={card} isSelected={isSelected} isHorizontal />
+      <CardSummary
+        card={card}
+        isSelected={isSelected}
+        statChanges={statChanges}
+        isHorizontal
+      />
     </CardWithTooltip>
   );
 }

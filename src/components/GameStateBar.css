@@ -1,9 +1,20 @@
-.gamestate > div {
+.gamestate {
+  display: grid;
+  grid-template-columns: 45% 10% 44%;
+  font-size: 0.85em;
+}
+
+.gamestate-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.gamestate > div > div {
   display: inline-block;
   margin: 5px;
 }
 
-.gamestate > div > div.resouceCount {
+.gamestate > div > div > div.resourceCount {
   display: inline-block;
   text-align: center;
   margin-left: 5px;
@@ -11,14 +22,16 @@
   min-width: 20px;
 }
 
-.gamestate > div.your-turn {
+.your-turn {
   text-align: center;
   margin-left: 5px;
-  background-color: green;
+  background-color: darkblue;
+  color: white;
 }
 
-.gamestate > div.opponent-turn {
+.opponent-turn {
   text-align: center;
   margin-left: 5px;
-  background-color: red;
+  background-color: darkred;
+  color: white;
 }

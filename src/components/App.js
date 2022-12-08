@@ -11,7 +11,7 @@ import React from "react";
 const CardGameClient = ForkedClient({
   game: CardGame,
   board: Board,
-  multiplayer: Local(),
+  // multiplayer: Local(),
   // multiplayer: SocketIO({ server: `http://${window.location.hostname}:8000`}),
 });
 

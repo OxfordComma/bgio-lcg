@@ -29,8 +29,21 @@
   background-color: yellow;
 }
 
+.land-area.party-location {
+  background-color: darkblue !important;
+}
+
+.land-area.enemy-party-location {
+  background-color: darkred !important;
+}
 .land-area.party-location > .card {
-  border-color: #0a1128;
-  border-width: 4px;
+  border-color: blue;
+  border-width: 5px;
+  margin: 1px;
+}
+
+.land-area.enemy-party-location > .card {
+  border-color: red;
+  border-width: 5px;
   margin: 1px;
 }

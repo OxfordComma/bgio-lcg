@@ -9,12 +9,28 @@ import {
   selectSelectedPartyPosition,
   selectSelectedItemID,
   selectSelectedBeingID,
+  selectCardByID,
 } from "../selectors";
 
 function Being({ being, onSelectBeing, onSelectItem }) {
   const items = useSelector(({ G }) =>
     selectBeingItems(G, being.playerID, being.id)
   );
+
+  const itemCards = useSelector(({ G }) =>
+    items.map((item) => selectCardByID(G, being.playerID, item.id))
+  );
+
+  const statChanges = {};
+  itemCards.map((card) => {
+    Object.keys(card.stats).map((stat) => {
+      if (!Object.keys(statChanges).includes(stat))
+        statChanges[stat] = card.stats[stat];
+      else statChanges[stat] += card.stats[stat];
+    });
+  });
+
+  // console.log('statChanges:', statChanges)
 
   const selectedItemID = useSelector(({ G }) =>
     selectSelectedItemID(G, being.playerID)
@@ -33,6 +49,7 @@ function Being({ being, onSelectBeing, onSelectItem }) {
             playerID={being.playerID}
             isSelected={being.id === selectedBeingID}
             onSelect={() => onSelectBeing(being.id)}
+            statChanges={statChanges}
           />
           {items.map((item) => (
             <SmallCard

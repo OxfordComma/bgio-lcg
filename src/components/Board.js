@@ -39,6 +39,7 @@ function GameBoard({
   onUseCard,
   onMove,
   onAttack,
+  goToCombat,
   onEndTurn,
 }) {
   return (
@@ -57,6 +58,7 @@ function GameBoard({
         playerID={playerID}
         move={onMove}
         attack={onAttack}
+        goToCombat={goToCombat}
         onPlayCard={onPlayCard}
         onUseCard={onUseCard}
         endTurn={onEndTurn}
@@ -91,6 +93,9 @@ function GameBoardWrapper({
   );
   const selectedItemID = useSelector(({ G }) =>
     selectSelectedItemID(G, playerID)
+  );
+  const opponentFrontRowBeing = useSelector(({ ctx }) =>
+    selectPlayerBeingByPosition(G, opponentID, 1)
   );
 
   function onSelectHand(cardID) {
@@ -159,28 +164,35 @@ function GameBoardWrapper({
     sendChatMessage(`Used card ${card.name}`);
   }
 
-  const attack = () => {
-    const totalStrength = selectTotalStrength(G, playerID);
-    const totalArmor = selectTotalDefense(G, opponentID);
-    const damage = Math.max(totalStrength - totalArmor, 0);
+  function goToCombat() {
+    moves.goToCombat();
+  }
 
-    moves.attack(sendChatMessage);
-    sendChatMessage(
-      `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${damage}`
-    );
+  function attack() {
+    // const totalStrength = selectTotalStrength(G, playerID);
+    // const totalArmor = selectTotalDefense(G, opponentID);
+    // const damage = Math.max(totalStrength - totalArmor, 0);
+    // const attacker = selectSelectedBeingID()
+    if (selectedBeingID)
+      moves.attack(selectedBeingID, opponentFrontRowBeing.id);
+    else console.log("No being selected");
+    // sendChatMessage(
+    //   `Attack! Strength: ${totalStrength}, Armor: ${totalArmor}, Damage: ${damage}`
+    // );
 
-    events.endTurn();
+    // events.endTurn();
+    // sendChatMessage(`end turn`);
+
+    // // for development
+    // if (window.location.pathname === `/${playerID}`) {
+    //   navigate(`/${opponentID}`);
+    // }
+  }
+
+  function endTurn() {
     sendChatMessage(`end turn`);
-
-    // for development
-    if (window.location.pathname === `/${playerID}`) {
-      navigate(`/${opponentID}`);
-    }
-  };
-  const endTurn = function () {
-    sendChatMessage(`end turn`);
     events.endTurn();
-  };
+  }
 
   return (
     <GameBoard
@@ -189,6 +201,7 @@ function GameBoardWrapper({
       chatMessages={chatMessages}
       onMove={onMove}
       onAttack={attack}
+      goToCombat={goToCombat}
       onEndTurn={endTurn}
       selectedHandCardID={selectedHandCardID}
       selectedLandscapeID={selectedLandscapeID}
@@ -236,7 +249,10 @@ export function Board({
           moves={moves}
           events={events}
           playerID={playerID}
-          sendChatMessage={sendChatMessage}
+          sendChatMessage={(msg) => {
+            console.log(msg);
+            sendChatMessage(msg);
+          }}
           chatMessages={chatMessages}
         />
       )}

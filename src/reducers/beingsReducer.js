@@ -49,6 +49,7 @@ export function beingsReducer(state = [], action) {
           playerID: action.playerID,
           beingCardID: action.startingBeingCardID,
           position: 1,
+          attackedThisTurn: false,
         },
       ];
     case "CARD_PLAYED":
@@ -61,11 +62,22 @@ export function beingsReducer(state = [], action) {
               playerID: action.playerID,
               beingCardID: action.card.id,
               position: action.targetPartyPosition,
+              attackedThisTurn: false,
             },
           ];
         default:
           return state;
       }
+    case "ATTACK":
+      // const attacker = state.find(being => being.id == action.attackerId)
+      // attacker.attackedThisTurn = true
+      return [
+        ...state.map((being) =>
+          being.id == action.attackerId
+            ? { ...being, attackedThisTurn: true }
+            : being
+        ),
+      ];
     default:
       return state || [];
   }

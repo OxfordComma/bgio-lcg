@@ -55,3 +55,11 @@
   display: flex;
   padding: 2px;
 }
+
+.stat-buffed {
+  color: green;
+}
+
+.stat-debuffed {
+  color: red;
+}

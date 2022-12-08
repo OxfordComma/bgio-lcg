@@ -3,6 +3,7 @@
   background-repeat: repeat;
 }
 
-/* .select-deck-menu .options {
-
-} */
+.select-deck-menu .options {
+  display: flex;
+  flex-direction: column;
+}
